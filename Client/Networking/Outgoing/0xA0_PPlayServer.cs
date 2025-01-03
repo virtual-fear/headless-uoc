@@ -1,0 +1,15 @@
+﻿namespace Client.Networking.Outgoing
+{
+    internal sealed class PPlayServer : Packet
+    {
+        public static Packet Instantiate(byte index)
+        {
+            Packet packet = new PPlayServer();
+            packet.Stream.Write((short)index);
+            packet.Stream.Fill();
+            return packet;
+        }
+
+        private PPlayServer() : base(0xA0, 3) { }
+    }
+}
