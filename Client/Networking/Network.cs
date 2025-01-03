@@ -20,10 +20,10 @@
     {
         public ConnectionAck Stage;
         public ConnectInfo() => Stage = ConnectionAck.FirstLogin;
-        public IPEndPoint? EndPoint;
-        public String? Username;
-        public String? Password;
-        public Int32 Seed;
+        public IPEndPoint? EndPoint = new IPEndPoint(IPAddress.None, -1);
+        public String? Username = string.Empty;
+        public String? Password = string.Empty;
+        public Int32 Seed = 0;
     }
 
     /// <summary>
