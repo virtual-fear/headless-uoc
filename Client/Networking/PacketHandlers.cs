@@ -2,7 +2,7 @@
 {
     using System;
     using Incoming;
-    public partial class PacketHandlers
+    public class PacketHandlers
     {
         private static PacketHandler[] RegisteredPacket = new PacketHandler[0x100];
         public static void Configure()

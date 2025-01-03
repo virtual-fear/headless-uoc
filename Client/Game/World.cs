@@ -6,6 +6,7 @@ using System.Text;
 namespace Client.Game
 {
     using Networking;
+    using global::Client.Networking.Incoming;
     using static Client.Networking.Incoming.PacketSink;
 
     public interface IEntity

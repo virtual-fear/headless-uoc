@@ -37,8 +37,8 @@ namespace Client.Networking
         public override bool Attach(Socket socket)
         {
             if (socket == null) { return false; }
-            var connection = new ConnectionEventArgs(socket, this);
-            if (connection.IsAllowed = socket.Connected)
+            var e = new ConnectionEventArgs(socket, this);
+            if (e.IsAllowed = socket.Connected)
             {
                 var lingerOption = socket.LingerState;
                 if (lingerOption != null)
@@ -64,11 +64,11 @@ namespace Client.Networking
                 {
                     throw new InvalidOperationException("Socket RemoteEndPoint is not an IPEndPoint.");
                 }
-                connection.IsReady = true;
+                e.IsReady = true;
                 Receive();
-                Network.Attach(connection);
             }
-            return connection.IsAllowed && connection.IsReady;
+            Network.Attach(e);
+            return e.IsAllowed && e.IsReady;
         }
         public override void Detach()
         {
@@ -113,7 +113,7 @@ namespace Client.Networking
                 }
             }
         }
-        private void    Receive()
+        private void Receive()
         {
             lock (Network.SharedLock)
             {

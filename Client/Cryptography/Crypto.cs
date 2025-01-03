@@ -1,7 +1,8 @@
 ﻿namespace Client.Cryptography
 {
-    using Client.Cryptography.Impl;
-    using Client.Networking.IO;
+    using global::Client.Networking.IO;
+    using Impl;
+
     public abstract class Crypto
     {
         public uint Seed { get; }

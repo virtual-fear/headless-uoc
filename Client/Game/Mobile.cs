@@ -1,13 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-namespace Client.Game
+﻿namespace Client.Game
 {
     using Client.Accounting;
-    using Client.Networking.Incoming;
-    using static Client.Networking.Incoming.PacketSink;
+    using global::Client.Networking.Incoming;
+    using static global::Client.Networking.Incoming.PacketSink;
 
     public enum Direction : byte
     {
