@@ -10,6 +10,7 @@ namespace Client.Networking
     using System.Runtime.InteropServices;
     using Accounting;
     using Arguments;
+    using Client.Cryptography.Impl;
     using Cryptography;
     using IO;
     using LoginAuth = Outgoing.LoginAuth;
@@ -21,14 +22,14 @@ namespace Client.Networking
         private Socket m_Socket;
         private IPAddress m_Address;
         private byte[] m_RecvBuffer;
-        private AsyncCallback m_RecvCallback;
-        private AsyncCallback m_SendCallback;
+        private AsyncCallback? m_RecvCallback;
+        private AsyncCallback? m_SendCallback;
         private BaseQueue m_Input = new InputQueue();
         private BaseQueue m_Output = new OutputQueue();
         private Crypto m_Crypto;
 
         private ConcurrentQueue<Packet> _packetQueue = new ConcurrentQueue<Packet>();
-        private Task _sendingTask;
+        private Task? _sendingTask;
         private bool _isSending;
         public override bool IsOpen => m_IsOpen;
         public override Crypto Crypto { get; set; }
@@ -137,7 +138,7 @@ namespace Client.Networking
                 if (m_Socket == null) { return; }
                 int length = m_Socket.EndReceive(asyncResult);
                 if (length <= 0) { return; }
-                lock (m_Crypto)
+                lock (m_Input)
                 {
                     m_Crypto.Decrypt(m_RecvBuffer, 0, length, m_Input);
                 }
@@ -146,7 +147,7 @@ namespace Client.Networking
             catch (SocketException ex)
             {
                 Logger.LogError(ex.Message);
-                Disconnected();
+                Detach();
             }
             catch (Exception exception)
             {
@@ -157,18 +158,20 @@ namespace Client.Networking
         {
             try
             {
+                if (!m_Socket.Connected)
+                    throw new SocketException((int)SocketError.ConnectionAborted);
+                
                 int length = m_Socket.EndSend(asyncResult);
                 if (length <= 0)
                 {
-                    Disconnected();
+                    Detach();
                     return;
                 }
+
                 OutputQueue output = (OutputQueue)m_Output;
                 var gram = output.Proceed();
                 if (gram == null)
-                {
                     return;
-                }
                 Send(gram);
             }
             catch (Exception exception)
@@ -230,7 +233,7 @@ namespace Client.Networking
             {
                 while (_packetQueue.TryDequeue(out Packet? packet))
                 {
-                    Logger.Log($"Client -> Server: {packet.GetType().Name} (0x{packet.ID:X2}) {(packet.Encode ? "(encoded)" : string.Empty)} {(packet.Fixed ? "(dynamic)" : string.Empty)}", color: ConsoleColor.Green);
+                    Logger.Log($"Client -> Server: {packet.GetType().Name} (0x{packet.ID:X2}, {packet.Length}) {(packet.Encode ? "(encoded)" : string.Empty)} {(packet.Fixed ? "(dynamic)" : string.Empty)}", ColorType.Success);
                     try
                     {
                         byte[] buffer = packet.Compile();
@@ -278,13 +281,13 @@ namespace Client.Networking
                         PacketHandler handler = PacketHandlers.GetHandler(packetID);
                         if (handler == null)
                         {
-                            Logger.Log($"Server -> Client: Unhandled packed (0x{packetID:X2}, {ip.GetPacketLength()})", color: ConsoleColor.Red);
+                            Logger.Log($"Server -> Client: Unhandled packed (0x{packetID:X2}, {ip.GetPacketLength()})", ColorType.Invalid);
                             PacketReader.Initialize(ip.Dequeue(ip.Count), false, (byte)packetID, "Unknown").Trace(true);
                             break;
                         }
 
                         int length = handler.Length <= 0 ? ip.GetPacketLength() : handler.Length;
-                        Logger.Log($"Server -> Client: {handler.Name} (0x{packetID:X2}, {handler.Length}).. length:{length} (done)", ConsoleColor.DarkCyan);
+                        Logger.Log($"Server -> Client: {handler.Name} (0x{packetID:X2}, {handler.Length}).. length:{length} (done)", ColorType.Success);
                         if (length < 3)
                         {
                             Logger.PushWarning("Detaching after receiving bad packet length!");
@@ -293,8 +296,9 @@ namespace Client.Networking
                         }
                         handler.Receive(this, PacketReader.Initialize(ip.Dequeue(length), handler));
                         var line = $"Completed slice with {length} bytes...({(IsOpen ? "still open" : "now closed")})\n";
-                        Logger.Log(line, color: IsOpen ? ConsoleColor.DarkYellow : ConsoleColor.DarkRed);
+                        Logger.Log(line, color: IsOpen ? ColorType.Info : ColorType.Invalid);
                     }
+
                 }
             }
         }

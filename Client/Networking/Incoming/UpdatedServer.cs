@@ -405,7 +405,7 @@ namespace Client.Networking.Incoming
             Logger.Log("Received the list of available servers");
             int entryIdx = 1;
             foreach(var entry in ServerData.Instance.ServerEntries)
-                Logger.Log($"  {entryIdx++}) {entry.Name} ({entry.PercentFull}%)", color: ConsoleColor.DarkCyan);
+                Logger.Log($"  {entryIdx++}) {entry.Name} ({entry.PercentFull}%)", ColorType.Info);
             PacketSink.InvokeServerListReceived(new ServerListReceivedEventArgs() { ServerListEntries = ServerData.Instance.ServerEntries });
         }
 
