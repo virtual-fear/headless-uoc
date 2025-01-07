@@ -1,16 +1,6 @@
-﻿namespace Client.Networking.Outgoing
+﻿namespace Client.Networking.Outgoing;
+public sealed class PRangeUpdate : Packet
 {
-    public sealed class PRangeUpdate : Packet
-    {
-        private PRangeUpdate()
-            : base(0xC8, 0x02) { }
-
-        public static void SendBy(NetState state) => state.Send(PRangeUpdate.Instantiate());
-        private static Packet Instantiate()
-        {
-            Packet packet = new PRangeUpdate();
-            packet.Stream.Write(18);
-            return packet;
-        }
-    }
+    private PRangeUpdate() : base(0xC8, 2) => base.Stream.Write(18);
+    public static void SendBy(NetState state) => state.Send(new PRangeUpdate());
 }

@@ -12,6 +12,11 @@
 	<IntermediateOutputPath>$(BaseIntermediateOutputPath)$(Configuration)\</IntermediateOutputPath>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Remove="Client\Networking\Snippets\**" />
+    <EmbeddedResource Remove="Client\Networking\Snippets\**" />
+    <None Remove="Client\Networking\Snippets\**" />
+  </ItemGroup>
+  <ItemGroup>
     <Compile Remove="Client\Game\Data\Configs.cs" />
   </ItemGroup>
 </Project>

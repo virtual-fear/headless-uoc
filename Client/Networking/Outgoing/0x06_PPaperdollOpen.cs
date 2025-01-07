@@ -1,15 +1,11 @@
-﻿namespace Client.Networking.Outgoing
+﻿namespace Client.Networking.Outgoing;
+public sealed class PPaperdollOpen : Packet
 {
-    public sealed class PPaperdollOpen : Packet
+    private PPaperdollOpen() : base(0x06, 5) { }
+    public static Packet Instantiate(int serial)
     {
-        private PPaperdollOpen()
-            : base(0x06, 5) { }
-     
-        public static Packet Instantiate(int serial)
-        {
-            Packet packet = new PPaperdollOpen();
-            packet.Stream.Write(serial | 0x7FFFFFFF);
-            return packet;
-        }
+        Packet packet = new PPaperdollOpen();
+        packet.Stream.Write(serial | 0x7FFFFFFF);
+        return packet;
     }
 }

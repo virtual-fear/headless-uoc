@@ -1,17 +1,12 @@
-﻿using Client.Game;
-
-namespace Client.Networking.Outgoing
+﻿namespace Client.Networking.Outgoing;
+using Client.Game;
+public sealed class PUseRequest : Packet
 {
-    public sealed class PUseRequest : Packet
+    private PUseRequest() : base(0x06, 5) { }
+    public static Packet Instantiate(IEntity entity)
     {
-        private PUseRequest()
-            : base(0x06, 5) { }
-        
-        public static Packet Instantiate(IEntity entity)
-        {
-            Packet packet = new PUseRequest();
-            packet.Stream.Write((int)entity.Serial);
-            return packet;
-        }
+        Packet packet = new PUseRequest();
+        packet.Stream.Write((int)entity.Serial);
+        return packet;
     }
 }

@@ -1,73 +1,40 @@
-﻿using System;
-using System.IO;
-using System.Reflection;
+﻿namespace Client.Networking;
 using Client.Diagnostics;
-
-namespace Client.Networking
+public class Packet
 {
-    [Obsolete]
-    public sealed class TicketAuth : Packet
+    public byte ID { get; }
+    public bool Fixed { get; }
+    public bool Encode { get; set; } = true;
+    public Int64 Length => Stream == null ? 0 : Stream.Length;
+    public PacketWriter Stream { get; }
+    public Packet(byte packetID, int length = -1)
     {
-        [Obsolete("Special login system used for UOGamers: Hybrid")]
-        private TicketAuth(ulong ticket)
-            : base(240)
-        {
-            base.Stream.Write((byte)0xdd);
-            base.Stream.Write((int)(ticket >> 0x20));
-            base.Stream.Write((int)ticket);
-            byte[] toWrite = null;
-            try
-            {   
-                toWrite = Assembly.GetExecutingAssembly().GetName().GetPublicKeyToken();
-            }
-            catch
-            {
-            }
-            if (toWrite == null)
-            {
-                toWrite = new byte[0];
-            }
-            base.Stream.Write(toWrite.Length);
-            base.Stream.Write(toWrite, 0, toWrite.Length);
-        }
-    }
+        // 0x00 : packetID
+        // 0x01 :   length << 8 (short #2)
+        // 0x02 :   length << 0 (short #1)
 
-    public class Packet
+        ID = packetID;
+
+        if (Fixed = (length <= 0))
+            length = 32;
+        
+        Stream = new PacketWriter(length);
+        Stream.Write((byte)packetID);
+        if (Fixed)
+            Stream.Write((ushort)0);
+
+        Type t = this.GetType();
+        PacketSendProfile.Acquire(t).Increment();
+    }
+    public byte[] Compile()
     {
-        public byte ID { get; }
-        public bool Fixed { get; }
-        public bool Encode { get; set; } = true;
-        public Int64 Length => Stream == null ? 0 : Stream.Length;
-        public PacketWriter Stream { get; }
-        public Packet(byte packetID, int length = -1)
+        if (Fixed)
         {
-            // 0x00 : packetID
-            // 0x01 :   length << 8 (short #2)
-            // 0x02 :   length << 0 (short #1)
-
-            ID = packetID;
-
-            if (Fixed = (length <= 0))
-                length = 32;
-            
-            Stream = new PacketWriter(length);
-            Stream.Write((byte)packetID);
-            if (Fixed)
-                Stream.Write((ushort)0);
-
-            Type t = this.GetType();
-            PacketSendProfile.Acquire(t).Increment();
+            Stream.Seek(1L, SeekOrigin.Begin);
+            Stream.Write((ushort)Stream.Length);
         }
-        public byte[] Compile()
-        {
-            if (Fixed)
-            {
-                Stream.Seek(1L, SeekOrigin.Begin);
-                Stream.Write((ushort)Stream.Length);
-            }
-            Stream.Flush();
-            return Stream.Compile();
-        }
-        public override string ToString() => $"{GetType().Name} (0x{ID:X2}, {Length})";
+        Stream.Flush();
+        return Stream.Compile();
     }
+    public override string ToString() => $"{GetType().Name} (0x{ID:X2}, {Length})";
 }

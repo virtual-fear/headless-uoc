@@ -1,10 +1,9 @@
-﻿using System;
-using System.Net.Sockets;
+﻿using System.Net.Sockets;
 
 namespace Client.Networking
 {
+    using Client.IO;
     using Cryptography;
-    using IO;
     public abstract class Receiver
     {
         public AsyncCallback Callback { get; }

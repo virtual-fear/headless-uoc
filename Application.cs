@@ -24,13 +24,16 @@ namespace Client
 
             Console.OutputEncoding = Encoding.UTF8;
             Logger.Log($"[https://github.com/godot-this/uo-assistant]", LogColor.Success);
-            string version = $"Version: {Version.Major}.{Version.Minor}.{Version.Build}.{Version.Revision}";
-            if (Version.Major > 0)
-                version += " (release)";
-            else if (Version.Build == 1)
-                version += " (alpha)";
-            else if (Version.Build >= 2)
-                version += " (alpha + new features)";
+
+            string majorType = Version.Major switch
+            {
+                > 0 => "release",
+                0 when Version.Build == 1 => "alpha",
+                0 when Version.Build >= 2 => "alpha + new features",
+                _ => "dev build"
+            };
+
+            string version = $"Version: {Version.Major}.{Version.Minor}.{Version.Build}.{Version.Revision} ({majorType})";
             Logger.Log(version, LogColor.Info);
             Logger.Log($"Running on {RuntimeInformation.FrameworkDescription}", LogColor.Info);
 
@@ -55,7 +58,7 @@ namespace Client
         ///     The main entry point for the client application. 
         ///     <para>This method initiates the asynchronous processing of the application and waits indefinitely for tasks to complete.</para>
         /// </summary>
-        /// <returns>A <see cref="Task"</see>> representing the asynchronous operation.</returns>
+        /// <returns>A <see cref="Task" /> representing the asynchronous operation.</returns>
         static async Task WaitIndefinitely() => await Task.Delay(-1);
     }
 }

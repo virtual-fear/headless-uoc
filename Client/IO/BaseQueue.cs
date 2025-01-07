@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Client.Networking.IO
+namespace Client.IO
 {
     public interface IConsolidator
     {
@@ -11,6 +11,6 @@ namespace Client.Networking.IO
         public abstract void Enqueue(byte[] buffer, int offset, int length);
         public abstract ArraySegment<byte> Dequeue(int size);
         public abstract void Clear();
-        public abstract Int32 Count { get; }
+        public abstract int Count { get; }
     }
 }

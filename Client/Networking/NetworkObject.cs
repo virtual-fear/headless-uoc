@@ -11,9 +11,10 @@ namespace Client.Networking
     using Accounting;
     using Arguments;
     using Client.Cryptography.Impl;
+    using Client.IO;
     using Cryptography;
     using IO;
-    using LoginAuth = Outgoing.LoginAuth;
+    using PLoginAccount = Outgoing.PLoginAccount;
     public sealed class NetworkObject : NetState
     {
         public bool Rebuild { get; private set; } = true;
@@ -150,7 +151,8 @@ namespace Client.Networking
             }
             catch (SocketException ex)
             {
-                Logger.LogError(ex.Message);
+                Logger.PushWarning(ex.Message);
+
                 Detach();
             }
             catch (Exception exception)
@@ -198,7 +200,7 @@ namespace Client.Networking
                 }
             }
         }
-        public override void Send(Packet packet)
+        public override void Send(Packet? packet)
         {
             if (packet == null)
                 throw new ArgumentNullException(nameof(packet));
@@ -222,10 +224,10 @@ namespace Client.Networking
             if (account == null) 
                 throw new ArgumentNullException("account", "Invalid account login.");
             
-            var e = new LoginAuth.LoginAuthEventArgs(this, account.Username, account.Password);
+            var e = new PLoginAccount.LoginAuthEventArgs(this, account.Username, account.Password);
             try
             {
-                Send(LoginAuth.Instantiate(e));
+                Send(PLoginAccount.Instantiate(e));
                 Account = account;
                 return true;
             }

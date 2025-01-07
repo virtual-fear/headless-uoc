@@ -4,6 +4,7 @@ namespace Client.Networking
 {
     using System.Runtime.CompilerServices;
     using Accounting;
+    using Client.IO;
     using Client.Networking.Arguments;
     using Cryptography;
     using IO;

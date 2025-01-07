@@ -12,8 +12,8 @@ namespace Client
     using Client.Networking.Incoming;
     using Client.Networking.Outgoing;
     using static Client.Networking.Incoming.PacketSink;
-    using static Client.Networking.Outgoing.LoginAuth;
-    using static Client.Networking.Outgoing.SecondLoginAuth;
+    using static Client.Networking.Outgoing.PLoginAccount;
+    using static Client.Networking.Outgoing.PLoginGame;
 
     public enum SocketStage
     {
@@ -33,9 +33,7 @@ namespace Client
     /// </summary>
     public partial class Assistant : Network
     {
-        // When the State is constructed, the network is attached to the socket.
-        // When the network is attached, the network cycle is run.
-        // When the network cycle is run, the network is sliced.
+        public static readonly Version ClientVersion = new Version(7, 0, 106, 21);
 
         static Assistant()
         {

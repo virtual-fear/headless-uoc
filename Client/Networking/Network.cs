@@ -8,8 +8,8 @@
     using Client.Networking.Incoming;
     using Client.Networking.Outgoing;
     using static Client.Networking.Incoming.PacketSink;
-    using static Client.Networking.Outgoing.LoginAuth;
-    using static Client.Networking.Outgoing.SecondLoginAuth;
+    using static Client.Networking.Outgoing.PLoginAccount;
+    using static Client.Networking.Outgoing.PLoginGame;
 
     public enum ConnectionAck
     {
@@ -86,7 +86,7 @@
 
         private static void Network_OnDetach(NetState ns)
         {
-            Logger.Log(ns.Address, "Detached network state", LogColor.Error);
+            Logger.PushWarning($"{ns.Address}: Detached network state");
 
             // Reconnect with the seed
             Task.Run(AsyncConnect);
@@ -110,31 +110,22 @@
 
                     PInitialSeed.SendBy(State);
                     State.Slice();
+                    // TODO: Build an account event management system
                     State.Login(new Account(username, password));
-                    //State.Send(LoginAuth.Instantiate(new LoginAuthEventArgs(State, info.Username, info.Password)));
                     e.IsAllowed = true;
                     break;
                 case ConnectionAck.SecondLogin:
                     Logger.Log($"{e.State.Address}: Sending ack response.", LogColor.Magenta);
-                    //Int32 v = info.Seed;
-                    //Span<byte> b = stackalloc byte[4] {
-                    //               (byte)(v >> 0x18),	// 24
-                    //				  (byte)(v >> 0x10),	// 16 
-                    //				  (byte)(v >> 0x08),    //  8
-                    //				  (byte)(v >> 0x00)     // 00
-                    //           };
-                    //Socket.Send(b);
                     State.Crypto = new GameCrypto();
                     UInt32 v = info.Seed;
                     Span<byte> b = stackalloc byte[4] {
-                        (byte)(v >> 0x18),	// 24
-                        (byte)(v >> 0x10),	// 16 
-                        (byte)(v >> 0x08),  //  8
-                        (byte)(v >> 0x00)   // 00
+                        (byte)(v >> 0x18),
+                        (byte)(v >> 0x10),
+                        (byte)(v >> 0x08),
+                        (byte)(v >> 0x00)
                     };
-                    Socket.Send(b);
-                    //packet.Stream.Write(b.ToArray(), 0, b.Length);
-                    State.Send(SecondLoginAuth.Instantiate(new SecondLoginAuthEventArgs(State, username, password, info.Seed)));
+                    Socket.Send(b); // Seed needs to be sent after GameCrypto
+                    State.Send(PLoginGame.Instantiate(new SecondLoginAuthEventArgs(State, username, password, info.Seed)));
                     break;
             }
         }
@@ -209,5 +200,4 @@
 
         #endregion
     }
-
 }
