@@ -23,7 +23,7 @@
         public IPEndPoint EndPoint = new IPEndPoint(IPAddress.None, 0);
         public String? Username = string.Empty;
         public String? Password = string.Empty;
-        public Int32 Seed = 0;
+        public UInt32 Seed = 0;
     }
 
     /// <summary>
@@ -49,11 +49,11 @@
             if (Socket == null || Socket.Blocking)
                 Socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
             IAsyncResult asyncResult = Socket.BeginConnect(serverEP, null, null);
-            Logger.Log(processName, $"Establishing connection with {serverEP}", ColorType.Info);
+            Logger.Log(processName, $"Establishing connection with {serverEP}", LogColor.Info);
             try
             {
                 Socket.EndConnect(asyncResult);
-                Logger.Log(processName, $"Connected to {serverEP.Address}", ColorType.Success);
+                Logger.Log(processName, $"Connected to {serverEP.Address}", LogColor.Success);
                 Network.Connect(new SocketEventArgs(Socket));
                 if ((State != null) && State.Attach(Socket))
                 {
@@ -86,14 +86,14 @@
 
         private static void Network_OnDetach(NetState ns)
         {
-            Logger.Log(ns.Address, "Detached network state", ColorType.Error);
+            Logger.Log(ns.Address, "Detached network state", LogColor.Error);
 
             // Reconnect with the seed
             Task.Run(AsyncConnect);
         }
         private static void Network_OnAttach(ConnectionEventArgs e)
         {
-            Logger.Log(Application.ProcessName, $"{e.State.Address} attached to network state.", ColorType.Info);
+            Logger.Log(Application.ProcessName, $"{e.State.Address} attached to network state.", LogColor.Info);
             ConnectInfo info = Network.Info;
             string username = info.Username ?? string.Empty;
             string password = info.Password ?? string.Empty;
@@ -105,27 +105,41 @@
             switch (info.Stage)
             {
                 case ConnectionAck.FirstLogin:
-                    PSeed.SendBy(State, State.Address.ToUInt32());
+                    if (State == null)
+                        throw new ArgumentNullException(nameof(State));
+
+                    PInitialSeed.SendBy(State);
+                    State.Slice();
                     State.Login(new Account(username, password));
                     //State.Send(LoginAuth.Instantiate(new LoginAuthEventArgs(State, info.Username, info.Password)));
                     e.IsAllowed = true;
                     break;
                 case ConnectionAck.SecondLogin:
-                    Logger.Log($"{e.State.Address}: Sending ack response.", ColorType.Special);
+                    Logger.Log($"{e.State.Address}: Sending ack response.", LogColor.Magenta);
                     //Int32 v = info.Seed;
-                    //           Span<byte> b = stackalloc byte[4] {
+                    //Span<byte> b = stackalloc byte[4] {
                     //               (byte)(v >> 0x18),	// 24
                     //				  (byte)(v >> 0x10),	// 16 
                     //				  (byte)(v >> 0x08),    //  8
                     //				  (byte)(v >> 0x00)     // 00
                     //           };
-                    //           Socket.Send(b);
+                    //Socket.Send(b);
                     State.Crypto = new GameCrypto();
+                    UInt32 v = info.Seed;
+                    Span<byte> b = stackalloc byte[4] {
+                        (byte)(v >> 0x18),	// 24
+                        (byte)(v >> 0x10),	// 16 
+                        (byte)(v >> 0x08),  //  8
+                        (byte)(v >> 0x00)   // 00
+                    };
+                    Socket.Send(b);
+                    //packet.Stream.Write(b.ToArray(), 0, b.Length);
                     State.Send(SecondLoginAuth.Instantiate(new SecondLoginAuthEventArgs(State, username, password, info.Seed)));
                     break;
             }
         }
-        private static void Network_OnConstruct(NetState ns) => Logger.Log(Application.ProcessName, "Constructed network state.", ColorType.Info);
+
+        private static void Network_OnConstruct(NetState ns) => Logger.Log(Application.ProcessName, "Constructed network state.", LogColor.Info);
         private static void Network_OnDisconnect(SocketEventArgs e) => Console.WriteLine(Application.ProcessName, $"{e.Address} disconnected from the server.");
         private static void Network_OnConnect(SocketEventArgs e) => State ??= new NetworkObject();
     }

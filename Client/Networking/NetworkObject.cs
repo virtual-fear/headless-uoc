@@ -32,7 +32,11 @@ namespace Client.Networking
         private Task? _sendingTask;
         private bool _isSending;
         public override bool IsOpen => m_IsOpen;
-        public override Crypto Crypto { get; set; }
+        public override Crypto Crypto
+        {
+            get => m_Crypto;
+            set => m_Crypto = value;
+        }
         public override IPAddress Address => m_Address;
         public override BaseQueue Input => m_Input;
         public override bool Attach(Socket socket)
@@ -179,12 +183,13 @@ namespace Client.Networking
                 InternalFailure(exception);
             }
         }
-        private void Send(byte[] buffer)
+        private void Send(byte[]? buffer)
         {
             if (m_IsOpen && (buffer != null))
             {
                 try
                 {
+                    Utility.FormatBuffer(Console.Out, buffer, ConsoleColor.DarkMagenta);
                     m_Socket.BeginSend(buffer, 0, buffer.Length, SocketFlags.None, m_SendCallback, null);
                 }
                 catch (Exception exception)
@@ -233,7 +238,7 @@ namespace Client.Networking
             {
                 while (_packetQueue.TryDequeue(out Packet? packet))
                 {
-                    Logger.Log($"Client -> Server: {packet.GetType().Name} (0x{packet.ID:X2}, {packet.Length}) {(packet.Encode ? "(encoded)" : string.Empty)} {(packet.Fixed ? "(dynamic)" : string.Empty)}", ColorType.Success);
+                    Logger.Log($"Client -> Server: {packet.GetType().Name} (0x{packet.ID:X2}, {packet.Length}) {(packet.Encode ? "(encoded)" : string.Empty)} {(packet.Fixed ? "(dynamic)" : string.Empty)} ({m_Crypto})", LogColor.Magenta);
                     try
                     {
                         byte[] buffer = packet.Compile();
@@ -252,7 +257,7 @@ namespace Client.Networking
                             {
                                 if (m_Output != null)
                                 {
-                                    Send(((OutputQueue)m_Output).Query());
+                                    Send(((OutputQueue)m_Output).Proceed());
                                 }
                             });
                         }
@@ -281,24 +286,25 @@ namespace Client.Networking
                         PacketHandler handler = PacketHandlers.GetHandler(packetID);
                         if (handler == null)
                         {
-                            Logger.Log($"Server -> Client: Unhandled packed (0x{packetID:X2}, {ip.GetPacketLength()})", ColorType.Invalid);
+                            Logger.Log($"Server -> Client: Unhandled packed (0x{packetID:X2}, {ip.GetPacketLength()})", LogColor.Invalid);
                             PacketReader.Initialize(ip.Dequeue(ip.Count), false, (byte)packetID, "Unknown").Trace(true);
                             break;
                         }
 
                         int length = handler.Length <= 0 ? ip.GetPacketLength() : handler.Length;
-                        Logger.Log($"Server -> Client: {handler.Name} (0x{packetID:X2}, {handler.Length}).. length:{length} (done)", ColorType.Success);
+                        Logger.Log($"Server -> Client: {handler.Name} (0x{packetID:X2}, {handler.Length}).. length:{length} (done)", LogColor.Success);
                         if (length < 3)
                         {
                             Logger.PushWarning("Detaching after receiving bad packet length!");
                             Detach();
                             break;
                         }
-                        handler.Receive(this, PacketReader.Initialize(ip.Dequeue(length), handler));
+                        ArraySegment<byte> segment = ip.Dequeue(length);
+                        Utility.FormatBuffer(Console.Out, segment.Array, color: ConsoleColor.DarkGreen);
+                        handler.Receive(this, PacketReader.Initialize(segment, handler));
                         var line = $"Completed slice with {length} bytes...({(IsOpen ? "still open" : "now closed")})\n";
-                        Logger.Log(line, color: IsOpen ? ColorType.Info : ColorType.Invalid);
+                        Logger.Log(line, color: IsOpen ? LogColor.Info : LogColor.Invalid);
                     }
-
                 }
             }
         }

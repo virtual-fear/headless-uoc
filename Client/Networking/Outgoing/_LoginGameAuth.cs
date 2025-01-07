@@ -57,8 +57,8 @@ namespace Client.Networking.Outgoing
             public NetState State { get; }
             public string Username { get; }
             public string Password { get; }
-            public int Seed { get; }
-            public SecondLoginAuthEventArgs(NetState state, string username, string password, int seed)
+            public uint Seed { get; }
+            public SecondLoginAuthEventArgs(NetState state, string username, string password, uint seed)
             {
                 State = state;
                 Username = username;
@@ -80,7 +80,7 @@ namespace Client.Networking.Outgoing
             Packet packet = new SecondLoginAuth();
             if (e.Allowed)
             {
-                packet.Stream.Write(e.Seed);
+                packet.Stream.WriteUInt32_BE(e.Seed);
                 packet.Stream.WriteAsciiFixed(un, 30);
                 packet.Stream.WriteAsciiFixed(pw, 30);
                 packet.Stream.Fill();
@@ -89,7 +89,7 @@ namespace Client.Networking.Outgoing
             return null;
         }
         private SecondLoginAuth()
-            : base(0x91, 65) => Encode = false;
+            : base(0x91, 65) => Encode = true;
     }
 
     public delegate void GameAuthEventHandler(GameAuthEventArgs e);

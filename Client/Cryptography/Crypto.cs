@@ -11,5 +11,6 @@
         public abstract void Encrypt(byte[] buffer, int offset, int length, IConsolidator output);
         public abstract void Decrypt(byte[] buffer, int offset, int length, IConsolidator output);
         public abstract int Decode(byte[] src, int srcOffset, byte[] dst, int dstOffset, int length);
+        public override string ToString() => GetType().Name;
     }
 }

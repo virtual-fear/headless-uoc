@@ -176,8 +176,8 @@ namespace Client.Networking.Incoming
         {
             public uint Addr { get; }
             public short Port { get; }
-            public int Seed { get; }
-            internal ServerAckEventArgs(uint addr, short port, int seed)
+            public uint Seed { get; }
+            internal ServerAckEventArgs(uint addr, short port, uint seed)
             {
                 Addr = addr;
                 Port = port;
@@ -405,7 +405,7 @@ namespace Client.Networking.Incoming
             Logger.Log("Received the list of available servers");
             int entryIdx = 1;
             foreach(var entry in ServerData.Instance.ServerEntries)
-                Logger.Log($"  {entryIdx++}) {entry.Name} ({entry.PercentFull}%)", ColorType.Info);
+                Logger.Log($"  {entryIdx++}) {entry.Name} ({entry.PercentFull}%)", LogColor.Info);
             PacketSink.InvokeServerListReceived(new ServerListReceivedEventArgs() { ServerListEntries = ServerData.Instance.ServerEntries });
         }
 
@@ -419,7 +419,7 @@ namespace Client.Networking.Incoming
         { 
             uint rawAddress = pvSrc.ReadUInt32LE();
             short port = pvSrc.ReadInt16();
-            int seed = pvSrc.ReadInt32();
+            uint seed = pvSrc.ReadUInt32();
             PacketSink.InvokeServerAck(new ServerAckEventArgs(rawAddress, port, seed));
         }
         public static void Register(int packetID, int length, bool ingame, OnPacketReceive receive)

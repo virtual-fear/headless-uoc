@@ -7,6 +7,14 @@ namespace Client
 {
     public static class Utility
     {
+        public static void FormatBuffer(TextWriter output, byte[] buffer, ConsoleColor color = ConsoleColor.Cyan)
+        {
+            var lastColor = Console.ForegroundColor;
+            Console.ForegroundColor = color;
+            using Stream input = new MemoryStream(buffer);
+            FormatBuffer(Console.Out, input, buffer.Length);
+            Console.ForegroundColor = lastColor;
+        }
         public static void FormatBuffer(TextWriter output, Stream input, int length)
         {
             output.WriteLine("        0  1  2  3  4  5  6  7   8  9  A  B  C  D  E  F");

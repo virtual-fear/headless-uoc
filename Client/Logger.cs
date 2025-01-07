@@ -1,6 +1,6 @@
 ﻿namespace Client
 {
-    public enum ColorType
+    public enum LogColor
     {
         None = ConsoleColor.Gray,
         Info = ConsoleColor.DarkYellow,
@@ -8,8 +8,10 @@
         Error = ConsoleColor.DarkRed,
         Warning = ConsoleColor.Yellow,
         Success = ConsoleColor.Green,
-        Special = ConsoleColor.Magenta
+        Magenta = ConsoleColor.Magenta,
+        DarkMagenta = ConsoleColor.DarkMagenta,
     }
+
     internal static class Logger
     {
         public static event EventHandler<string>? OnLog;
@@ -22,41 +24,26 @@
             Logger.OnLogError += Logger_OnLogError;
             Logger.OnPushWarning += Logger_OnPushWarning;
         }
-
-        private static void InternalLog(ColorType type, object? sender, string e)
+        private static void InternalLog(LogColor type, object? sender, string text)
         {
-            if (type != ColorType.None)
+            var typeColor = (ConsoleColor)type;
+            switch(type)
             {
-                Console.ForegroundColor = (ConsoleColor)type;
-                string typeText = string.Empty;
-                if (type == ColorType.Info)
-                    typeText = "[INFO]";
-                else if (type == ColorType.Error)
-                    typeText = "[ERROR]";
-                else if (type == ColorType.Warning)
-                    typeText = "[WARNING]";
-                Console.Write(typeText + ' ');
+                case LogColor.Info: typeColor.Write("[INFO] "); break;
+                case LogColor.Error: typeColor.Write("[ERROR] "); break;
+                case LogColor.Warning: typeColor.Write("[WARNING] "); break;
+                case LogColor.None:
+                default: break;
             }
-            if (sender is ColorType c)
-            {
-                var color = (ConsoleColor)c;
-                if (color != Console.ForegroundColor)
-                    Console.ForegroundColor = color;
-            }
-            else
-            {
-                Console.ForegroundColor = ConsoleColor.DarkGray;
-            }
-            Console.WriteLine(e);
-            if (sender != null)
-                Console.ResetColor();
+            if (sender is ConsoleColor || sender is LogColor)
+                ((ConsoleColor)sender).WriteLine(text);
         }
-        private static void Logger_OnPushWarning(object? sender, string e) => InternalLog(ColorType.Warning, sender, e);
-        private static void Logger_OnLogError(object? sender, string e) => InternalLog(ColorType.Error, sender, e);
-        private static void Logger_OnLog(object? sender, string e) => InternalLog(ColorType.None, sender, e);
-        public static void Log(bool indent, string what, ColorType color) => Log($"{(indent ? new string(' ', 3) : string.Empty)}{what}", color);
-        public static void Log(object o, string what, ColorType color) => Log($"{Name(o)}: {what}", color);
-        public static void Log(string what, ColorType color) => OnLog?.Invoke(color, what);
+        private static void Logger_OnPushWarning(object? sender, string e) => InternalLog(LogColor.Warning, sender, e);
+        private static void Logger_OnLogError(object? sender, string e) => InternalLog(LogColor.Error, sender, e);
+        private static void Logger_OnLog(object? sender, string e) => InternalLog(LogColor.None, sender, e);
+        public static void Log(bool indent, string what, LogColor color) => Log($"{(indent ? new string(' ', 3) : string.Empty)}{what}", color);
+        public static void Log(object o, string what, LogColor color) => Log($"{Name(o)}: {what}", color);
+        public static void Log(string what, LogColor color) => OnLog?.Invoke(color, what);
         public static void Log(string what = "") => OnLog?.Invoke(null, what);
         public static void Log(object o, string what) => Log($"{Name(o)}: {what}");
         public static void LogError(string what) => OnLogError?.Invoke(null, what);

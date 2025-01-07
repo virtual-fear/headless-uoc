@@ -17,7 +17,7 @@ namespace Client.Networking
             base.Stream.Write((int)ticket);
             byte[] toWrite = null;
             try
-            {
+            {   
                 toWrite = Assembly.GetExecutingAssembly().GetName().GetPublicKeyToken();
             }
             catch
@@ -37,7 +37,7 @@ namespace Client.Networking
         public byte ID { get; }
         public bool Fixed { get; }
         public bool Encode { get; set; } = true;
-        public Int64 Length => Stream == null ? 0 : Stream.Count;
+        public Int64 Length => Stream == null ? 0 : Stream.Length;
         public PacketWriter Stream { get; }
         public Packet(byte packetID, int length = -1)
         {
@@ -46,13 +46,14 @@ namespace Client.Networking
             // 0x02 :   length << 0 (short #1)
 
             ID = packetID;
-            if (Fixed = (length == -1))
+
+            if (Fixed = (length <= 0))
                 length = 32;
             
             Stream = new PacketWriter(length);
-            Stream.Write(packetID);
+            Stream.Write((byte)packetID);
             if (Fixed)
-                Stream.Write((short)0);
+                Stream.Write((ushort)0);
 
             Type t = this.GetType();
             PacketSendProfile.Acquire(t).Increment();
@@ -62,7 +63,7 @@ namespace Client.Networking
             if (Fixed)
             {
                 Stream.Seek(1L, SeekOrigin.Begin);
-                Stream.Write((ushort)Stream.Count);
+                Stream.Write((ushort)Stream.Length);
             }
             Stream.Flush();
             return Stream.Compile();

@@ -18,22 +18,30 @@ namespace Client.Networking.IO
             }
         }
         public override int Count => Queue.Count;
-        public byte[] Proceed()
+        public byte[]? Proceed()
         {
             lock (Chain)
             {
                 IsBusy = true;
-                if (Queue.Count > 0)
-                    Queue.RemoveAt(0);
-               
-                if (Queue.Count > 0)
-                    return Queue[0];
-                
-                IsBusy = false;
+                try
+                {
+                    if (Queue.Count > 0)
+                    {
+                        var buff = Queue[0];
+                        Queue.RemoveAt(0);
+                        IsBusy = false;
+                        return buff;
+                    }
+                }
+                finally
+                {
+                    if (Queue.Count == 0)
+                        IsBusy = false;
+                }
                 return null;
             }
         }
-        public byte[] Query()
+        public byte[]? Query()
         {
             lock (Chain)
             {

@@ -12,22 +12,18 @@ namespace Client
         public static Process Process { get; } = Process.GetCurrentProcess();
         public static string ProcessName { get; private set; } = nameof(Client);
         public static Thread? Thread { get; private set; }
-        public static SynchronizationContext? LoopContext { get; private set; }
         static Application() => Configure(Process);
         private static void Configure(Process process)
         {
             ProcessName = process.ProcessName;
             Thread = Thread.CurrentThread;
             Thread.Name = "Game Thread";
-            LoopContext = new EventLoopContext();
-            SynchronizationContext.SetSynchronizationContext(LoopContext);
 
             AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
             AppDomain.CurrentDomain.ProcessExit += CurrentDomain_ProcessExit;
-            
-            Console.OutputEncoding = Encoding.UTF8;
 
-            Logger.Log($"[https://github.com/godot-this/uo-assistant]", ColorType.Success);
+            Console.OutputEncoding = Encoding.UTF8;
+            Logger.Log($"[https://github.com/godot-this/uo-assistant]", LogColor.Success);
             string version = $"Version: {Version.Major}.{Version.Minor}.{Version.Build}.{Version.Revision}";
             if (Version.Major > 0)
                 version += " (release)";
@@ -35,8 +31,8 @@ namespace Client
                 version += " (alpha)";
             else if (Version.Build >= 2)
                 version += " (alpha + new features)";
-            Logger.Log(version, ColorType.Info);
-            Logger.Log($"Running on {RuntimeInformation.FrameworkDescription}", ColorType.Info);
+            Logger.Log(version, LogColor.Info);
+            Logger.Log($"Running on {RuntimeInformation.FrameworkDescription}", LogColor.Info);
 
             // Setup the assistant
             Assistant.Configure();
@@ -44,15 +40,12 @@ namespace Client
             // Run the assistant
             Assistant.AsyncConnect();
         }
-
         private static void CurrentDomain_ProcessExit(object? sender, EventArgs e)
         {
-            throw new NotImplementedException();
         }
 
         private static void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
         {
-            throw new NotImplementedException();
         }
 
         [STAThread]

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Buffers.Binary;
 using System.IO;
 using System.Text;
 
@@ -12,7 +13,7 @@ namespace Client.Networking
         private MemoryStream m_Stream;
 
         public PacketWriter()
-            : this(32)
+            : this(64)
         {
         }
 
@@ -21,28 +22,23 @@ namespace Client.Networking
             m_Stream = new MemoryStream((m_Capacity = capacity));
         }
 
-        protected Stream BaseStream
-        {
-            get { return m_Stream; }
-        }
-
-        public long Count
-        {
-            get
-            {
-                return m_Stream.Length;
-            }
-        }
+        public Stream UnderlyingStream => m_Stream;
+        public int Capacity => m_Capacity;
+        public long Length => m_Stream.Length;
 
         public byte[] Compile()
         {
-            m_Stream.Flush();
-            return m_Stream.ToArray();
+            lock (m_Stream)
+            {
+                m_Stream.Flush();
+                return m_Stream.ToArray();
+            }
         }
 
         public void Flush()
         {
-            m_Stream.Flush();
+            lock (m_Stream)
+                m_Stream.Flush();
         }
 
         protected void Flush(int count)
@@ -81,6 +77,32 @@ namespace Client.Networking
                 m_Buffer[0] = (byte)(value >> 8);
                 m_Buffer[1] = (byte)(value >> 0);
                 Flush(0, 2);
+            }
+        }
+
+        public void WriteUInt32_BE(uint value)
+        {
+            lock(m_Stream)
+            {
+                Span<byte> buffer = stackalloc byte[4];
+                BinaryPrimitives.WriteUInt32BigEndian(buffer, value);
+                m_Stream.Write(buffer);
+            }
+        }
+
+        public void WriteInt32_LE(uint value)
+        {
+            lock (m_Buffer)
+            {
+                var buffer = BitConverter.GetBytes(value);
+                if (!BitConverter.IsLittleEndian)
+                    Array.Reverse(buffer);
+
+                m_Buffer[0] = buffer[0];
+                m_Buffer[1] = buffer[1];
+                m_Buffer[2] = buffer[2];
+                m_Buffer[3] = buffer[3];
+                Flush();
             }
         }
 

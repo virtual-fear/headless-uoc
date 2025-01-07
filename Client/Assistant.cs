@@ -62,39 +62,27 @@ namespace Client
 
         private static async void ReceivedServerAck_0x8C(ServerAckEventArgs e)
         {
-            PacketSink.ServerAck -= ReceivedServerAck_0x8C;
             Logger.Log(typeof(Assistant),
-                       "Received acknowledgement from the server.", color: ColorType.Info);
-            Logger.Log($"{new string(' ', nameof(Assistant).Length+-4)}Seed:0x{e.Seed:X4}", color: ColorType.Success);
+                       "Received acknowledgement from the server.", color: LogColor.Info);
+            Logger.Log($"{new string(' ', nameof(Assistant).Length+-4)}Seed:0x{e.Seed:X4}", color: LogColor.Success);
             var v = Network.Info;
             v.Seed = e.Seed;
             v.Stage = ConnectionAck.SecondLogin;
             Info = v;
-            int s = v.Seed;
-            var b = new byte[4] {
-                (byte)(s >> 0x18),	// 24
-			    (byte)(s >> 0x10),	// 16 
-			    (byte)(s >> 0x08),	//  8
-			    (byte)(s >> 0x00)	// 00
-            };
-            Socket.Send(b);
             Socket?.Disconnect(reuseSocket: true);
-            //if (Socket == null || Socket.Blocking)
-            //    await Task.Run(AsyncConnect);
             await Task.CompletedTask;
         }
 
         //[Obsolete("This event method is not used in the original code (used only for testing purposes)", error: false)]
         private static void ReceivedServerList_0xA8(ServerListReceivedEventArgs e)
         {
-            PacketSink.ServerList -= ReceivedServerList_0xA8;
             var shard = e.ServerListEntries.FirstOrDefault();
             if (shard == null)
             {
-                Logger.Log("No shards are currently available", ColorType.Warning);
+                Logger.Log("No shards are currently available", LogColor.Warning);
                 return;
             }
-            Logger.Log("  > Connecting to the first shard available!", ColorType.Special);
+            Logger.Log("  > Connecting to the first shard available!", LogColor.DarkMagenta);
             Network.State.Send(PPlayServer.Instantiate((byte)shard.Index));
         }
 
