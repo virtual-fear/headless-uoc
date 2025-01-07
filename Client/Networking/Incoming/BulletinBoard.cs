@@ -1,7 +1,7 @@
 ﻿namespace Client.Networking.Incoming;
 using System.Text;
-using Client.Game;
-using Client.Game.Data.BulletinBoard;
+using Client.Game.Context;
+using Client.Game.Context.Data.BulletinBoard;
 public sealed class BulletinBoardEventArgs : EventArgs
 {
     public NetState State { get; }

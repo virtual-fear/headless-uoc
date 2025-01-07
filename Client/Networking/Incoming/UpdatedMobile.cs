@@ -1,9 +1,6 @@
-﻿using Client.Game;
-using Client.Game.Data;
-using Client.Game.Data.Items;
-using Client.Game.Data.Other;
-
-namespace Client.Networking.Incoming;
+﻿namespace Client.Networking.Incoming;
+using Client.Game.Context;
+using Client.Game.Context.Data;
 using static PacketSink;
 public partial class PacketSink
 {
@@ -123,7 +120,7 @@ public partial class PacketSink
     {
         public NetState State { get; }
         public DeathAnimationEventArgs(NetState state) => State = state;
-        public Mobile Mobile { get; set; }
+        public MobileAgent Mobile { get; set; }
         public Item Corpse { get; set; }
     }
     public sealed class MobileDamageEventArgs : EventArgs
@@ -192,7 +189,7 @@ public static class UpdatedMobile
         Register(0x72, 05, true, new OnPacketReceive(SetWarMode)); // NOTE: Maybe this should be elsewhere?
         RegisterExtended(0x22, 11, true, new OnPacketReceive(Damage));
 
-        Game.Mobile.Configure();
+        MobileAgent.Configure();
     }
 
     private static void Damage(NetState ns, PacketReader pvSrc)
@@ -234,7 +231,7 @@ public static class UpdatedMobile
     {
         DeathAnimationEventArgs e = new DeathAnimationEventArgs(ns);
 
-        e.Mobile = Mobile.Acquire(pvSrc.ReadInt32());
+        e.Mobile = MobileAgent.Acquire(pvSrc.ReadInt32());
         e.Corpse = Item.Acquire(pvSrc.ReadInt32());
 
         pvSrc.ReadInt32();

@@ -1,7 +1,6 @@
 ﻿namespace Client.Networking.Outgoing;
 
-using Client.Game.Data.Other;
-
+using Client.Game.Context.Data;
 internal sealed class PPlayCharacter : Packet
 {
     private PPlayCharacter() : base(0x5D, 73) { }

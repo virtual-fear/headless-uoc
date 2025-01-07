@@ -1,6 +1,5 @@
 ﻿namespace Client.Networking.Outgoing;
-using Client.Game;
-using Client.Game.Data.Chat;
+using Client.Game.Context.Data;
 
 public sealed class PUnicodeSpeech : Packet
 {

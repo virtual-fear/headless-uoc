@@ -1,7 +1,4 @@
-﻿using System.Collections.Generic;
-using System.IO;
-
-namespace Client.Game
+﻿namespace Client.Game
 {
     public enum Files
     {

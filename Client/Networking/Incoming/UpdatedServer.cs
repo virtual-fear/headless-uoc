@@ -1,6 +1,5 @@
-﻿using Client.Game;
-using Client.Game.Data;
-using Client.Game.Data.Other;
+﻿using Client.Game.Context;
+using Client.Game.Context.Data;
 
 namespace Client.Networking.Incoming;
 
@@ -145,7 +144,7 @@ public static class UpdatedServer
         UpdatedWorld.Configure();
 
         // Setup mobiles/items
-        Mobile.Configure();
+        MobileAgent.Configure();
         Item.Configure();
     }
     private static void CurrentTime(NetState ns, PacketReader pvSrc)

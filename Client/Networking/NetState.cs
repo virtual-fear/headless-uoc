@@ -2,13 +2,15 @@
 using System.Net.Sockets;
 namespace Client.Networking;
 using Client.Accounting;
+using Client.Game.Context;
+
 public abstract class NetState : Network
 {
     public NetState() : base() => Construct(this);
     public Version? Version { get; private set; }
     public int AuthID { get; protected set; }
     public IAccount? Account { get; protected set; }
-    public Game.Mobile? Mobile { get; private set; }
+    public MobileAgent? Mobile { get; private set; }
     public abstract bool IsOpen { get; }
     public abstract IOStream Stream { get; }
     public abstract IPAddress Address { get; }

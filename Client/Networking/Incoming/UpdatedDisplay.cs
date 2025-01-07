@@ -1,5 +1,5 @@
-﻿using Client.Game;
-using Client.Game.Data.ContextMenu;
+﻿using Client.Game.Context;
+using Client.Game.Context.Data;
 
 namespace Client.Networking.Incoming;
 
@@ -12,7 +12,7 @@ public partial class PacketSink
     {
         public NetState State { get; }
         public DisplayPaperdollEventArgs(NetState state) => State = state;
-        public Mobile Mobile { get; set; }
+        public MobileAgent Mobile { get; set; }
         public string Text { get; set; }
         public bool Draggable { get; set; }
     }
@@ -20,7 +20,7 @@ public partial class PacketSink
     {
         public NetState State { get; }
         public DisplayProfileEventArgs(NetState state) => State = state;
-        public Mobile Mobile { get; set; }
+        public MobileAgent Mobile { get; set; }
         public string Header { get; set; }
         public string Footer { get; set; }
         public string Body { get; set; }
@@ -222,20 +222,20 @@ public class ContextMenuEntry
 /// </summary>
 public class ContextMenu
 {
-    private Mobile m_From;
+    private MobileAgent m_From;
     private object m_Target;
     private ContextMenuEntry[] m_Entries;
 
     /// <summary>
-    /// Gets the <see cref="Mobile" /> who opened this ContextMenu.
+    /// Gets the <see cref="MobileAgent" /> who opened this ContextMenu.
     /// </summary>
-    public Mobile From
+    public MobileAgent From
     {
         get { return m_From; }
     }
 
     /// <summary>
-    /// Gets an object of the <see cref="Mobile" /> or <see cref="Item" /> for which this ContextMenu is on.
+    /// Gets an object of the <see cref="MobileAgent" /> or <see cref="Item" /> for which this ContextMenu is on.
     /// </summary>
     public object Target
     {
@@ -254,21 +254,21 @@ public class ContextMenu
     /// Instantiates a new ContextMenu instance.
     /// </summary>
     /// <param name="from">
-    /// The <see cref="Mobile" /> who opened this ContextMenu.
+    /// The <see cref="MobileAgent" /> who opened this ContextMenu.
     /// <seealso cref="From" />
     /// </param>
     /// <param name="target">
-    /// The <see cref="Mobile" /> or <see cref="Item" /> for which this ContextMenu is on.
+    /// The <see cref="MobileAgent" /> or <see cref="Item" /> for which this ContextMenu is on.
     /// <seealso cref="Target" />
     /// </param>
-    public ContextMenu(Mobile from, object target)
+    public ContextMenu(MobileAgent from, object target)
     {
         m_From = from;
         m_Target = target;
 
         List<ContextMenuEntry> list = new List<ContextMenuEntry>();
 
-        if (target is Mobile)
+        if (target is MobileAgent)
         {
             //((Mobile)target).GetContextMenuEntries(from, list);
         }
@@ -393,7 +393,7 @@ public static class UpdatedDisplay
         e.TypeID = pvSrc.ReadInt32();
         e.GumpX = pvSrc.ReadInt32();
         e.GumpY = pvSrc.ReadInt32();
-        PacketReader pvComp = Game.Gumps.GetCompressedReader(pvSrc);
+        PacketReader pvComp = Gumps.GetCompressedReader(pvSrc);
         e.Layout = pvComp.ReadString();
         string[] text = new string[pvSrc.ReadInt32()];
         for (int i = 0; i < text.Length; ++i)
@@ -488,7 +488,7 @@ public static class UpdatedDisplay
     {
         DisplayProfileEventArgs e = new DisplayProfileEventArgs(ns);
 
-        e.Mobile = Mobile.Acquire(pvSrc.ReadInt32());
+        e.Mobile = MobileAgent.Acquire(pvSrc.ReadInt32());
         e.Header = pvSrc.ReadString();
         e.Footer = pvSrc.ReadUnicodeString();
         e.Body = pvSrc.ReadUnicodeString();
@@ -499,7 +499,7 @@ public static class UpdatedDisplay
     {
         DisplayPaperdollEventArgs e = new DisplayPaperdollEventArgs(ns);
 
-        e.Mobile = Mobile.Acquire(pvSrc.ReadInt32());
+        e.Mobile = MobileAgent.Acquire(pvSrc.ReadInt32());
         e.Text = pvSrc.ReadString(60);
 
         bool canLift = (pvSrc.ReadByte() & 2) != 0;

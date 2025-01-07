@@ -1,6 +1,5 @@
-﻿using Client.Game;
-using Client.Game.Data;
-using Client.Game.Data.Items;
+﻿using Client.Game.Context;
+using Client.Game.Context.Data;
 namespace Client.Networking.Incoming;
 
 using static PacketSink;
@@ -98,7 +97,7 @@ public static class UpdatedItem
         //Register(0xF3, 24, true, new OnPacketReceive(WorldItemSA));
         //Register(0xF3, 26, true, new OnPacketReceive(WorldItemHS));
 
-        Game.Item.Configure();
+        Item.Configure();
     }
     private static void WorldItemHS(NetState ns, PacketReader pvSrc)
     {
