@@ -1,7 +1,7 @@
 ﻿namespace Client.Networking.Outgoing;
 internal sealed class PPlayServer : Packet
 {
-    private PPlayServer() : base(0xA0, 3) { }
+    private PPlayServer() : base(0xA0, 3) => Encode = false;
     public static Packet Instantiate(byte index)
     {
         Packet packet = new PPlayServer();

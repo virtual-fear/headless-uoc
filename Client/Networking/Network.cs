@@ -4,12 +4,7 @@
     using System.Net.Sockets;
     using Arguments;
     using Client.Accounting;
-    using Client.Cryptography.Impl;
-    using Client.Networking.Incoming;
     using Client.Networking.Outgoing;
-    using static Client.Networking.Incoming.PacketSink;
-    using static Client.Networking.Outgoing.PLoginAccount;
-    using static Client.Networking.Outgoing.PLoginGame;
 
     public enum ConnectionAck
     {
@@ -33,6 +28,14 @@
     /// </summary>
     public partial class Network
     {
+        public partial class Constants
+        {
+            /// <summary>
+            ///     Determines if the socket should be lingering after the <see cref="System.Net.Sockets.Socket.Close()"/> is called.
+            /// </summary>
+            public const bool EnabledLingering = false;
+        }
+
         public static readonly object SharedLock = new object();
 
         /// <summary>
@@ -102,31 +105,16 @@
                 Logger.LogError("Username or password is empty.");
                 return;
             }
-            switch (info.Stage)
+            if (info.Stage == ConnectionAck.FirstLogin)
             {
-                case ConnectionAck.FirstLogin:
-                    if (State == null)
-                        throw new ArgumentNullException(nameof(State));
+                if (State == null)
+                    throw new ArgumentNullException(nameof(State));
 
-                    PInitialSeed.SendBy(State);
-                    State.Slice();
-                    // TODO: Build an account event management system
-                    State.Login(new Account(username, password));
-                    e.IsAllowed = true;
-                    break;
-                case ConnectionAck.SecondLogin:
-                    Logger.Log($"{e.State.Address}: Sending ack response.", LogColor.Magenta);
-                    State.Crypto = new GameCrypto();
-                    UInt32 v = info.Seed;
-                    Span<byte> b = stackalloc byte[4] {
-                        (byte)(v >> 0x18),
-                        (byte)(v >> 0x10),
-                        (byte)(v >> 0x08),
-                        (byte)(v >> 0x00)
-                    };
-                    Socket.Send(b); // Seed needs to be sent after GameCrypto
-                    State.Send(PLoginGame.Instantiate(new SecondLoginAuthEventArgs(State, username, password, info.Seed)));
-                    break;
+                PInitialSeed.SendBy(State);
+                State.Slice();
+                // TODO: Build an account event management system
+                State.Login(new Account(username, password));
+                e.IsAllowed = true;
             }
         }
 
