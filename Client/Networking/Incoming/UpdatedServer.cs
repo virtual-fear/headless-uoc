@@ -119,7 +119,7 @@ public static class UpdatedServer
 
         UpdatedAnimations.Configure();
         UpdatedBooks.Configure();
-        UpdatedBulletinBoard.Configure();
+        BulletinBoard.Configure();
         UpdatedContainer.Configure();
         UpdatedCustomizedHouseContent.Configure();
         UpdatedDisplay.Configure();
