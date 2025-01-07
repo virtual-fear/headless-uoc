@@ -2,7 +2,7 @@
 
 namespace Client.Accounting
 {
-    using Client.Game.Context;
+    using Client.Game.Context.Agents;
     public interface IAccount
     {
         string Username { get; }

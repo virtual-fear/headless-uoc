@@ -2,7 +2,7 @@
 using System.Net.Sockets;
 namespace Client.Networking;
 using Client.Accounting;
-using Client.Game.Context;
+using Client.Game.Context.Agents;
 
 public abstract class NetState : Network
 {

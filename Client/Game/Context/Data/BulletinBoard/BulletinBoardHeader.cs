@@ -1,6 +1,5 @@
-﻿using Client.Game.Context;
-
-namespace Client.Game.Context.Data.BulletinBoard;
+﻿namespace Client.Game.Context.Data.BulletinBoard;
+using Client.Game.Context.Agents;
 public sealed class BulletinBoardHeader
 {
     public Item Board { get; }

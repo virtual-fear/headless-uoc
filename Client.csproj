@@ -19,4 +19,7 @@
     <None Remove="Client\Game\Snippets\**" />
     <None Remove="Client\Networking\Snippets\**" />
   </ItemGroup>
+  <ItemGroup>
+    <Compile Remove="Client\Game\Config.cs" />
+  </ItemGroup>
 </Project>

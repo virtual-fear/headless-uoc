@@ -1,13 +1,11 @@
-﻿namespace Client.Game.Context;
-
-using Client;
+﻿using static Client.Networking.Incoming.PacketSink;
+namespace Client.Game.Context.Agents;
 using Client.Game.Context.Data;
-using static Client.Networking.Incoming.PacketSink;
 public interface IMobileValidator
 {
     bool IsValid(MobileAgent check);
 }
-public sealed class MobileAgent : Agent
+public class MobileAgent : Agent
 {
     public static MobileAgent Acquire(int serial)
     {
@@ -52,10 +50,7 @@ public sealed class MobileAgent : Agent
     private bool _warmode;
     #endregion
 
-    public MobileAgent(int serial)
-        : base(serial)
-    {
-    }
+    public MobileAgent(int serial) : base(serial) { }
 
     protected override void OnChangedLocation()
     {
@@ -94,7 +89,10 @@ public sealed class MobileAgent : Agent
 
     static void OnMovementRej(MovementRejEventArgs e)
     {
-        MobileAgent.Acquire(e.State.Mobile.Serial).UpdateMovementRej(e.Direction, e.Sequence, e.X, e.Y, e.Z);
+        if (e.State.Mobile is Mobile mob && (mob != null))
+        {
+            MobileAgent.Acquire(mob.Serial).UpdateMovementRej(e.Direction, e.Sequence, e.X, e.Y, e.Z);
+        }
     }
 
     private void UpdateMovementRej(Direction direction, byte sequence, short x, short y, sbyte z)
@@ -107,6 +105,9 @@ public sealed class MobileAgent : Agent
 
     static void OnMovementAck(MovementAckEventArgs e)
     {
+        if (e.State.Mobile == null)
+            return;
+
         MobileAgent.Acquire(e.State.Mobile.Serial).UpdateMovementAck(e.Notoriety, e.Sequence);
     }
 

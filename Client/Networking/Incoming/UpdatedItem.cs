@@ -1,4 +1,4 @@
-﻿using Client.Game.Context;
+﻿using Client.Game.Context.Agents;
 using Client.Game.Context.Data;
 namespace Client.Networking.Incoming;
 
@@ -86,9 +86,6 @@ public partial class PacketSink
     public static void InvokeWorldItemSA(WorldItemSAEventArgs e) => WorldItemSA?.Invoke(e);
     public static void InvokeWorldItem(WorldItemEventArgs e) => WorldItem?.Invoke(e);
 }
-
-
-
 public static class UpdatedItem
 {
     public static void Configure()

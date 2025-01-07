@@ -1,4 +1,4 @@
-﻿namespace Client.Game.Context
+﻿namespace Client.Game.Context.Agents
 {
     using static Client.Networking.Incoming.PacketSink;
     public class WorldAgent : Agent

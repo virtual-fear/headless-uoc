@@ -1,8 +1,6 @@
-﻿using Client.Game.Context;
+﻿namespace Client.Networking.Incoming;
+using Client.Game.Context.Agents;
 using Client.Game.Context.Data;
-
-namespace Client.Networking.Incoming;
-
 using static PacketSink;
 public partial class PacketSink
 {
@@ -35,18 +33,15 @@ public partial class PacketSink
     {
         public NetState State { get; }
         public CharacterListEventArgs(NetState state) => State = state;
-        public IEnumerable<CharInfo> Characters { get; private set; }
-        public IEnumerable<CityInfo> Cities { get; private set; }
+        public IEnumerable<CharInfo>? Characters { get; private set; }
+        public IEnumerable<CityInfo>? Cities { get; private set; }
         public int Flags { get; private set; }
-        public void LoadCharacters(PacketReader pvSrc)
-        {
-            Characters = CharInfo.Instantiate(State, pvSrc);
-        }
+        public void LoadCharacters(PacketReader pvSrc) => Characters = CharInfo.Instantiate(this.State, pvSrc);
         public void LoadCities(PacketReader pvSrc)
         {
             Cities = CityInfo.Instantiate(pvSrc);
             Flags = pvSrc.ReadInt32();  //      CharacterListFlags
-            pvSrc.ReadInt16();  //      -1
+            pvSrc.ReadInt16();          //      -1
         }
     }
     public sealed class SupportedFeaturesEventArgs : EventArgs

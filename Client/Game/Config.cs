@@ -53,18 +53,18 @@
                 { Files.GumpMul, "GumpArt.mul" }
             };
 
-            if (!File.Exists(FileManager.Resolve(Files.Verdata)))
-            {
-                m_Files[Files.Verdata] = FileManager.Base.Resolve("data/ultima/empty-verdata.mul");
-                if (!File.Exists(m_Files[Files.Verdata]))
-                {
-                    using (Stream stream = File.Create(m_Files[Files.Verdata], 4))
-                    {
-                        stream.Write(new byte[4], 0, 4);
-                        stream.Flush();
-                    }
-                }
-            }
+            //if (!File.Exists(FileManager.Resolve(Files.Verdata)))
+            //{
+            //    m_Files[Files.Verdata] = FileManager.BaseFM.Resolve("data/ultima/empty-verdata.mul");
+            //    if (!File.Exists(m_Files[Files.Verdata]))
+            //    {
+            //        using (Stream stream = File.Create(m_Files[Files.Verdata], 4))
+            //        {
+            //            stream.Write(new byte[4], 0, 4);
+            //            stream.Flush();
+            //        }
+            //    }
+            //}
         }
     }
 }

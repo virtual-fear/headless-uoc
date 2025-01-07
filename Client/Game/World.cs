@@ -1,5 +1,5 @@
 ﻿namespace Client.Game;
-using Client.Game.Context;
+using Client.Game.Context.Agents;
 public sealed class World : WorldAgent
 {
     public World() : base(0) { }

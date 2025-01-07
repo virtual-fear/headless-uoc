@@ -1,5 +1,5 @@
 ﻿namespace Client.Game.Context.Data.Skilling;
-public delegate void SkillUseCallback(Mobile from);
+public delegate void SkillInfoCallback(SkillInfo info, Mobile from);
 public sealed class SkillInfo
 {
     public int SkillID { get; }
@@ -9,13 +9,13 @@ public sealed class SkillInfo
     public double DexScale { get; set; }
     public double IntScale { get; set; }
     public double StatTotal { get; set; }
-    public SkillUseCallback Callback { get; set; }
+    public SkillInfoCallback Callback { get; set; }
     public double StrGain { get; set; }
     public double DexGain { get; set; }
     public double IntGain { get; set; }
     public double GainFactor { get; set; }
     internal SkillInfo(int skillID, string name, double strScale, double dexScale, double intScale, string title,
-                     SkillUseCallback callback, double strGain, double dexGain, double intGain, double gainFactor)
+                     SkillInfoCallback callback, double strGain, double dexGain, double intGain, double gainFactor)
     {
         SkillID = skillID;
         Name = name;
@@ -30,7 +30,6 @@ public sealed class SkillInfo
         GainFactor = gainFactor;
         StatTotal = strScale + dexScale + intScale;
     }
-
     public static SkillInfo[] Table { get; set; } = new SkillInfo[58]
     {
         new SkillInfo(0, "Alchemy", 0.0, 5.0, 5.0, "Alchemist", null, 0.0, 0.5, 0.5, 1.0),

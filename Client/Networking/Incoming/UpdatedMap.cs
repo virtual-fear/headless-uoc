@@ -1,5 +1,5 @@
 ﻿using System.Collections;
-using Client.Game.Context;
+using Client.Game.Context.Agents;
 
 namespace Client.Networking.Incoming;
 

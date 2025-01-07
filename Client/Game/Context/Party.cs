@@ -1,4 +1,6 @@
 ﻿namespace Client.Game.Context;
+
+using Client.Game.Context.Agents;
 using Client.Game.Context.Data;
 using Client.Networking;
 using Client.Networking.Outgoing;

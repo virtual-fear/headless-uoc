@@ -1,6 +1,6 @@
 ﻿namespace Client.Networking.Incoming;
 using System.Text;
-using Client.Game.Context;
+using Client.Game.Context.Agents;
 using Client.Game.Context.Data.BulletinBoard;
 public sealed class BulletinBoardEventArgs : EventArgs
 {
@@ -21,7 +21,6 @@ public partial class PacketSink
     public static event PacketEventHandler<BulletinBoardEventArgs>? BulletinBoard;
     public static void InvokeBulletinBoard(BulletinBoardEventArgs e) => BulletinBoard?.Invoke(e);
 }
-
 public static class BulletinBoard
 {
     private delegate string BoardReader(PacketReader pvSrc);

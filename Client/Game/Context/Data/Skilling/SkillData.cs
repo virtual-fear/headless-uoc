@@ -1,4 +1,5 @@
 ﻿namespace Client.Game.Context.Data.Skilling;
+using Client.Game.Context.Agents;
 public sealed class SkillData
 {
     public MobileAgent Agent { get; }
