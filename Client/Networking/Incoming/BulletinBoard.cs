@@ -2,22 +2,23 @@
 using System.Text;
 using Client.Game.Context.Agents;
 using Client.Game.Context.Data.BulletinBoard;
-public sealed class BulletinBoardEventArgs : EventArgs
-{
-    public NetState State { get; }
-    public bool Supported { get; }
-    public BulletinBoardEventArgs(NetState state, bool supported)
-    {
-        State = state;
-        Supported = supported;
-    }
-    public BulletinBoardType? Type { get; set; }
-    public Item? Item { get; set; }
-    public BulletinBoardHeader? Header { get; set; }
-    public BulletinBoardBody? Body { get; set; }
-}
+using static PacketSink;
 public partial class PacketSink
 {
+    public sealed class BulletinBoardEventArgs : EventArgs
+    {
+        public NetState State { get; }
+        public bool Supported { get; }
+        public BulletinBoardEventArgs(NetState state, bool supported)
+        {
+            State = state;
+            Supported = supported;
+        }
+        public BulletinBoardType? Type { get; set; }
+        public Item? Item { get; set; }
+        public BulletinBoardHeader? Header { get; set; }
+        public BulletinBoardBody? Body { get; set; }
+    }
     public static event PacketEventHandler<BulletinBoardEventArgs>? BulletinBoard;
     public static void InvokeBulletinBoard(BulletinBoardEventArgs e) => BulletinBoard?.Invoke(e);
 }
