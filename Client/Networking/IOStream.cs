@@ -1,6 +1,5 @@
 ﻿namespace Client.Networking;
 
-using System.Net.Sockets;
 using Client.Cryptography;
 using Client.Cryptography.Impl;
 using Client.IO;
