@@ -4,6 +4,7 @@ using Client.Cryptography;
 using Client.Cryptography.Impl;
 using Client.IO;
 using Client.Networking.Arguments;
+using Client.Networking.Data;
 using Client.Networking.Outgoing;
 using static Client.Networking.Outgoing.PLoginGame;
 public abstract class IOStream

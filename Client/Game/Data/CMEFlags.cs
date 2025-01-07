@@ -1,4 +1,7 @@
 ﻿namespace Client.Game.Data;
+/// <summary>
+///     Context Menu Entry (CME) Flags
+/// </summary>
 public enum CMEFlags
 {
     None = 0x00,

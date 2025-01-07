@@ -1,21 +1,9 @@
 ﻿namespace Client.Game
 {
     using Client.Accounting;
+    using Client.Game.Data;
     using global::Client.Networking.Incoming;
     using static global::Client.Networking.Incoming.PacketSink;
-
-    public enum Direction : byte
-    {
-        Up = 0,
-        North = 1,
-        Right = 2,
-        East = 3,
-        Down = 4,
-        South = 5,
-        Left = 6,
-        West = 7
-    }
-
     public class Agent : IEntity
     {
         private Agent m_Parent;

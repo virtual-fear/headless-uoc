@@ -1,4 +1,5 @@
 ﻿using Client.Game;
+using Client.Game.Data;
 
 namespace Client.Networking.Incoming;
 
@@ -79,13 +80,13 @@ public partial class PacketSink
 
     #endregion (done)
 
-    public static event PacketEventHandler<DisplayPaperdollEventArgs> DisplayPaperdoll;
-    public static event PacketEventHandler<DisplayProfileEventArgs> DisplayProfile;
-    public static event PacketEventHandler<DisplayQuestionMenuEventArgs> DisplayQuestionMenu;
-    public static event PacketEventHandler<DisplayHuePickerEventArgs> DisplayHuePicker;
-    public static event PacketEventHandler<DisplayGumpEventArgs> DisplayGump;
-    public static event PacketEventHandler<DisplayEquipmentInfoEventArgs> DisplayEquipmentInfo;
-    public static event PacketEventHandler<DisplayContextMenuEventArgs> DisplayContextMenu;
+    public static event PacketEventHandler<DisplayPaperdollEventArgs>? DisplayPaperdoll;
+    public static event PacketEventHandler<DisplayProfileEventArgs>? DisplayProfile;
+    public static event PacketEventHandler<DisplayQuestionMenuEventArgs>? DisplayQuestionMenu;
+    public static event PacketEventHandler<DisplayHuePickerEventArgs>? DisplayHuePicker;
+    public static event PacketEventHandler<DisplayGumpEventArgs>? DisplayGump;
+    public static event PacketEventHandler<DisplayEquipmentInfoEventArgs>? DisplayEquipmentInfo;
+    public static event PacketEventHandler<DisplayContextMenuEventArgs>? DisplayContextMenu;
     public static void InvokeDisplayContextMenu(DisplayContextMenuEventArgs e) => DisplayContextMenu?.Invoke(e);
     public static void InvokeDisplayEquipmentInfo(DisplayEquipmentInfoEventArgs e) => DisplayEquipmentInfo?.Invoke(e);
     public static void InvokeDisplayGump(DisplayGumpEventArgs e) => DisplayGump?.Invoke(e);
