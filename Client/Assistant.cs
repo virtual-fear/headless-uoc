@@ -1,26 +1,11 @@
 namespace Client
 {
-    using System.Diagnostics;
     using System.Net;
-    using System.Net.Sockets;
-    using System.Reflection;
-    using System.Runtime.InteropServices;
-    using Client.Accounting;
-    using Client.Cryptography.Impl;
     using Client.Networking;
-    using Client.Networking.Arguments;
+    using Client.Networking.Data;
     using Client.Networking.Incoming;
     using Client.Networking.Outgoing;
     using static Client.Networking.Incoming.PacketSink;
-    using static Client.Networking.Outgoing.PLoginAccount;
-    using static Client.Networking.Outgoing.PLoginGame;
-
-    public enum SocketStage
-    {
-        Disconnected,
-        Connecting,
-        Connected
-    }
 
     /// <summary>
     ///     <c>An event driven network client, built for ModernUO.
@@ -81,6 +66,11 @@ namespace Client
                 return;
             }
             Logger.Log("  > Connecting to the first shard available!", LogColor.DarkMagenta);
+            if (Network.State == null)
+            {
+                throw new InvalidOperationException("Invalid network state",
+                    innerException: new ArgumentNullException(nameof(Network.State)));
+            }
             Network.State.Send(PPlayServer.Instantiate((byte)shard.Index));
         }
 
