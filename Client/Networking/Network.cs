@@ -4,22 +4,8 @@
     using System.Net.Sockets;
     using Arguments;
     using Client.Accounting;
+    using Client.Networking.Data;
     using Client.Networking.Outgoing;
-
-    public enum ConnectionAck
-    {
-        FirstLogin,
-        SecondLogin,
-    }
-    public struct ConnectInfo
-    {
-        public ConnectionAck Stage;
-        public ConnectInfo() => Stage = ConnectionAck.FirstLogin;
-        public IPEndPoint EndPoint = new IPEndPoint(IPAddress.None, 0);
-        public String? Username = string.Empty;
-        public String? Password = string.Empty;
-        public UInt32 Seed = 0;
-    }
 
     /// <summary>
     ///   Using this partial class provides us with the flexibility to expose events without explicitly showing our invocation methods. 
