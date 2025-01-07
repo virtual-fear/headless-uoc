@@ -7,12 +7,21 @@ namespace Client
 {
     public static class Utility
     {
-        public static void FormatBuffer(TextWriter output, byte[] buffer, ConsoleColor color = ConsoleColor.Cyan)
+        public static void FormatBuffer(TextWriter output, byte[]? buffer, ConsoleColor color = ConsoleColor.Cyan)
         {
+            if (buffer == null)
+                color = ConsoleColor.Red;
             var lastColor = Console.ForegroundColor;
             Console.ForegroundColor = color;
-            using Stream input = new MemoryStream(buffer);
-            FormatBuffer(Console.Out, input, buffer.Length);
+            if (buffer == null)
+            {
+                output.WriteLine("NO buffer to format!");
+            }
+            else
+            {
+                using Stream input = new MemoryStream(buffer);
+                FormatBuffer(output, input, buffer.Length);
+            }
             Console.ForegroundColor = lastColor;
         }
         public static void FormatBuffer(TextWriter output, Stream input, int length)
