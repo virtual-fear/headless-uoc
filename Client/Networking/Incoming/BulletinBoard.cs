@@ -16,14 +16,14 @@ public sealed class BulletinBoardEventArgs : EventArgs
     public BulletinBoardHeader? Header { get; set; }
     public BulletinBoardBody? Body { get; set; }
 }
+public partial class PacketSink
+{
+    public static event PacketEventHandler<BulletinBoardEventArgs>? BulletinBoard;
+    public static void InvokeBulletinBoard(BulletinBoardEventArgs e) => BulletinBoard?.Invoke(e);
+}
+
 public static class BulletinBoard
 {
-    public partial class PacketSink
-    {
-        public static event PacketEventHandler<BulletinBoardEventArgs>? BulletinBoard;
-        public static void InvokeBulletinBoard(BulletinBoardEventArgs e) => BulletinBoard?.Invoke(e);
-    }
-
     private delegate string BoardReader(PacketReader pvSrc);
     public static void Configure() => Register(0x71, -1, true, new OnPacketReceive(Update));
     private static void Update(NetState ns, PacketReader pvSrc)
