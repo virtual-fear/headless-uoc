@@ -8,11 +8,9 @@ namespace Client
     using static Client.Networking.Incoming.PacketSink;
 
     /// <summary>
-    ///     <c>An event driven network client, built for ModernUO.
-    ///     <para>Currently supporting .NET Framework v9.0</para>
-    ///     </c>
-    ///     <para>The main entry point for the Godot engine to internally connect to the remote server.</para>
-    ///     <para>It is recommended to use this class to handle and maintain the network events.</para>
+    ///     An event driven network client, built for ModernUO.
+    ///     <para>Currently supporting <c>.NET Framework v6.0</c></para>
+    ///     It is recommended to use this class to handle and maintain the network events.
     ///     <para>Game events that are network related can be subscribed outside of this class to 
     ///     interact parallel with external game objects.</para>
     /// </summary>
@@ -22,7 +20,7 @@ namespace Client
 
         static Assistant()
         {
-            // TODO: Reach out to the user to get the username (or use config file)
+            // TODO: Reach out to the user to get the username (or use config file) 
             // Maybe implement string[] args to get the username and password
             Info = new ConnectInfo()
             {
