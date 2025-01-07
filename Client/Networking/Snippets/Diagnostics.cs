@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.IO;
-
-namespace Client.Networking
+﻿namespace Client.Networking.Snippets
 {
     public interface IDiagnostic
     {
@@ -22,7 +16,7 @@ namespace Client.Networking
 
         public static void Register(IDiagnostic[] range)
         {
-            if ((range != null) && (range.Length > 0))
+            if (range != null && range.Length > 0)
                 for (int i = 0; i < range.Length; ++i)
                 {
                     IDiagnostic d = range[i];
@@ -40,25 +34,25 @@ namespace Client.Networking
 
         public static void Close()
         {
-            foreach (IDiagnostic d in Diagnostics.Queue)
+            foreach (IDiagnostic d in Queue)
                 d.Close();
         }
 
         public static void Open()
         {
-            foreach (IDiagnostic d in Diagnostics.Queue)
+            foreach (IDiagnostic d in Queue)
                 d.Open();
         }
 
         public static void Received(PacketHandler handler, byte[] buffer, int offset, int length)
         {
-            foreach (IDiagnostic d in Diagnostics.Queue)
+            foreach (IDiagnostic d in Queue)
                 d.Received(handler, buffer, offset, length);
         }
 
         public static void Sent(Packet packet, byte[] buffer, int offset, int length)
         {
-            foreach (IDiagnostic d in Diagnostics.Queue)
+            foreach (IDiagnostic d in Queue)
                 d.Sent(packet, buffer, offset, length);
         }
     }
@@ -70,7 +64,7 @@ namespace Client.Networking
 
         public static IDiagnostic Instantiate<T>()
         {
-            return new Diagnostic(new StreamWriter((typeof(T).Name.ToLower() + "-diagnostics.log"), true));
+            return new Diagnostic(new StreamWriter(typeof(T).Name.ToLower() + "-diagnostics.log", true));
         }
 
         public Diagnostic(TextWriter output)
@@ -87,10 +81,10 @@ namespace Client.Networking
             return Format("{0}...({1})", title, DateTime.Now);
         }
 
-        private static string Format( string format, params object[] args )
+        private static string Format(string format, params object[] args)
         {
             string m = string.Format(format, args);
-            return string.Format("###\t{0}\t###",m);
+            return string.Format("###\t{0}\t###", m);
         }
 
         public void Close()
@@ -135,15 +129,15 @@ namespace Client.Networking
             {
                 throw new ArgumentNullException("buffer");
             }
-            if ((offset < 0) || (offset >= buffer.Length))
+            if (offset < 0 || offset >= buffer.Length)
             {
                 throw new ArgumentOutOfRangeException("offset", offset, "Offset must be greater than or equal to zero and less than the size of the buffer.");
             }
-            if ((length < 0) || (length > buffer.Length))
+            if (length < 0 || length > buffer.Length)
             {
                 throw new ArgumentOutOfRangeException("length", length, "Length cannot be less than zero or greater than the size of the buffer.");
             }
-            if ((buffer.Length - offset) < length)
+            if (buffer.Length - offset < length)
             {
                 throw new ArgumentException("Offset and length do not point to a valid segment within the buffer.");
             }
@@ -156,9 +150,9 @@ namespace Client.Networking
                 output.Write("   ");
                 for (int i = 0; i < 0x10; i++)
                 {
-                    if ((x + i) < length)
+                    if (x + i < length)
                     {
-                        output.Write(buffer[(offset + x) + i].ToString("X2"));
+                        output.Write(buffer[offset + x + i].ToString("X2"));
                         if (i == 7)
                         {
                             output.Write("  ");
@@ -179,10 +173,10 @@ namespace Client.Networking
                 }
                 output.Write("  ");
                 int y = 0;
-                while ((y < 0x10) && (x < length))
+                while (y < 0x10 && x < length)
                 {
                     byte num4 = buffer[offset + x];
-                    if ((num4 >= 0x20) && (num4 < 0x80))
+                    if (num4 >= 0x20 && num4 < 0x80)
                     {
                         output.Write((char)num4);
                     }

@@ -1,4 +1,4 @@
-﻿namespace Client.Game.Data;
+﻿namespace Client.Game.Data.Mobiles;
 public enum BodyType : byte
 {
     Empty,

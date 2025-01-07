@@ -1,5 +1,6 @@
 ﻿namespace Client.Game;
-using Client.Game.Data;
+using Client.Game.Data.Mobiles;
+
 public struct Body
 {
     private static readonly string m_Path = @"data\bodytable.cfg";

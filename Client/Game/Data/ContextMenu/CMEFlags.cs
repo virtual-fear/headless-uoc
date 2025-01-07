@@ -1,4 +1,4 @@
-﻿namespace Client.Game.Data;
+﻿namespace Client.Game.Data.ContextMenu;
 /// <summary>
 ///     Context Menu Entry (CME) Flags
 /// </summary>

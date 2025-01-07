@@ -1,4 +1,4 @@
-﻿namespace Client.Game.Data;
+﻿namespace Client.Game.Data.Other;
 public enum Direction : byte
 {
     Up = 0,

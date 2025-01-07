@@ -1,3 +1,5 @@
+using Client.Game.Data.Other;
+
 namespace Client.Game.Data;
 internal sealed class ServerData
 {

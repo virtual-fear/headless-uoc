@@ -1,8 +1,7 @@
-﻿namespace Client.Networking.Incoming;
-
-using static PacketSink;
+﻿
+namespace Client.Networking.Incoming;
 public partial class PacketSink
-{ 
+{
     public sealed class UpdateStatueAnimationEventArgs : EventArgs
     {
         public NetState State { get; }
@@ -12,8 +11,8 @@ public partial class PacketSink
         public byte Animation { get; set; }
         public byte Frame { get; set; }
     }
-    
-    public static event PacketEventHandler<UpdateStatueAnimationEventArgs> UpdateStatueAnimation;
+
+    public static event PacketEventHandler<UpdateStatueAnimationEventArgs>? UpdateStatueAnimation;
     public static void InvokeUpdateStatueAnimation(UpdateStatueAnimationEventArgs e) => UpdateStatueAnimation?.Invoke(e);
 }
 
@@ -22,7 +21,7 @@ public static class UpdatedAnimations
     public static void Configure() => RegisterExtended(0x11, 17, true, new OnPacketReceive(StatueUpdate));
     private static void StatueUpdate(NetState ns, PacketReader pvSrc)
     {
-        UpdateStatueAnimationEventArgs e = new UpdateStatueAnimationEventArgs(ns);
+        var e = new PacketSink.UpdateStatueAnimationEventArgs(ns);
         pvSrc.Seek(3, SeekOrigin.Current);
         //pvSrc.ReadInt16();  //  0x19
         //pvSrc.ReadByte();   //  0x05

@@ -1,5 +1,5 @@
 ﻿using Client.Game;
-using Client.Game.Data;
+using Client.Game.Data.ContextMenu;
 
 namespace Client.Networking.Incoming;
 

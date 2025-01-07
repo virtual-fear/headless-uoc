@@ -1,5 +1,7 @@
 ﻿using Client.Game;
 using Client.Game.Data;
+using Client.Game.Data.Other;
+
 namespace Client.Networking.Incoming;
 
 using static PacketSink;

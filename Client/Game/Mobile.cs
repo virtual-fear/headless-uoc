@@ -2,6 +2,8 @@
 {
     using Client.Accounting;
     using Client.Game.Data;
+    using Client.Game.Data.Items;
+    using Client.Game.Data.Other;
     using global::Client.Networking.Incoming;
     using static global::Client.Networking.Incoming.PacketSink;
     public class Agent : IEntity

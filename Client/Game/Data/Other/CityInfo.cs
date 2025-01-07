@@ -1,4 +1,4 @@
-﻿namespace Client.Game.Data;
+﻿namespace Client.Game.Data.Other;
 using Client.Networking;
 public sealed class CityInfo
 {

@@ -1,5 +1,8 @@
 ﻿using Client.Game;
 using Client.Game.Data;
+using Client.Game.Data.Items;
+using Client.Game.Data.Other;
+
 namespace Client.Networking.Incoming;
 using static PacketSink;
 public partial class PacketSink

@@ -23,10 +23,10 @@ public partial class PacketSink
             State = state;
             Supported = supported;
         }
-        public string Title { get; set; }
-        public string Author { get; set; }
+        public string Title { get; set; } = string.Empty;
+        public string Author { get; set; } = string.Empty;
     }
-    #endregion (done)
+    #endregion
 
     public static event PacketEventHandler<BookOpenEventArgs>? BookOpen;
     public static event PacketEventHandler<BookInfoEventArgs>? BookInfo;

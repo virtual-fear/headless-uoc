@@ -1,4 +1,4 @@
-﻿namespace Client.Game.Data;
+﻿namespace Client.Game.Data.Chat;
 public enum MessageType
 {
     Regular = 0x00,

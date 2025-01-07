@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using Client.Game;
+using Client.Game.Data.Items;
 
 namespace Client.Networking.Incoming
 {

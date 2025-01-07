@@ -1,20 +1,7 @@
-﻿using System.Globalization;
-using System.Collections.Generic;
-using System.IO;
-
-namespace Client.Game
+﻿namespace Client.Game;
+using System.Globalization;
+public class Localization
 {
-    public class Localization
-    {
-        private static string m_Language;
-        public static string Language
-        {
-            get { return m_Language; }
-        }
-
-        static Localization()
-        {
-            m_Language = CultureInfo.CurrentUICulture.ThreeLetterWindowsLanguageName.ToUpper();
-        }
-    }
+    public static string Language { get; }
+    static Localization() => Language = CultureInfo.CurrentUICulture.ThreeLetterWindowsLanguageName.ToUpper();
 }
