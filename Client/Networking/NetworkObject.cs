@@ -259,7 +259,8 @@ public sealed class NetworkObject : NetState
                     if (handler == null)
                     {
                         Logger.Log($"Server -> Client: Unhandled packed (0x{packetID:X2}, {m_Stream.Input.GetPacketLength()})", LogColor.Invalid);
-                        PacketReader.Initialize(Stream.Input.Dequeue(Stream.Input.Count), false, (byte)packetID, "Unknown").Trace(true);
+                        Span<byte> badBuffer = Stream.Input.Dequeue(Stream.Input.Count).AsSpan();
+                        new PacketReader(badBuffer, false, (byte)packetID, "Unknown").Trace(true);
                         break;
                     }
 
@@ -271,9 +272,10 @@ public sealed class NetworkObject : NetState
                         Detach();
                         break;
                     }
-                    ArraySegment<byte> segment = Stream.Input.Dequeue(length);
-                    Utility.FormatBuffer(Console.Out, segment.Array, color: ConsoleColor.DarkGreen);
-                    handler.Receive(this, PacketReader.Initialize(segment, handler));
+                    Span<byte> buffer = Stream.Input.Dequeue(length);
+                    Utility.FormatBuffer(Console.Out, buffer.ToArray(), color: ConsoleColor.DarkGreen);
+                    PacketReader reader = PacketReader.Create(ref buffer, ref handler);
+                    handler.Receive(this, reader);
                     var line = $"Completed slice with {length} bytes...({(IsOpen ? "still open" : "now closed")})\n";
                     Logger.Log(line, color: IsOpen ? LogColor.Info : LogColor.Invalid);
                 }

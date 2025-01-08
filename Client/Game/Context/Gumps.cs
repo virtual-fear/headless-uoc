@@ -43,17 +43,28 @@ public static class Gumps
 
         int compressedLength = pvSrc.ReadInt32();
         if (compressedLength == 0)
-            return new PacketReader(m_CompBuffer, index: 0, size: 3, false, 0x00, "Gump Subset");
+            return new PacketReader(
+                   buffer: m_CompBuffer.AsSpan(),
+                fixedSize: false,
+                      cmd: 0x00,
+                     name: "Gump Subset");
 
         int decompressedLength = pvSrc.ReadInt32();
         if (decompressedLength == 0)
-            return new PacketReader(m_CompBuffer, index: 0, size: 3, false, 0x00, "Gump Subset");
+            return new PacketReader(
+                 buffer: m_CompBuffer.AsSpan(start: 0, length: 3),
+              fixedSize: false,
+                    cmd: 0x00,
+                   name: "Gump Subset");
 
         byte[] buffer = pvSrc.ReadBytes(compressedLength - 4);
         if (decompressedLength > m_CompBuffer.Length)
             m_CompBuffer = new byte[decompressedLength + 0xFFFF & -4096]; // 4095
-
         ZLib.Unpack(m_CompBuffer, ref decompressedLength, buffer, buffer.Length);
-        return new PacketReader(m_CompBuffer, index: 0, size: decompressedLength, true, 0x00, "Gump Subset");
+        return new PacketReader(
+            buffer: m_CompBuffer.AsSpan(start: 0, length: decompressedLength),
+            fixedSize: true,
+            cmd: 0x00,
+            name: "Gump Subset");
     }
 }
