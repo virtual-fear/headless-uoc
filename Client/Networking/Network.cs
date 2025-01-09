@@ -3,7 +3,7 @@
     using System.Net;
     using System.Net.Sockets;
     using Arguments;
-    using Client.Accounting;
+    using Client.Game.Accounting;
     using Client.Networking.Data;
     using Client.Networking.Outgoing;
 

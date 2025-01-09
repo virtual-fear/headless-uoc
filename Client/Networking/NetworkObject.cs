@@ -3,7 +3,8 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 namespace Client.Networking;
-using Client.Accounting;
+
+using Client.Game.Data;
 using Client.Networking.Arguments;
 using PLoginAccount = Outgoing.PLoginAccount;
 public sealed class NetworkObject : NetState

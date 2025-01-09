@@ -65,7 +65,7 @@ public class MobileContext : ContextEntity
         MobileAnimation += OnAnimation;
         MobileAttributes += OnAttributes;
         MobileDamage += OnDamage;
-        MobileHits += OnHits;
+        MobileHits += OnHits; 
         MobileIncoming += OnIncoming;
         MobileMana += OnMana;
         MobileMoving += OnMoving;

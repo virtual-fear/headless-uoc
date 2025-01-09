@@ -1,6 +1,8 @@
 ﻿namespace Client.Networking.Incoming;
+
 using Client.Game.Context;
 using Client.Game.Data;
+using Client.Networking.Data;
 using static PacketSink;
 public partial class PacketSink
 {
@@ -10,7 +12,7 @@ public partial class PacketSink
     {
         public NetState State { get; }
         public AccountLoginEventArgs(NetState state) => State = state;
-        public IEnumerable<ShardInfo> Shards { get; set; }
+        public IEnumerable<ShardData> Shards { get; set; }
     }
     public sealed class ServerAckEventArgs : EventArgs
     {
@@ -27,7 +29,7 @@ public partial class PacketSink
     }
     public sealed class ServerListReceivedEventArgs : EventArgs
     {
-        internal ServerListEntry[] ServerListEntries { get; set; }
+        internal ServerEntry[] ServerListEntries { get; set; }
     }
     public sealed class CharacterListEventArgs : EventArgs
     {
@@ -211,8 +213,8 @@ public static class UpdatedServer
         e.LoadCharacters(pvSrc);
         e.LoadCities(pvSrc);
 
-        ServerData.Instance.CharInfo = (CharInfo[])e.Characters;
-        ServerData.Instance.CityInfo = (CityInfo[])e.Cities;
+        ServerInfo.Instance.CharInfo = (CharInfo[])e.Characters;
+        ServerInfo.Instance.CityInfo = (CityInfo[])e.Cities;
 
         PacketSink.InvokeCharListReceived(e);
     }
@@ -227,10 +229,10 @@ public static class UpdatedServer
         //writer.Write((ushort)info.Length);
         byte flags = pvSrc.ReadByte(); // 0x5D (Unknown)
         ushort count = pvSrc.ReadUInt16(); // info.Length
-        List<ServerListEntry> entries = new List<ServerListEntry>();
+        List<ServerEntry> entries = new List<ServerEntry>();
         for (ushort i = 0; i < count; i++)
         {
-            entries.Add(new ServerListEntry(
+            entries.Add(new ServerEntry(
                 (uint)pvSrc.ReadInt16(),    // i
                 pvSrc.ReadStringSafe(32), // name
                 pvSrc.ReadByte(), // full percent
@@ -238,12 +240,12 @@ public static class UpdatedServer
                 pvSrc.ReadUInt32() // raw ip
             ));
         }
-        ServerData.Instance.ServerEntries = entries.ToArray();
+        ServerInfo.Instance.Servers = entries.ToArray();
         Logger.Log("Received the list of available servers");
         int entryIdx = 1;
-        foreach(var entry in ServerData.Instance.ServerEntries)
+        foreach(var entry in ServerInfo.Instance.Servers)
             Logger.Log($"  {entryIdx++}) {entry.Name} ({entry.PercentFull}%)", LogColor.Info);
-        PacketSink.InvokeServerListReceived(new ServerListReceivedEventArgs() { ServerListEntries = ServerData.Instance.ServerEntries });
+        PacketSink.InvokeServerListReceived(new ServerListReceivedEventArgs() { ServerListEntries = ServerInfo.Instance.Servers });
     }
 
     /**

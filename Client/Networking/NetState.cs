@@ -1,8 +1,8 @@
 ﻿using System.Net;
 using System.Net.Sockets;
 namespace Client.Networking;
-using Client.Accounting;
 using Client.Game.Context;
+using Client.Game.Data;
 
 public abstract class NetState : Network
 {

@@ -1,21 +1,7 @@
-﻿namespace Client.Accounting;
+﻿namespace Client.Game.Accounting;
 using Client.Game.Context;
+using Client.Game.Data;
 using System.Xml;
-public interface IAccount
-{
-    string Username { get; }
-    string Password { get; set; }
-    MobileContext this[int index] { get; set; }
-    void Delete();
-}
-
-public interface INode
-{
-    void Begin(string key);
-    void End();
-    string GetAttribute(string key, string def);
-    void SetAttribute(string key, string value);
-}
 
 public class Account : IAccount, IComparable, IComparable<Account>
 {
@@ -23,7 +9,8 @@ public class Account : IAccount, IComparable, IComparable<Account>
     private string m_Password;
     private DateTime m_Created;
     private MobileContext[] m_Mobiles;
-    public Account( string username, string password ) {
+    public Account(string username, string password)
+    {
         m_Username = username;
         m_Password = password;
         m_Created = DateTime.UtcNow;
@@ -56,7 +43,7 @@ public class Account : IAccount, IComparable, IComparable<Account>
         {
             int c = 0;
 
-            for (int i = 0; i < this.Length; ++i)
+            for (int i = 0; i < Length; ++i)
             {
                 if (this[i] != null)
                     ++c;
@@ -95,7 +82,7 @@ public class Account : IAccount, IComparable, IComparable<Account>
             if (index >= 0 && index < m_Mobiles.Length)
             {
                 MobileContext m = m_Mobiles[index];
-                if ((m != null) && m.IsDeleted)
+                if (m != null && m.IsDeleted)
                 {
                     m.Account = null;
                     m = null;
@@ -124,7 +111,7 @@ public class Account : IAccount, IComparable, IComparable<Account>
     /// </summary>
     public void Delete()
     {
-        for (int i = 0; i < this.Length; ++i)
+        for (int i = 0; i < Length; ++i)
         {
             MobileContext m = this[i];
 
@@ -190,7 +177,7 @@ public class Account : IAccount, IComparable, IComparable<Account>
     {
         m_Username = Utility.GetAttribute(node, "username", "empty");
         m_Password = Utility.GetAttribute(node, "password", "empty");
-    
+
     }
 
     public override string ToString()
@@ -201,7 +188,7 @@ public class Account : IAccount, IComparable, IComparable<Account>
     public int CompareTo(object obj)
     {
         if (obj is Account)
-            return this.CompareTo((Account)obj);
+            return CompareTo((Account)obj);
 
         throw new ArgumentException();
     }

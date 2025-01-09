@@ -57,8 +57,13 @@ namespace Client
         //[Obsolete("This event method is not used in the original code (used only for testing purposes)", error: false)]
         private static void ReceivedServerList_0xA8(ServerListReceivedEventArgs e)
         {
+            if (e.ServerListEntries.Length == 0)
+            {
+                Logger.Log("No shard entries are currently available", LogColor.Warning);
+                return;
+            }
             var shard = e.ServerListEntries.FirstOrDefault();
-            if (shard == null)
+            if (shard.Name.Length == 0)
             {
                 Logger.Log("No shards are currently available", LogColor.Warning);
                 return;
