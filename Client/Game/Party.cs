@@ -1,7 +1,7 @@
 ﻿namespace Client.Game;
 
 using Client;
-using Client.Game.Agents;
+using Client.Game.Context;
 using Client.Game.Data;
 using Client.Networking;
 using Client.Networking.Outgoing;

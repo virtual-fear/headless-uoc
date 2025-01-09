@@ -5,7 +5,7 @@ using Client.Game.Data;
 
 public class ContextEntity : IEntity
 {
-    private ContextEntity m_Parent;
+    private ContextEntity? m_Parent;
     public int Serial { get; }
     public short X { get; private set; }
     public short Y { get; private set; }

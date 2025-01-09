@@ -1,6 +1,6 @@
 ﻿namespace Client.Game.Data.Skilling;
 
-using Client.Game.Agents;
+using Client.Game.Context;
 public sealed class SkillList
 {
     public MobileContext Agent { get; }

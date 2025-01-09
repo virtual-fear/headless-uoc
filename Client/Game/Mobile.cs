@@ -1,4 +1,4 @@
-﻿using Client.Game.Agents;
+﻿using Client.Game.Context;
 
 namespace Client.Game;
 public sealed class Mobile : MobileContext
