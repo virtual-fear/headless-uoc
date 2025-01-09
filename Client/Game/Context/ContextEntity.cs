@@ -1,4 +1,4 @@
-﻿namespace Client.Game.Agents;
+﻿namespace Client.Game.Context;
 
 using Client.Accounting;
 using Client.Game.Data;

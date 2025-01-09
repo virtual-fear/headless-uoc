@@ -1,11 +1,6 @@
 ﻿using static Client.Networking.Incoming.PacketSink;
-namespace Client.Game.Agents;
-
-using Client;
-using Client.Game;
-
+namespace Client.Game.Context;
 using Client.Game.Data;
-
 public interface IMobileValidator
 {
     bool IsValid(MobileContext check);
