@@ -2,12 +2,12 @@
 
 namespace Client.Accounting
 {
-    using Client.Game.Context.Agents;
+    using Client.Game.Agents;
     public interface IAccount
     {
         string Username { get; }
         string Password { get; set; }
-        MobileAgent this[int index] { get; set; }
+        MobileContext this[int index] { get; set; }
         void Delete();
     }
 
@@ -24,12 +24,12 @@ namespace Client.Accounting
         private string m_Username;
         private string m_Password;
         private DateTime m_Created;
-        private MobileAgent[] m_Mobiles;
+        private MobileContext[] m_Mobiles;
         public Account( string username, string password ) {
             m_Username = username;
             m_Password = password;
             m_Created = DateTime.UtcNow;
-            m_Mobiles = new MobileAgent[5];
+            m_Mobiles = new MobileContext[5];
         }
 
         /// <summary>
@@ -90,13 +90,13 @@ namespace Client.Accounting
         /// Gets or sets the character at the specified index for this account.
         /// Out of bound index values are handled; null returned for get, ignored for set.
         /// </summary>
-        public MobileAgent this[int index]
+        public MobileContext this[int index]
         {
             get
             {
                 if (index >= 0 && index < m_Mobiles.Length)
                 {
-                    MobileAgent m = m_Mobiles[index];
+                    MobileContext m = m_Mobiles[index];
                     if ((m != null) && m.IsDeleted)
                     {
                         m.Account = null;
@@ -128,7 +128,7 @@ namespace Client.Accounting
         {
             for (int i = 0; i < this.Length; ++i)
             {
-                MobileAgent m = this[i];
+                MobileContext m = this[i];
 
                 if (m == null)
                     continue;
@@ -172,7 +172,7 @@ namespace Client.Accounting
 
             for (int i = 0; i < m_Mobiles.Length; ++i)
             {
-                MobileAgent m = m_Mobiles[i];
+                MobileContext m = m_Mobiles[i];
                 //if ((m == null) ||m.Removed) // m.Deleted
                 if (m == null)
                     continue;

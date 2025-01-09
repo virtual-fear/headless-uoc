@@ -1,5 +1,5 @@
 ﻿using System.Collections;
-using Client.Game.Context.Agents;
+using Client.Game.Agents;
 
 namespace Client.Networking.Incoming;
 
@@ -102,7 +102,7 @@ public static class UpdatedMap
             // [1]  ==  Felucca | Trammel | Ileshenar | Malas
             // [2]  ==  StaticBlock | LandBlock
 
-            t[WorldAgent.GetIndex(i)] = new KeyValuePair<int, int>(staticBlocks, landBlocks);
+            t[WorldContext.GetIndex(i)] = new KeyValuePair<int, int>(staticBlocks, landBlocks);
         }
 
         e.Table = t;

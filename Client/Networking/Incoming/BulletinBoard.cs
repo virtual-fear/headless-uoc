@@ -1,7 +1,7 @@
 ﻿namespace Client.Networking.Incoming;
 using System.Text;
-using Client.Game.Context.Agents;
-using Client.Game.Context.Data.BulletinBoard;
+using Client.Game.Agents;
+using Client.Game.Data.BulletinBoard;
 using static PacketSink;
 public partial class PacketSink
 {

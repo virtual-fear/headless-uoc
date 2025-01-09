@@ -1,8 +1,9 @@
 ﻿namespace Client;
-using Client.Game.Context.Agents;
+
+using Client.Game.Agents;
 public class ObjectManager
 {
-    private static readonly Type _typeMobile = typeof(MobileAgent);
+    private static readonly Type _typeMobile = typeof(MobileContext);
     private static readonly Type _typeItem = typeof(Item);
 
     private static Dictionary<Type, Dictionary<int, object>> m_Types;

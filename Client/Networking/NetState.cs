@@ -2,7 +2,7 @@
 using System.Net.Sockets;
 namespace Client.Networking;
 using Client.Accounting;
-using Client.Game.Context.Agents;
+using Client.Game.Agents;
 
 public abstract class NetState : Network
 {
@@ -10,7 +10,7 @@ public abstract class NetState : Network
     public Version? Version { get; private set; }
     public int AuthID { get; protected set; }
     public IAccount? Account { get; protected set; }
-    public MobileAgent? Mobile { get; private set; }
+    public MobileContext? Mobile { get; private set; }
     public abstract bool IsOpen { get; }
     public abstract IOStream Stream { get; }
     public abstract IPAddress Address { get; }

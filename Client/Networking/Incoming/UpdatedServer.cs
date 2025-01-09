@@ -1,6 +1,7 @@
 ﻿namespace Client.Networking.Incoming;
-using Client.Game.Context.Agents;
-using Client.Game.Context.Data;
+
+using Client.Game.Agents;
+using Client.Game.Data;
 using static PacketSink;
 public partial class PacketSink
 {
@@ -139,7 +140,7 @@ public static class UpdatedServer
         UpdatedWorld.Configure();
 
         // Setup mobiles/items
-        MobileAgent.Configure();
+        MobileContext.Configure();
         Item.Configure();
     }
     private static void CurrentTime(NetState ns, PacketReader pvSrc)

@@ -1,7 +1,7 @@
-﻿using Client.Game.Context.Agents;
+﻿using Client.Game.Agents;
 
 namespace Client.Game;
-public sealed class Mobile : MobileAgent
+public sealed class Mobile : MobileContext
 {
     public Mobile(int serial) : base(serial) { }
 }

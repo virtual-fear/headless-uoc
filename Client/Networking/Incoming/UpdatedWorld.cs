@@ -1,7 +1,6 @@
 ﻿namespace Client.Networking.Incoming;
 
-using Client.Game.Context.Data;
-
+using Client.Game.Data;
 using static PacketSink;
 public partial class PacketSink
 {

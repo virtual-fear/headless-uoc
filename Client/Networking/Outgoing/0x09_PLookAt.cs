@@ -1,5 +1,6 @@
 ﻿namespace Client.Networking.Outgoing;
-using Client.Game.Context.Data;
+
+using Client.Game.Data;
 
 public sealed class PLookAt : Packet
 {

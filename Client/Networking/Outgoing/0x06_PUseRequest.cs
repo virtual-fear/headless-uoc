@@ -1,5 +1,7 @@
 ﻿namespace Client.Networking.Outgoing;
-using Client.Game.Context.Data;
+
+using Client.Game.Data;
+
 public sealed class PUseRequest : Packet
 {
     private PUseRequest() : base(0x06, 5) { }
