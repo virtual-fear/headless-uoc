@@ -1,11 +1,8 @@
-﻿namespace Client.Networking.Incoming.Shard;
-public partial class PacketHandlers
+﻿namespace Client.Networking.Incoming;
+public partial class Shard
 {
-    protected static class LoginDelay
-    {
-        [PacketHandler(0xFD, length: -1, ingame: false)]
-        internal static void Receive(NetState state, PacketReader pvSrc)
-            => Logger.LogError("LoginDelay received, not fully implemented yet.");
+    [PacketHandler(0xFD, length: -1, ingame: false)]
+    protected static void Received_LoginDelay(NetState state, PacketReader pvSrc)
+        => Logger.LogError("LoginDelay received, not fully implemented yet.");
 
-    }
 }

@@ -1,28 +1,26 @@
-﻿
-namespace Client.Networking.Incoming.Player;
+﻿namespace Client.Networking.Incoming;
 using Client.Game.Data;
-public partial class PacketHandlers
+public class TargetReqEventArgs : EventArgs
 {
-    public static event PacketEventHandler<TargetReqEventArgs>? Player_TargetRequest;
-    public class TargetReqEventArgs : EventArgs
+    public NetState State { get; }
+    public TargetReqEventArgs(NetState state) => State = state;
+    public bool AllowGround { get; set; }
+    public int TargetID { get; set; }
+    public TargetFlags Flags { get; set; }
+}
+
+public partial class Player
+{
+    public static event PacketEventHandler<TargetReqEventArgs>? OnTargetRequest;
+
+    [PacketHandler(0x6C, length: 19, ingame: true)]
+    protected static void Receive_TargetRequest(NetState ns, PacketReader pvSrc)
     {
-        public NetState State { get; }
-        public TargetReqEventArgs(NetState state) => State = state;
-        public bool AllowGround { get; set; }
-        public int TargetID { get; set; }
-        public TargetFlags Flags { get; set; }
-    }
-    protected static class TargetRequest
-    {
-        [PacketHandler(0x6C, length: 19, ingame: true)]
-        internal static void Update(NetState ns, PacketReader pvSrc)
-        {
-            TargetReqEventArgs e = new(ns);
-            e.AllowGround = pvSrc.ReadBoolean();
-            e.TargetID = pvSrc.ReadInt32();
-            e.Flags = (TargetFlags)pvSrc.ReadByte();
-            pvSrc.ReadBytes(13);
-            Player_TargetRequest?.Invoke(e);
-        }
+        TargetReqEventArgs e = new(ns);
+        e.AllowGround = pvSrc.ReadBoolean();
+        e.TargetID = pvSrc.ReadInt32();
+        e.Flags = (TargetFlags)pvSrc.ReadByte();
+        pvSrc.ReadBytes(13);
+        OnTargetRequest?.Invoke(e);
     }
 }

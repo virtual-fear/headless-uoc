@@ -1,16 +1,13 @@
-﻿namespace Client.Networking.Incoming.Shard;
+﻿namespace Client.Networking.Incoming;
 using Client.Networking.Data;
-public partial class PacketHandlers
+public sealed class AccountLoginEventArgs : EventArgs
 {
-    public static event PacketEventHandler<AccountLoginEventArgs>? Shard_AccountLogin;
-    public sealed class AccountLoginEventArgs : EventArgs
-    {
-        public NetState? State { get; }
-        public AccountLoginEventArgs(NetState? state) => State = state;
-        public IEnumerable<ShardData>? Shards { get; set; }
-    }
+    public NetState State { get; }
+    public AccountLoginEventArgs(NetState state) => State = state;
+    public IEnumerable<ShardData>? Shards { get; set; }
+}
 
-    protected static class AccountLogin
-    {
-    }
+public partial class Shard
+{
+    public static event PacketEventHandler<AccountLoginEventArgs>? OnAccountLogin;
 }

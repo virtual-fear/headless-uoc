@@ -1,7 +1,8 @@
 ﻿namespace Client.Game.Context;
 
 using Client.Game.Data;
-using static Client.Networking.Incoming.Shard.PacketHandlers;
+using Client.Networking.Incoming;
+
 public class WorldContext : ContextEntity
 {
     private static Dictionary<Serial, ItemContext> _worldItems;

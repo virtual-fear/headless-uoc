@@ -1,12 +1,7 @@
-﻿namespace Client.Networking.Incoming.Display;
+﻿namespace Client.Networking.Incoming;
 using Client.Game.Context;
 using Client.Game.Data;
-
-public partial class PacketHandlers
-{
-    public static event PacketEventHandler<PaperdollEventArgs>? DisplayPaperdoll;
-
-    public sealed class PaperdollEventArgs : EventArgs
+public sealed class PaperdollEventArgs : EventArgs
     {
         public NetState State { get; }
         public PaperdollEventArgs(NetState state) => State = state;
@@ -14,17 +9,18 @@ public partial class PacketHandlers
         public string Text { get; set; }
         public bool Draggable { get; set; }
     }
-    protected static class Paperdoll
+public partial class Display
+{
+    public static event PacketEventHandler<PaperdollEventArgs>? UpdatePaperdoll;
+
+    [PacketHandler(0x88, length: 66, ingame: true)]
+    protected static void ReceivedDisplay_Paperdoll(NetState ns, PacketReader pvSrc)
     {
-        [PacketHandler(0x88, length: 66, ingame: true)]
-        public static void Update(NetState ns, PacketReader pvSrc)
-        {
-            PaperdollEventArgs e = new PaperdollEventArgs(ns);
-            e.Mobile = MobileContext.Acquire((Serial)pvSrc.ReadUInt32());
-            e.Text = pvSrc.ReadString(60);
-            bool canLift = (pvSrc.ReadByte() & 2) != 0;
-            e.Draggable = canLift;
-            DisplayPaperdoll?.Invoke(e);
-        }
+        PaperdollEventArgs e = new PaperdollEventArgs(ns);
+        e.Mobile = MobileContext.Acquire((Serial)pvSrc.ReadUInt32());
+        e.Text = pvSrc.ReadString(60);
+        bool canLift = (pvSrc.ReadByte() & 2) != 0;
+        e.Draggable = canLift;
+        UpdatePaperdoll?.Invoke(e);
     }
 }

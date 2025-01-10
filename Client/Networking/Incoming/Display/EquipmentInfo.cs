@@ -1,8 +1,5 @@
-﻿namespace Client.Networking.Incoming.Display;
-public partial class PacketHandlers
-{
-    public static event PacketEventHandler<EquipmentInfoEventArgs>? DisplayEquipmentInfo;
-    public sealed class EquipmentInfoEventArgs : EventArgs
+﻿namespace Client.Networking.Incoming;
+public sealed class EquipmentInfoEventArgs : EventArgs
     {
         private List<EquipInfoAttribute> m_Attributes = new();
         public NetState? State { get; }
@@ -20,33 +17,34 @@ public partial class PacketHandlers
             m_Attributes.Add(attribute);
         }
     }
-    protected static class EquipmentInfo
+public partial class EquipmentInfo
+{
+    public static event PacketEventHandler<EquipmentInfoEventArgs>? UpdateEquipmentInfo;
+
+    public const bool ExtendedCommand = true;
+
+    [PacketHandler(0x10, length: -1, ingame: true, extCmd: ExtendedCommand)]
+    protected static void ReceivedDisplay_EquipmentInfo(NetState ns, PacketReader pvSrc)
     {
-        public const bool ExtendedCommand = true;
+        EquipmentInfoEventArgs e = new(ns);
 
-        [PacketHandler(0x10, length: -1, ingame: true, extCmd: ExtendedCommand)]
-        public static void Update(NetState ns, PacketReader pvSrc)
+        e.Item = pvSrc.ReadInt32();
+        e.Number = pvSrc.ReadInt32();
+        e.Identified = (pvSrc.ReadInt32() != -3);
+
+        if (e.Identified)
+            e.Name = pvSrc.ReadString(pvSrc.ReadUInt16());
+
+        int n, c;
+        while (pvSrc.ReadInt32() != -1)
         {
-            EquipmentInfoEventArgs e = new(ns);
+            pvSrc.Seek(-4, SeekOrigin.Current);
 
-            e.Item = pvSrc.ReadInt32();
-            e.Number = pvSrc.ReadInt32();
-            e.Identified = (pvSrc.ReadInt32() != -3);
+            n = pvSrc.ReadInt32();
+            c = pvSrc.ReadInt16();
 
-            if (e.Identified)
-                e.Name = pvSrc.ReadString(pvSrc.ReadUInt16());
-
-            int n, c;
-            while (pvSrc.ReadInt32() != -1)
-            {
-                pvSrc.Seek(-4, SeekOrigin.Current);
-
-                n = pvSrc.ReadInt32();
-                c = pvSrc.ReadInt16();
-
-                e.AddAttribute(new EquipInfoAttribute(n, c));
-            }
-            DisplayEquipmentInfo?.Invoke(e);
+            e.AddAttribute(new EquipInfoAttribute(n, c));
         }
+        UpdateEquipmentInfo?.Invoke(e);
     }
 }

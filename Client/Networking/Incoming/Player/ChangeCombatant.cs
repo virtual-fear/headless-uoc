@@ -1,22 +1,19 @@
-﻿namespace Client.Networking.Incoming.Player;
-public partial class PacketHandlers
+﻿namespace Client.Networking.Incoming;
+public sealed class ChangeCombatantEventArgs : EventArgs
 {
-    public static event PacketEventHandler<ChangeCombatantEventArgs>? Player_ChangeCombatant;
-    public sealed class ChangeCombatantEventArgs : EventArgs
-    {
-        public NetState State { get; }
-        public ChangeCombatantEventArgs(NetState state) => State = state;
-        public int Serial { get; set; }
-    }
+    public NetState State { get; }
+    public ChangeCombatantEventArgs(NetState state) => State = state;
+    public int Serial { get; set; }
+}
+public partial class Player
+{
+    public static event PacketEventHandler<ChangeCombatantEventArgs>? OnChangeCombatant;
 
-    protected static class ChangeCombatant
+    [PacketHandler(0xAA, length: 5, ingame: true)]
+    protected static void Receive_ChangeCombatant(NetState ns, PacketReader pvSrc)
     {
-        [PacketHandler(0xAA, length: 5, ingame: true)]
-        public static void Update(NetState ns, PacketReader pvSrc)
-        {
-            ChangeCombatantEventArgs e = new(ns);
-            e.Serial = pvSrc.ReadInt32();
-            Player_ChangeCombatant?.Invoke(e);
-        }
+        ChangeCombatantEventArgs e = new(ns);
+        e.Serial = pvSrc.ReadInt32();
+        OnChangeCombatant?.Invoke(e);
     }
 }

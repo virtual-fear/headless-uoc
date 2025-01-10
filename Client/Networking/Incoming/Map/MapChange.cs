@@ -1,34 +1,23 @@
-﻿namespace Client.Networking.Incoming.Map;
-public partial class PacketHandlers
+﻿namespace Client.Networking.Incoming;
+public sealed class MapChangeEventArgs : EventArgs
 {
-    public static event PacketEventHandler<MapChangeEventArgs>? MapUpdateChange;
-    public class MapChangeEventArgs : EventArgs
+    public NetState State { get; }
+    public PacketReader? Reader { get; set; }
+    public byte Index { get; set; }
+    public MapChangeEventArgs(NetState state) => State = state;
+}
+public partial class Map
+{
+    public static event PacketEventHandler<MapChangeEventArgs>? OnChange;
+
+    [PacketHandler(0x8, length: 6, ingame: true, extCmd: true)]
+    protected static void ReceivedMap_Change(NetState ns, PacketReader pvSrc)
     {
-        private NetState m_State;
-        private PacketReader m_Reader;
-        private byte m_Index;
-
-        public NetState State { get { return m_State; } }
-        public PacketReader Reader { get { return m_Reader; } set { m_Reader = value; } }
-        public byte Index { get { return m_Index; } set { m_Index = value; } }
-
-        public MapChangeEventArgs(NetState state)
+        MapChangeEventArgs e = new MapChangeEventArgs(ns)
         {
-            m_State = state;
-        }
-    }
-
-    protected static class MapChange
-    {
-        [PacketHandler(0x8, length: 6, ingame: true, extCmd: true)]
-        public static void Update(NetState ns, PacketReader pvSrc)
-        {
-            MapChangeEventArgs e = new MapChangeEventArgs(ns)
-            {
-                Reader = pvSrc,
-                Index = pvSrc.ReadByte()
-            };
-            MapUpdateChange?.Invoke(e);
-        }
+            Reader = pvSrc,
+            Index = pvSrc.ReadByte()
+        };
+        OnChange?.Invoke(e);
     }
 }

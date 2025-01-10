@@ -1,7 +1,6 @@
 ﻿namespace Client.Game.Context;
 using Client.Game.Data;
-using static Client.Networking.Incoming.Items.PacketHandlers;
-using static Client.Networking.Incoming.PacketHandlers;
+using Client.Networking.Incoming;
 public interface IItemValidator
 {
     bool IsValid(ItemContext check);
@@ -15,17 +14,26 @@ public sealed class ItemContext : ContextEntity
     public Layer Layer { get; private set; }
     public static ItemContext Acquire(Serial serial) => WorldContext.WantItem(serial);
     public ItemContext(Serial serial) : base(serial) { }
-    public static void Configure()
+    static ItemContext() => Configure();
+    private static void Configure()
     {
-        OnItemIncoming += ItemContext_OnItemIncoming;
-        OnItemUpdate += ItemContext_OnItemUpdate;
-        OnRemove += ItemContext_OnRemove;
+        Item.OnUpdate += Item_OnUpdate;
+        Item.OnUpdateIncoming += Item_OnUpdateIncoming;
     }
+
     private static void ItemContext_OnRemove(RemoveEventArgs e)
     {
         Acquire(e.Serial)?.Delete();
     }
-    private static void ItemContext_OnItemUpdate(ItemEventArgs e)
+
+    private static void Item_OnUpdateIncoming(ItemIncomingEventArgs e)
+    {
+        var item = Acquire(e.Serial);
+        item.ID = e.ItemID;
+        item.Hue = e.Hue;
+        item.Layer = e.Layer;
+    }
+    private static void Item_OnUpdate(ItemEventArgs e)
     {
         var item = Acquire(e.Serial);
         item.ID = e.ItemID;
@@ -33,12 +41,5 @@ public sealed class ItemContext : ContextEntity
         item.Amount = e.Amount;
         item.Flags = e.Flags;
         item.SetLocation(e.X, e.Y, e.Z);
-    }
-    private static void ItemContext_OnItemIncoming(ItemIncomingEventArgs e)
-    {
-        var item = Acquire(e.Serial);
-        item.ID = e.ItemID;
-        item.Hue = e.Hue;
-        item.Layer = e.Layer;
     }
 }

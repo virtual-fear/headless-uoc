@@ -1,22 +1,19 @@
-﻿namespace Client.Networking.Incoming.Player;
-public partial class PacketHandlers
+﻿namespace Client.Networking.Incoming;
+public sealed class DeathStatusEventArgs : EventArgs
 {
-    public static event PacketEventHandler<DeathStatusEventArgs>? Player_DeathStatus;
-    public sealed class DeathStatusEventArgs : EventArgs
-    {
-        public NetState State { get; }
-        public DeathStatusEventArgs(NetState state) => State = state;
-        public bool Dead { get; set; }
-    }
+    public NetState State { get; }
+    public DeathStatusEventArgs(NetState state) => State = state;
+    public bool Dead { get; set; }
+}
+public partial class Player
+{
+    public static event PacketEventHandler<DeathStatusEventArgs>? OnDeathStatus;
 
-    protected static class DeathStatus
+    [PacketHandler(0x2C, length: 2, ingame: true)]
+    protected static void Receive_DeathStatus(NetState ns, PacketReader pvSrc)
     {
-        [PacketHandler(0x2C, length: 2, ingame: true)]
-        internal static void Update(NetState ns, PacketReader pvSrc)
-        {
-            DeathStatusEventArgs e = new DeathStatusEventArgs(ns);
-            e.Dead = (pvSrc.ReadByte() == 2);
-            Player_DeathStatus?.Invoke(e);
-        }
+        DeathStatusEventArgs e = new DeathStatusEventArgs(ns);
+        e.Dead = (pvSrc.ReadByte() == 2);
+        OnDeathStatus?.Invoke(e);
     }
 }

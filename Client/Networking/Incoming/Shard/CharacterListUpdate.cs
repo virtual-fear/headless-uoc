@@ -1,13 +1,9 @@
-﻿namespace Client.Networking.Incoming.Shard;
-public partial class PacketHandlers
+﻿namespace Client.Networking.Incoming;
+public partial class Shard
 {
-    protected static class CharacterListUpdate
+    [PacketHandler(0x86, length: -1, ingame: false)]
+    protected static void Received_CharacterListUpdate(NetState state, PacketReader pvSrc)
     {
-        [PacketHandler(0x86, length: -1, ingame: false)]
-        internal static void Update (NetState state, PacketReader pvSrc)
-        {
-            Logger.LogError("CharacterListUpdate received, not fully implemented yet.");
-        }
-
+        Logger.LogError("CharacterListUpdate received, not fully implemented yet.");
     }
 }

@@ -1,7 +1,6 @@
 ﻿namespace Client.Game.Context;
 using Client.Game.Data;
-using static Client.Networking.Incoming.Mobiles.PacketHandlers;
-using static Client.Networking.Incoming.Movement.PacketHandlers;
+using Client.Networking.Incoming;
 public interface IMobileValidator
 {
     bool IsValid(MobileContext check);
@@ -58,29 +57,29 @@ public class MobileContext : ContextEntity
     }
     public static void Configure()
     {
-        OnMobileAnimation += MobileContext_OnMobileAnimation;
-        OnMobileAttributes += MobileContext_OnMobileAttributes;
-        OnMobileDamage += MobileContext_OnMobileDamage;
-        OnMobileHits += MobileContext_OnMobileHits;
-        OnMobileIncoming += MobileContext_OnMobileIncoming;
-        OnMobileMana += MobileContext_OnMobileMana;
-        OnMobileMoving += MobileContext_OnMobileMoving;
-        OnMobileStam += MobileContext_OnMobileStam;
-        OnMobileStatus += MobileContext_OnMobileStatus;
-        OnMobileUpdate += MobileContext_OnMobileUpdate;
-        OnMovementAck += MobileContext_OnMovementAck;
-        OnMovementRej += MobileContext_OnMovementRej;
-        OnSetWarMode += MobileContext_OnSetWarMode;
+        Mobile.OnAnimation += Mobile_OnAnimation;
+        Mobile.OnChangedAttributes += Mobile_OnChangedAttributes;
+        Mobile.ReceivedDamage += Mobile_ReceivedDamage;
+        Mobile.OnChangedHits += Mobile_OnChangedHits;
+        Mobile.OnIncoming += Mobile_OnIncoming;
+        Mobile.OnChangedMana += Mobile_OnChangedMana;
+        Mobile.OnMoving += Mobile_OnMoving;
+        Mobile.OnChangedStamina += Mobile_OnChangedStamina;
+        Mobile.OnStatus += Mobile_OnStatus;
+        Mobile.OnUpdate += Mobile_OnUpdate;
+        Mobile.OnMovementAck += Mobile_OnMovementAck;
+        Mobile.OnMovementRej += Mobile_OnMovementRej;
+        Mobile.OnWarmode += Mobile_OnWarmode;
     }
 
-    private static void MobileContext_OnSetWarMode(SetWarModeEventArgs e)
+    private static void Mobile_OnWarmode(SetWarModeEventArgs e)
     {
         WorldContext.Player.UpdateSetWarMode(e.Enabled);
     }
     private void UpdateSetWarMode(bool enabled) => _warmode = enabled;
-    static void MobileContext_OnMovementRej(MovementRejEventArgs e)
+    static void Mobile_OnMovementRej(MovementRejEventArgs e)
     {
-        if (e.State.Mobile is Mobile mob && mob != null)
+        if (e.State.Mobile is MobileContext mob && mob != null)
         {
             Acquire(mob.Serial).UpdateMovementRej(e.Direction, e.Sequence, e.X, e.Y, e.Z);
         }
@@ -92,7 +91,7 @@ public class MobileContext : ContextEntity
 
         SetLocation(x, y, z);
     }
-    static void MobileContext_OnMovementAck(MovementAckEventArgs e)
+    static void Mobile_OnMovementAck(MovementAckEventArgs e)
     {
         if (e.State.Mobile == null)
             return;
@@ -104,7 +103,7 @@ public class MobileContext : ContextEntity
         _notoriety = notoriety;
         _sequence = sequence;
     }
-    static void MobileContext_OnMobileUpdate(MobileUpdateEventArgs e)
+    static void Mobile_OnUpdate(MobileUpdateEventArgs e)
     {
         Acquire(e.Serial).Update((ushort)e.Body, e.Direction, e.Hue, e.X, e.Y, e.Z);
     }
@@ -116,7 +115,7 @@ public class MobileContext : ContextEntity
 
         SetLocation(x, y, z);
     }
-    static void MobileContext_OnMobileStatus(MobileStatusEventArgs e)
+    static void Mobile_OnStatus(MobileStatusEventArgs e)
     {
         Acquire(e.Serial).UpdateStatus(e);
     }
@@ -152,7 +151,7 @@ public class MobileContext : ContextEntity
         _typeID = e.Type;
         _weight = e.Weight;
     }
-    static void MobileContext_OnMobileStam(MobileStamEventArgs e)
+    static void Mobile_OnChangedStamina(MobileStamEventArgs e)
     {
         Acquire(e.Serial).UpdateStam(e.Stam, e.StamMax);
     }
@@ -161,7 +160,7 @@ public class MobileContext : ContextEntity
         _stam = stam;
         _stamMax = stamMax;
     }
-    static void MobileContext_OnMobileMoving(MobileMovingEventArgs e)
+    static void Mobile_OnMoving(MobileMovingEventArgs e)
     {
         Acquire(e.Serial).UpdateMoving(e.Body, e.Direction, e.Hue, e.Notoriety, e.X, e.Y, e.Z);
     }
@@ -173,7 +172,7 @@ public class MobileContext : ContextEntity
         _notoriety = notoriety;
         SetLocation(x, y, z);
     }
-    static void MobileContext_OnMobileMana(MobileManaEventArgs e)
+    static void Mobile_OnChangedMana(MobileManaEventArgs e)
     {
         Acquire(e.Serial).UpdateMana(e.Mana, e.ManaMax);
     }
@@ -182,7 +181,7 @@ public class MobileContext : ContextEntity
         _mana = mana;
         _manaMax = manaMax;
     }
-    static void MobileContext_OnMobileIncoming(MobileIncomingEventArgs e)
+    static void Mobile_OnIncoming(MobileIncomingEventArgs e)
     {
         Acquire(e.Serial).UpdateIncoming(e.Body, e.Direction, e.Hue, e.Notoriety, e.X, e.Y, e.Z);
     }
@@ -194,7 +193,7 @@ public class MobileContext : ContextEntity
         _notoriety = notoriety;
         SetLocation(x, y, z);
     }
-    static void MobileContext_OnMobileHits(MobileHitsEventArgs e)
+    static void Mobile_OnChangedHits(MobileHitsEventArgs e)
     {
         Acquire(e.Serial).UpdateHits(e.Hits, e.HitsMax);
     }
@@ -203,7 +202,7 @@ public class MobileContext : ContextEntity
         _hits = hits;
         _hitsMax = hitsMax;
     }
-    static void MobileContext_OnMobileDamage(MobileDamageEventArgs e)
+    static void Mobile_ReceivedDamage(MobileDamageEventArgs e)
     {
         MobileContext mob = Acquire(e.Serial);
         short playerHealth = mob._hits;
@@ -224,7 +223,7 @@ public class MobileContext : ContextEntity
 
         _hits = health;
     }
-    static void MobileContext_OnMobileAttributes(MobileAttributesEventArgs e)
+    static void Mobile_OnChangedAttributes(MobileAttributesEventArgs e)
     {
         Acquire(e.Serial).UpdateAttributes(e.Hits, e.MaxHits, e.Mana, e.MaxMana, e.Stam, e.MaxStam);
     }
@@ -237,7 +236,7 @@ public class MobileContext : ContextEntity
         _stam = stam;
         _stamMax = stamMax;
     }
-    static void MobileContext_OnMobileAnimation(MobileAnimationEventArgs e)
+    static void Mobile_OnAnimation(MobileAnimationEventArgs e)
     {
         Acquire(e.Serial).UpdateAnimation((short)e.Action, e.Delay, e.Forward, (short)e.FrameCount, e.Repeat, (short)e.RepeatCount);
     }

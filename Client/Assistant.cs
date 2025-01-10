@@ -3,9 +3,8 @@ namespace Client
     using System.Net;
     using Client.Networking;
     using Client.Networking.Data;
+    using Client.Networking.Incoming;
     using Client.Networking.Outgoing;
-    using static Client.Networking.Incoming.Shard.PacketHandlers;
-    using PacketHandlers = Networking.PacketHandlers;
 
     /// <summary>
     ///     An event driven network client, built for ModernUO.
@@ -37,8 +36,8 @@ namespace Client
 
             // TODO: Create a class to handle the Configuration setup of PacketSink
             // so when the app is run, it can determine what events need to be used
-            Shard_ServerList += OnServerList;
-            Shard_ServerAck += OnServerAck;
+            Shard.UpdateServerList += Shard_UpdateServerList;
+            Shard.OnServerAck += Shard_OnServerAck;
         }
 
         /// <summary>
@@ -46,7 +45,7 @@ namespace Client
         /// </summary>
         /// <param name="e"></param>
         /// <exception cref="NotImplementedException"></exception>
-        private static async void OnServerAck(ServerAckEventArgs e)
+        private static async void Shard_OnServerAck(ServerAckEventArgs e)
         {
             Logger.Log(typeof(Assistant),
                        "Received acknowledgement from the server.", color: LogColor.Info);
@@ -60,7 +59,7 @@ namespace Client
         }
 
         //[Obsolete("This event method is not used in the original code (used only for testing purposes)", error: false)]
-        private static void OnServerList(ServerListReceivedEventArgs e)
+        private static void Shard_UpdateServerList(ServerListReceivedEventArgs e)
         {
             if (e.ServerListEntries.Length == 0)
             {

@@ -1,19 +1,17 @@
-﻿namespace Client.Networking.Incoming.Player;
-public partial class PacketHandlers
+﻿namespace Client.Networking.Incoming;
+public sealed class ClearWeaponAbilityEventArgs : EventArgs
 {
-    public static event PacketEventHandler<ClearWeaponAbilityEventArgs>? Player_ClearWeaponAbility;
-    public sealed class ClearWeaponAbilityEventArgs : EventArgs
+    public NetState State { get; }
+    public ClearWeaponAbilityEventArgs(NetState state) => State = state;
+}
+public partial class Player
+{
+    public static event PacketEventHandler<ClearWeaponAbilityEventArgs>? OnClearWeaponAbility;
+
+    [PacketHandler(0x21, length: 5, ingame: true, extCmd: true)]
+    protected static void Receive_ClearWeaponAbility(NetState ns, PacketReader pvSrc)
     {
-        public NetState State { get; }
-        public ClearWeaponAbilityEventArgs(NetState state) => State = state;
-    }
-    protected static class ClearWeaponAbility
-    {
-        [PacketHandler(0x21, length: 5, ingame: true, extCmd: true)]
-        public static void Update(NetState ns, PacketReader pvSrc)
-        {
-            ClearWeaponAbilityEventArgs e = new ClearWeaponAbilityEventArgs(ns);
-            Player_ClearWeaponAbility?.Invoke(e);
-        }
+        ClearWeaponAbilityEventArgs e = new ClearWeaponAbilityEventArgs(ns);
+        OnClearWeaponAbility?.Invoke(e);
     }
 }

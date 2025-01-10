@@ -1,8 +1,8 @@
 ﻿namespace Client.Networking.Data;
 using System.Net;
 using Client.Networking;
+using Client.Networking.Incoming;
 using Client.Networking.Outgoing;
-using static Client.Networking.Incoming.Shard.PacketHandlers;
 public struct ShardData
 {
     public byte Index { get; }
