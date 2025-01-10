@@ -3,25 +3,25 @@ using Client.Game.Context;
 public class ObjectManager
 {
     private static readonly Type _typeMobile = typeof(MobileContext);
-    private static readonly Type _typeItem = typeof(Item);
+    private static readonly Type _typeItem = typeof(ItemContext);
 
-    private static Dictionary<Type, Dictionary<int, object>> m_Types;
+    private static Dictionary<Type, Dictionary<int, object?>> m_Types;
     private static Dictionary<int, object> Find(Type type)
     {
         if (m_Types == null)
-            m_Types = new Dictionary<Type, Dictionary<int, object>>();
+            m_Types = new Dictionary<Type, Dictionary<int, object?>>();
 
         if (m_Types[type] == null)
-            m_Types[type] = new Dictionary<int, object>();
+            m_Types[type] = new Dictionary<int, object?>();
 
         return m_Types[type];
     }
 
-    private static object Find(Type type, int serial)
+    private static object? Find(Type type, int serial)
     {
         Dictionary<int, object> types = Find(type);
 
-        object o = null;
+        object? o = null;
 
         if (types.ContainsKey(serial))
             o = types[serial];
@@ -29,7 +29,7 @@ public class ObjectManager
         return o;
     }
 
-    public object this[Type type, int serial]
+    public object? this[Type type, int serial]
     {
         get { return Find(type, serial); }
         set

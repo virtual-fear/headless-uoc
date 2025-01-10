@@ -1,9 +1,28 @@
 ﻿using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 
 namespace Client.Networking
 {
     public delegate void OnPacketReceive(NetState state, PacketReader pvSrc);
     public delegate void PacketEventHandler<T>(T e);
+
+    [CompilerGenerated]
+    [AttributeUsage(AttributeTargets.Method, AllowMultiple = false)]
+    public class PacketHandlerAttribute : Attribute
+    {
+        public int PacketID { get; }
+        public int Length { get; }
+        public bool Ingame { get; }
+        public bool ExtendedCommand { get; }
+        public PacketHandlerAttribute(int packetID, int length, bool ingame, bool extCmd = false)
+        {
+            PacketID = packetID;
+            Length = length;
+            Ingame = ingame;
+            ExtendedCommand = extCmd;
+        }
+    }
+
     public class PacketHandler
     {
         protected Dictionary<int, PacketHandler> Table { get; } = new Dictionary<int, PacketHandler>();
@@ -21,7 +40,7 @@ namespace Client.Networking
             Ingame = ingame;
             OnReceive = receive;
         }
-        public PacketHandler this[int packetID] 
+        public PacketHandler? this[int packetID] 
         {
             get => Table.ContainsKey(packetID) ? Table[packetID] : null;
             set

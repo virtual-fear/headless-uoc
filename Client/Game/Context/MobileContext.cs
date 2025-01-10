@@ -1,6 +1,7 @@
-﻿using static Client.Networking.Incoming.PacketSink;
-namespace Client.Game.Context;
+﻿namespace Client.Game.Context;
 using Client.Game.Data;
+using static Client.Networking.Incoming.Mobiles.PacketHandlers;
+using static Client.Networking.Incoming.Movement.PacketHandlers;
 public interface IMobileValidator
 {
     bool IsValid(MobileContext check);
@@ -45,56 +46,48 @@ public class MobileContext : ContextEntity
     private byte _gender;
     private bool _isPet;
     private short _luck;
-    private string _name;
+    private string? _name;
     private byte _typeID;
     private bool _warmode;
     #endregion
 
+    static MobileContext() => Configure();
     public MobileContext(int serial) : base(serial) { }
-
     protected override void OnChangedLocation()
     {
         base.OnChangedLocation();
 
         Logger.Log($"Mobile: {Serial}: moved to {X}, {Y}");
     }
-
     public static void Configure()
     {
-        //PacketSink.LoginConfirm += WorldContent.LoginConfirm;
-        MobileAnimation += OnAnimation;
-        MobileAttributes += OnAttributes;
-        MobileDamage += OnDamage;
-        MobileHits += OnHits; 
-        MobileIncoming += OnIncoming;
-        MobileMana += OnMana;
-        MobileMoving += OnMoving;
-        MobileStam += OnStam;
-        MobileStatus += OnStatus;
-        MobileUpdate += OnUpdate;
-        MovementAck += OnMovementAck;
-        MovementRej += OnMovementRej;
-        SetWarMode += OnSetWarMode;
+        OnMobileAnimation += MobileContext_OnMobileAnimation;
+        OnMobileAttributes += MobileContext_OnMobileAttributes;
+        OnMobileDamage += MobileContext_OnMobileDamage;
+        OnMobileHits += MobileContext_OnMobileHits;
+        OnMobileIncoming += MobileContext_OnMobileIncoming;
+        OnMobileMana += MobileContext_OnMobileMana;
+        OnMobileMoving += MobileContext_OnMobileMoving;
+        OnMobileStam += MobileContext_OnMobileStam;
+        OnMobileStatus += MobileContext_OnMobileStatus;
+        OnMobileUpdate += MobileContext_OnMobileUpdate;
+        OnMovementAck += MobileContext_OnMovementAck;
+        OnMovementRej += MobileContext_OnMovementRej;
+        OnSetWarMode += MobileContext_OnSetWarMode;
     }
 
-    static void OnSetWarMode(SetWarModeEventArgs e)
+    private static void MobileContext_OnSetWarMode(SetWarModeEventArgs e)
     {
         WorldContext.Player.UpdateSetWarMode(e.Enabled);
     }
-
-    private void UpdateSetWarMode(bool enabled)
-    {
-        _warmode = enabled;
-    }
-
-    static void OnMovementRej(MovementRejEventArgs e)
+    private void UpdateSetWarMode(bool enabled) => _warmode = enabled;
+    static void MobileContext_OnMovementRej(MovementRejEventArgs e)
     {
         if (e.State.Mobile is Mobile mob && mob != null)
         {
             Acquire(mob.Serial).UpdateMovementRej(e.Direction, e.Sequence, e.X, e.Y, e.Z);
         }
     }
-
     private void UpdateMovementRej(Direction direction, byte sequence, short x, short y, sbyte z)
     {
         _direction = direction;
@@ -102,26 +95,22 @@ public class MobileContext : ContextEntity
 
         SetLocation(x, y, z);
     }
-
-    static void OnMovementAck(MovementAckEventArgs e)
+    static void MobileContext_OnMovementAck(MovementAckEventArgs e)
     {
         if (e.State.Mobile == null)
             return;
 
         Acquire(e.State.Mobile.Serial).UpdateMovementAck(e.Notoriety, e.Sequence);
     }
-
     private void UpdateMovementAck(Notoriety notoriety, byte sequence)
     {
         _notoriety = notoriety;
         _sequence = sequence;
     }
-
-    static void OnUpdate(MobileUpdateEventArgs e)
+    static void MobileContext_OnMobileUpdate(MobileUpdateEventArgs e)
     {
         Acquire(e.Serial).Update((ushort)e.Body, e.Direction, e.Hue, e.X, e.Y, e.Z);
     }
-
     private void Update(ushort bodyID, Direction direction, short hue, short x, short y, sbyte z)
     {
         _bodyID = (short)bodyID;
@@ -130,12 +119,10 @@ public class MobileContext : ContextEntity
 
         SetLocation(x, y, z);
     }
-
-    static void OnStatus(MobileStatusEventArgs e)
+    static void MobileContext_OnMobileStatus(MobileStatusEventArgs e)
     {
         Acquire(e.Serial).UpdateStatus(e);
     }
-
     private void UpdateStatus(MobileStatusEventArgs e)
     {
         _armor = e.Armor;
@@ -168,23 +155,19 @@ public class MobileContext : ContextEntity
         _typeID = e.Type;
         _weight = e.Weight;
     }
-
-    static void OnStam(MobileStamEventArgs e)
+    static void MobileContext_OnMobileStam(MobileStamEventArgs e)
     {
         Acquire(e.Serial).UpdateStam(e.Stam, e.StamMax);
     }
-
     private void UpdateStam(short stam, short stamMax)
     {
         _stam = stam;
         _stamMax = stamMax;
     }
-
-    static void OnMoving(MobileMovingEventArgs e)
+    static void MobileContext_OnMobileMoving(MobileMovingEventArgs e)
     {
         Acquire(e.Serial).UpdateMoving(e.Body, e.Direction, e.Hue, e.Notoriety, e.X, e.Y, e.Z);
     }
-
     private void UpdateMoving(short bodyID, Direction direction, short hue, Notoriety notoriety, short x, short y, sbyte z)
     {
         _bodyID = bodyID;
@@ -193,23 +176,19 @@ public class MobileContext : ContextEntity
         _notoriety = notoriety;
         SetLocation(x, y, z);
     }
-
-    static void OnMana(MobileManaEventArgs e)
+    static void MobileContext_OnMobileMana(MobileManaEventArgs e)
     {
         Acquire(e.Serial).UpdateMana(e.Mana, e.ManaMax);
     }
-
     private void UpdateMana(short mana, short manaMax)
     {
         _mana = mana;
         _manaMax = manaMax;
     }
-
-    static void OnIncoming(MobileIncomingEventArgs e)
+    static void MobileContext_OnMobileIncoming(MobileIncomingEventArgs e)
     {
         Acquire(e.Serial).UpdateIncoming(e.Body, e.Direction, e.Hue, e.Notoriety, e.X, e.Y, e.Z);
     }
-
     private void UpdateIncoming(short bodyID, Direction direction, short hue, Notoriety notoriety, short x, short y, sbyte z)
     {
         _bodyID = bodyID;
@@ -218,19 +197,16 @@ public class MobileContext : ContextEntity
         _notoriety = notoriety;
         SetLocation(x, y, z);
     }
-
-    static void OnHits(MobileHitsEventArgs e)
+    static void MobileContext_OnMobileHits(MobileHitsEventArgs e)
     {
         Acquire(e.Serial).UpdateHits(e.Hits, e.HitsMax);
     }
-
     private void UpdateHits(short hits, short hitsMax)
     {
         _hits = hits;
         _hitsMax = hitsMax;
     }
-
-    static void OnDamage(MobileDamageEventArgs e)
+    static void MobileContext_OnMobileDamage(MobileDamageEventArgs e)
     {
         MobileContext m = Acquire(e.Serial);
 
@@ -242,7 +218,6 @@ public class MobileContext : ContextEntity
 
         Acquire(e.Serial).UpdateDamage(e.Amount);
     }
-
     private void UpdateDamage(ushort amount)
     {
         short health = _hits;
@@ -253,12 +228,10 @@ public class MobileContext : ContextEntity
 
         _hits = health;
     }
-
-    static void OnAttributes(MobileAttributesEventArgs e)
+    static void MobileContext_OnMobileAttributes(MobileAttributesEventArgs e)
     {
         Acquire(e.Serial).UpdateAttributes(e.Hits, e.MaxHits, e.Mana, e.MaxMana, e.Stam, e.MaxStam);
     }
-
     private void UpdateAttributes(short hits, short hitsMax, short mana, short manaMax, short stam, short stamMax)
     {
         _hits = hits;
@@ -268,55 +241,12 @@ public class MobileContext : ContextEntity
         _stam = stam;
         _stamMax = stamMax;
     }
-
-    static void OnAnimation(MobileAnimationEventArgs e)
+    static void MobileContext_OnMobileAnimation(MobileAnimationEventArgs e)
     {
         Acquire(e.Serial).UpdateAnimation((short)e.Action, e.Delay, e.Forward, (short)e.FrameCount, e.Repeat, (short)e.RepeatCount);
     }
-
     private void UpdateAnimation(short actionID, byte delay, bool forward, short frames, bool repeat, short count)
     {
     }
 }
 
-public interface IItemValidator
-{
-    bool IsValid(Item check);
-}
-public sealed class Item : ContextEntity
-{
-    public int ID { get; private set; }
-    public short Hue { get; private set; }
-    public short Amount { get; private set; }
-    public byte Flags { get; private set; }
-    public Layer Layer { get; private set; }
-    public static Item Acquire(int serial) => WorldContext.WantItem(serial);
-    public Item(int serial) : base(serial) { }
-    public static void Configure()
-    {
-        ItemIncoming += OnItemIncoming;
-        Remove += OnRemoveItem;
-        WorldItem += OnWorldItem;
-    }
-    private static void OnWorldItem(WorldItemEventArgs e)
-    {
-        var item = Acquire(e.Serial);
-        item.ID = e.ItemID;
-        item.Hue = e.Hue;
-        item.Amount = e.Amount;
-        item.Flags = e.Flags;
-        item.SetLocation(e.X, e.Y, e.Z);
-    }
-    private static void OnRemoveItem(RemoveEventArgs e)
-    {
-        var item = Acquire(e.Serial);
-        item.Delete();
-    }
-    static void OnItemIncoming(ItemIncomingEventArgs e)
-    {
-        var item = Acquire(e.Serial);
-        item.ID = e.ItemID;
-        item.Hue = e.Hue;
-        item.Layer = e.Layer;
-    }
-}

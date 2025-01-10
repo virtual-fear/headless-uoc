@@ -3,9 +3,9 @@ namespace Client
     using System.Net;
     using Client.Networking;
     using Client.Networking.Data;
-    using Client.Networking.Incoming;
     using Client.Networking.Outgoing;
-    using static Client.Networking.Incoming.PacketSink;
+    using static Client.Networking.Incoming.Shard.PacketHandlers;
+    using PacketHandlers = Networking.PacketHandlers;
 
     /// <summary>
     ///     An event driven network client, built for ModernUO.
@@ -33,19 +33,24 @@ namespace Client
 
         public static void Configure()
         {
-            PacketHandlers.Configure();
+            PacketHandlers.RegisterAttributes();
 
             // TODO: Create a class to handle the Configuration setup of PacketSink
             // so when the app is run, it can determine what events need to be used
-            PacketSink.ServerList += ReceivedServerList_0xA8;
-            PacketSink.ServerAck += ReceivedServerAck_0x8C;
+            Shard_ServerList += OnServerList;
+            Shard_ServerAck += OnServerAck;
         }
 
-        private static async void ReceivedServerAck_0x8C(ServerAckEventArgs e)
+        /// <summary>
+        ///     ReceivedServerAck : 0x8C
+        /// </summary>
+        /// <param name="e"></param>
+        /// <exception cref="NotImplementedException"></exception>
+        private static async void OnServerAck(ServerAckEventArgs e)
         {
             Logger.Log(typeof(Assistant),
                        "Received acknowledgement from the server.", color: LogColor.Info);
-            Logger.Log($"{new string(' ', nameof(Assistant).Length+-4)}Seed:0x{e.Seed:X4}", color: LogColor.Success);
+            Logger.Log($"{new string(' ', nameof(Assistant).Length + -4)}Seed:0x{e.Seed:X4}", color: LogColor.Success);
             var v = Network.Info;
             v.Seed = e.Seed;
             v.Stage = ConnectionAck.SecondLogin;
@@ -55,7 +60,7 @@ namespace Client
         }
 
         //[Obsolete("This event method is not used in the original code (used only for testing purposes)", error: false)]
-        private static void ReceivedServerList_0xA8(ServerListReceivedEventArgs e)
+        private static void OnServerList(ServerListReceivedEventArgs e)
         {
             if (e.ServerListEntries.Length == 0)
             {
@@ -76,6 +81,5 @@ namespace Client
             }
             Network.State.Send(PPlayServer.Instantiate((byte)shard.Index));
         }
-
     }
 }

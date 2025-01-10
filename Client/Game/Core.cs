@@ -1,5 +1,7 @@
 ﻿namespace Client.Game;
 using Microsoft.Win32;
+using static Client.Game.PacketHandlers;
+
 public static class Core
 {
     public static List<string> Directories { get; } = new List<string>();

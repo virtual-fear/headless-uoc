@@ -1,4 +1,5 @@
 ﻿namespace Client.Game.Context;
+
 using Client.Game.Data;
 
 public class ContextEntity : IEntity
@@ -44,7 +45,7 @@ public class ContextEntity : IEntity
             if (child.Parent != null)
                 child.Parent.Detach(child);
 
-            if (child is Item ||
+            if (child is ItemContext ||
                 child is MobileContext)
             {
                 Children[child.Serial] = child;

@@ -2,7 +2,7 @@
 using System.Net;
 using Client.Networking;
 using Client.Networking.Outgoing;
-using static Networking.Incoming.PacketSink;
+using static Client.Networking.Incoming.Shard.PacketHandlers;
 public struct ShardData
 {
     public byte Index { get; }
@@ -28,5 +28,5 @@ public struct ShardData
 
         return info;
     }
-    public void Submit(AccountLoginEventArgs e) => e.State.Send(PPlayServer.Instantiate(Index));
+    public void Submit(AccountLoginEventArgs e) => e.State?.Send(PPlayServer.Instantiate(Index));
 }
