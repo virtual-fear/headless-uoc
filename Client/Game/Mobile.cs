@@ -1,7 +1,6 @@
 ﻿using Client.Game.Context;
-
-namespace Client.Game;
+using Client.Game.Data;
 public sealed class Mobile : MobileContext
 {
-    public Mobile(int serial) : base(serial) { }
+    public Mobile(Serial serial) : base(serial) { }
 }

@@ -1,4 +1,6 @@
-﻿namespace Client.Networking.Incoming;
+﻿using Client.Game.Data;
+
+namespace Client.Networking.Incoming;
 public partial class PacketHandlers
 {
     public static event PacketEventHandler<RemoveEventArgs>? OnRemove;
@@ -6,14 +8,14 @@ public partial class PacketHandlers
     {
         public NetState State { get; }
         public RemoveEventArgs(NetState state) => State = state;
-        public int Serial { get; set; }
+        public Serial Serial { get; set; }
     }
     protected static class Remove
     {
         internal static void Update(NetState ns, PacketReader pvSrc)
         {
             RemoveEventArgs e = new(ns);
-            e.Serial = pvSrc.ReadInt32();
+            e.Serial = (Serial)pvSrc.ReadUInt32();
             OnRemove?.Invoke(e);
         }
     }

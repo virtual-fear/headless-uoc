@@ -1,4 +1,5 @@
 ﻿namespace Client.Networking.Incoming.Shard;
+
 using Client.Game.Data;
 public partial class PacketHandlers
 {
@@ -7,7 +8,7 @@ public partial class PacketHandlers
     {
         public NetState State { get; }
         public LoginConfirmEventArgs(NetState state) => State = state;
-        public int Serial { get; set; } = -1;
+        public Serial Serial { get; set; } = (Serial)0;
         public short Body { get; set; }
         public short X { get; set; }
         public short Y { get; set; }
@@ -22,7 +23,7 @@ public partial class PacketHandlers
         internal static void Update(NetState ns, PacketReader pvSrc)
         {
             LoginConfirmEventArgs e = new(ns);
-            e.Serial = pvSrc.ReadInt32();
+            e.Serial = (Serial)pvSrc.ReadUInt32();
             pvSrc.Seek(4, SeekOrigin.Current);
             e.Body = pvSrc.ReadInt16();
             e.X = pvSrc.ReadInt16();

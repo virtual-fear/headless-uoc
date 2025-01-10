@@ -1,4 +1,6 @@
-﻿namespace Client.Networking.Incoming.Mobiles;
+﻿using Client.Game.Data;
+
+namespace Client.Networking.Incoming.Mobiles;
 public partial class PacketHandlers
 {
     public static event PacketEventHandler<MobileHitsEventArgs>? OnMobileHits;
@@ -6,7 +8,7 @@ public partial class PacketHandlers
     {
         public NetState State { get; }
         public MobileHitsEventArgs(NetState state) => State = state;
-        public int Serial { get; set; }
+        public Serial Serial { get; set; }
         public short HitsMax { get; set; }
         public short Hits { get; set; }
     }
@@ -17,7 +19,7 @@ public partial class PacketHandlers
         protected static void Update(NetState ns, PacketReader pvSrc)
         {
             MobileHitsEventArgs e = new(ns);
-            e.Serial = pvSrc.ReadInt32();
+            e.Serial = (Serial)pvSrc.ReadUInt32();
             e.HitsMax = pvSrc.ReadInt16();
             e.Hits = pvSrc.ReadInt16();
             OnMobileHits?.Invoke(e);

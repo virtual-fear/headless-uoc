@@ -1,7 +1,7 @@
 ﻿namespace Client.Networking.Incoming.Player;
 public partial class PacketHandlers
 {
-    public static event PacketEventHandler<ToggleSpecialAbilityEventArgs>? Player_ToggleSpecialAbility; // (ext) packetID: 0x25
+    public static event PacketEventHandler<ToggleSpecialAbilityEventArgs>? Player_ToggleSpecialAbility;
     public sealed class ToggleSpecialAbilityEventArgs : EventArgs
     {
         public NetState State { get; }

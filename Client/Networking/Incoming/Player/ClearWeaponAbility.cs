@@ -1,7 +1,7 @@
 ﻿namespace Client.Networking.Incoming.Player;
 public partial class PacketHandlers
 {
-    public static event PacketEventHandler<ClearWeaponAbilityEventArgs>? Player_ClearWeaponAbility;     // (ext) packetID: 0x21
+    public static event PacketEventHandler<ClearWeaponAbilityEventArgs>? Player_ClearWeaponAbility;
     public sealed class ClearWeaponAbilityEventArgs : EventArgs
     {
         public NetState State { get; }

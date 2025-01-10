@@ -4,12 +4,24 @@ using Client.Game.Data;
 
 public class ContextEntity : IEntity
 {
-    private ContextEntity? m_Parent;
-    public int Serial { get; }
+    private Serial _serial;
+    public Serial Serial
+    {
+        get => _serial;
+        set
+        {
+            _serial = value;
+            OnSerialChanged();
+        }
+    }
+    protected virtual void OnSerialChanged() { }
+    public IAccount? Account { get; set; } = null;
     public short X { get; private set; }
     public short Y { get; private set; }
     public sbyte Z { get; private set; }
-    public ContextEntity Parent
+    
+    private ContextEntity? m_Parent;
+    public ContextEntity? Parent
     {
         get => m_Parent;
         private set
@@ -18,8 +30,8 @@ public class ContextEntity : IEntity
             OnParentChanged();
         }
     }
-    public Dictionary<int, ContextEntity> Children { get; } = new();
-    public ContextEntity(int serial) => Serial = serial;
+    public Dictionary<Serial, ContextEntity> Children { get; } = new();
+    public ContextEntity(Serial serial) => Serial = serial;
     public ContextEntity? WorldRoot
     {
         get
@@ -45,8 +57,7 @@ public class ContextEntity : IEntity
             if (child.Parent != null)
                 child.Parent.Detach(child);
 
-            if (child is ItemContext ||
-                child is MobileContext)
+            if (child is ItemContext || child is MobileContext)
             {
                 Children[child.Serial] = child;
             }
@@ -66,6 +77,16 @@ public class ContextEntity : IEntity
             child.Parent = null;
         }
     }
+    public bool IsChildOf(ContextEntity agent)
+    {
+        if (agent != null)
+        {
+            for (ContextEntity? i = m_Parent; i != null; i = i.Parent)
+                if (i == agent)
+                    return true;
+        }
+        return false;
+    }
     public int DistanceTo(int x, int y)
     {
         x = X - x;
@@ -73,17 +94,6 @@ public class ContextEntity : IEntity
 
         return (int)Math.Sqrt(x * x + y * y);
     }
-    public bool IsChildOf(ContextEntity agent)
-    {
-        if (agent != null)
-        {
-            for (ContextEntity i = m_Parent; i != null; i = i.Parent)
-                if (i == agent)
-                    return true;
-        }
-        return false;
-    }
-    public IAccount? Account { get; set; } = null;
     public bool IsDeleted { get; set; } = false;
     public void Delete()
     {

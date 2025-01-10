@@ -8,10 +8,7 @@ public interface IMobileValidator
 }
 public class MobileContext : ContextEntity
 {
-    public static MobileContext Acquire(int serial)
-    {
-        return WorldContext.WantMobile(serial);
-    }
+    public static MobileContext Acquire(Serial serial) => WorldContext.WantMobile(serial);
 
     #region Fields
     private Direction _direction;
@@ -52,7 +49,7 @@ public class MobileContext : ContextEntity
     #endregion
 
     static MobileContext() => Configure();
-    public MobileContext(int serial) : base(serial) { }
+    public MobileContext(Serial serial) : base(serial) { }
     protected override void OnChangedLocation()
     {
         base.OnChangedLocation();
@@ -208,9 +205,8 @@ public class MobileContext : ContextEntity
     }
     static void MobileContext_OnMobileDamage(MobileDamageEventArgs e)
     {
-        MobileContext m = Acquire(e.Serial);
-
-        short playerHealth = m._hits;
+        MobileContext mob = Acquire(e.Serial);
+        short playerHealth = mob._hits;
         playerHealth -= (short)e.Amount;
 
         if (playerHealth < 0)

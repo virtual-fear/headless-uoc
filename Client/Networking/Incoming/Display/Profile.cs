@@ -1,5 +1,6 @@
 ﻿namespace Client.Networking.Incoming.Display;
 using Client.Game.Context;
+using Client.Game.Data;
 public partial class PacketHandlers
 {
     public static event PacketEventHandler<DisplayProfileEventArgs>? DisplayProfile;
@@ -18,7 +19,7 @@ public partial class PacketHandlers
         public static void Update(NetState ns, PacketReader pvSrc)
         {
             DisplayProfileEventArgs e = new DisplayProfileEventArgs(ns);
-            e.Mobile = MobileContext.Acquire(pvSrc.ReadInt32());
+            e.Mobile = MobileContext.Acquire((Serial)pvSrc.ReadUInt32());
             e.Header = pvSrc.ReadString();
             e.Footer = pvSrc.ReadUnicodeString();
             e.Body = pvSrc.ReadUnicodeString();

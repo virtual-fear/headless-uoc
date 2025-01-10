@@ -1,4 +1,5 @@
 ﻿namespace Client.Networking.Incoming.Movement;
+
 using Client.Game.Data;
 public partial class PacketHandlers
 {
@@ -7,7 +8,7 @@ public partial class PacketHandlers
     {
         public NetState State { get; }
         public MobileMovingEventArgs(NetState state) => State = state;
-        public int Serial { get; set; }
+        public Serial Serial { get; set; }
         public short Body { get; set; }
         public short X { get; set; }
         public short Y { get; set; }
@@ -23,7 +24,7 @@ public partial class PacketHandlers
         internal static void Update(NetState ns, PacketReader pvSrc)
         {
             MobileMovingEventArgs e = new MobileMovingEventArgs(ns);
-            e.Serial = pvSrc.ReadInt32();
+            e.Serial = (Serial)pvSrc.ReadUInt32();
             e.Body = pvSrc.ReadInt16();
             e.X = pvSrc.ReadInt16();
             e.Y = pvSrc.ReadInt16();

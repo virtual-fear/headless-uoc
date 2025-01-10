@@ -1,5 +1,7 @@
 ﻿namespace Client.Networking.Incoming.Display;
 using Client.Game.Context;
+using Client.Game.Data;
+
 public partial class PacketHandlers
 {
     public static event PacketEventHandler<PaperdollEventArgs>? DisplayPaperdoll;
@@ -18,7 +20,7 @@ public partial class PacketHandlers
         public static void Update(NetState ns, PacketReader pvSrc)
         {
             PaperdollEventArgs e = new PaperdollEventArgs(ns);
-            e.Mobile = MobileContext.Acquire(pvSrc.ReadInt32());
+            e.Mobile = MobileContext.Acquire((Serial)pvSrc.ReadUInt32());
             e.Text = pvSrc.ReadString(60);
             bool canLift = (pvSrc.ReadByte() & 2) != 0;
             e.Draggable = canLift;

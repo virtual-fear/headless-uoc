@@ -1,4 +1,5 @@
 ﻿namespace Client.Networking.Incoming.Mobiles;
+
 using Client.Game.Data;
 public partial class PacketHandlers
 {
@@ -7,7 +8,7 @@ public partial class PacketHandlers
     {
         public NetState State { get; }
         public MobileUpdateEventArgs(NetState state) => State = state;
-        public int Serial { get; set; }
+        public Serial Serial { get; set; }
         public short Body { get; set; }
         public short Hue { get; set; }
         public byte PacketFlags { get; set; }
@@ -22,7 +23,7 @@ public partial class PacketHandlers
         public static void Update(NetState ns, PacketReader pvSrc)
         {
             MobileUpdateEventArgs e = new MobileUpdateEventArgs(ns);
-            e.Serial = pvSrc.ReadInt32();
+            e.Serial = (Serial)pvSrc.ReadUInt32();
             e.Body = (short)pvSrc.ReadUInt16();
             pvSrc.ReadByte();   //  0
             e.Hue = pvSrc.ReadInt16();

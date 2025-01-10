@@ -1,6 +1,8 @@
 ﻿namespace Client.Networking.Incoming.Map;
 using System.Collections;
 using Client.Game.Context;
+using Client.Game.Data;
+
 public partial class PacketHandlers
 {
     public static event PacketEventHandler<MapPatchesEventArgs>? MapUpdatePatches;
@@ -28,7 +30,7 @@ public partial class PacketHandlers
                 // Map.[1].Tiles.Patch.[2]
                 // [1]  ==  Felucca | Trammel | Ileshenar | Malas
                 // [2]  ==  StaticBlock | LandBlock
-                t[WorldContext.GetIndex(i)] = new KeyValuePair<int, int>(staticBlocks, landBlocks);
+                t[(WorldType)i] = new KeyValuePair<int, int>(staticBlocks, landBlocks);
             }
             e.Table = t;
             MapUpdatePatches?.Invoke(e);

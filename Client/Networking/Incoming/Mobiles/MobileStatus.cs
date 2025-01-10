@@ -1,4 +1,6 @@
-﻿namespace Client.Networking.Incoming.Mobiles;
+﻿using Client.Game.Data;
+
+namespace Client.Networking.Incoming.Mobiles;
 public partial class PacketHandlers
 {
     public static event PacketEventHandler<MobileStatusEventArgs>? OnMobileStatus;
@@ -6,8 +8,8 @@ public partial class PacketHandlers
     {
         public NetState State { get; }
         public MobileStatusEventArgs(NetState state) => State = state;
-        public int Serial { get; set; }
-        public string Name { get; set; }
+        public Serial Serial { get; set; }
+        public string? Name { get; set; }
         public short Hits { get; set; }
         public short MaxHits { get; set; }
         public bool IsPet { get; set; }
@@ -44,7 +46,7 @@ public partial class PacketHandlers
         {
             MobileStatusEventArgs e = new(ns);
 
-            e.Serial = pvSrc.ReadInt32();
+            e.Serial = (Serial)pvSrc.ReadUInt32();
             e.Name = pvSrc.ReadString(30);
             e.Hits = pvSrc.ReadInt16();
             e.MaxHits = pvSrc.ReadInt16();

@@ -1,5 +1,7 @@
 ﻿namespace Client.Networking.Incoming.Mobiles;
 using Client.Game.Context;
+using Client.Game.Data;
+
 public partial class PacketHandlers
 {
     public static event PacketEventHandler<DeathAnimationEventArgs>? OnDeathAnimation;
@@ -16,8 +18,8 @@ public partial class PacketHandlers
         public static void Update(NetState ns, PacketReader pvSrc)
         {
             DeathAnimationEventArgs e = new(ns);
-            e.Mobile = MobileContext.Acquire(pvSrc.ReadInt32());
-            e.Corpse = ItemContext.Acquire(pvSrc.ReadInt32());
+            e.Mobile = MobileContext.Acquire((Serial)pvSrc.ReadUInt32());
+            e.Corpse = ItemContext.Acquire((Serial)pvSrc.ReadUInt32());
             pvSrc.ReadInt32();
             OnDeathAnimation?.Invoke(e);
         }

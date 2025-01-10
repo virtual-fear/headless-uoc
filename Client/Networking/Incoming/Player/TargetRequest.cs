@@ -1,5 +1,6 @@
-﻿using Client.Game.Data;
+﻿
 namespace Client.Networking.Incoming.Player;
+using Client.Game.Data;
 public partial class PacketHandlers
 {
     public static event PacketEventHandler<TargetReqEventArgs>? Player_TargetRequest;

@@ -13,8 +13,8 @@ public sealed class ItemContext : ContextEntity
     public short Amount { get; private set; }
     public byte Flags { get; private set; }
     public Layer Layer { get; private set; }
-    public static ItemContext Acquire(int serial) => WorldContext.WantItem(serial);
-    public ItemContext(int serial) : base(serial) { }
+    public static ItemContext Acquire(Serial serial) => WorldContext.WantItem(serial);
+    public ItemContext(Serial serial) : base(serial) { }
     public static void Configure()
     {
         OnItemIncoming += ItemContext_OnItemIncoming;

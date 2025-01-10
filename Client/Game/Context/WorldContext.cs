@@ -1,22 +1,18 @@
 ﻿namespace Client.Game.Context;
+
+using Client.Game.Data;
 using static Client.Networking.Incoming.Shard.PacketHandlers;
 public class WorldContext : ContextEntity
 {
-    private static string[] _worldNames;
-    private static Dictionary<int, ItemContext> _worldItems;
-    private static Dictionary<int, MobileContext> _worldMobiles;
+    private static Dictionary<Serial, ItemContext> _worldItems;
+    private static Dictionary<Serial, MobileContext> _worldMobiles;
     private static int _worldRange = 12;
 
-    private static int m_Serial;
     private static MobileContext m_Player;
-    public static int Serial
+    protected override void OnSerialChanged()
     {
-        get { return m_Serial; }
-        set
-        {
-            m_Serial = value;
-            m_Player = FindMobile(m_Serial);
-        }
+        m_Player = FindMobile(base.Serial);
+        base.OnSerialChanged();
     }
     public static MobileContext Player
     {
@@ -30,15 +26,12 @@ public class WorldContext : ContextEntity
     {
         get { return _worldRange; }
     }
-
     static WorldContext()
     {
-        _worldNames = new string[] { "Felucca", "Trammel", "Ilshenar", "Malas", "Tokunuo Islands" };
-        _worldItems = new Dictionary<int, ItemContext>();
-        _worldMobiles = new Dictionary<int, MobileContext>();
+        _worldItems = new Dictionary<Serial, ItemContext>();
+        _worldMobiles = new Dictionary<Serial, MobileContext>();
         _worldRange = 12;
     }
-
 
     public static void LoginConfirm(LoginConfirmEventArgs e)
     {
@@ -48,23 +41,19 @@ public class WorldContext : ContextEntity
         //m_Player.Direction = e.Direction;
     }
 
-    public WorldContext(int serial) : base(serial)
+    public WorldContext(Serial serial) : base(serial)
     {
     }
 
     public static void Clear()
     {
-        m_Serial = 0x00;
-        m_Player = null;
-
         _worldMobiles.Clear();
         _worldItems.Clear();
     }
 
-    public static ItemContext FindItem(int serial)
+    public static ItemContext? FindItem(Serial serial)
     {
-        ItemContext item;
-        _worldItems.TryGetValue(serial, out item);
+        _worldItems.TryGetValue(serial, out ItemContext? item);
         return item;
     }
     public static ItemContext FindItem(IItemValidator validator)
@@ -89,7 +78,7 @@ public class WorldContext : ContextEntity
             return false;
         });
     }
-    public static ItemContext FindItem(Predicate<ItemContext> validator)
+    public static ItemContext? FindItem(Predicate<ItemContext> validator)
     {
         if (validator == null)
             throw new ArgumentNullException("validator");
@@ -105,12 +94,10 @@ public class WorldContext : ContextEntity
     {
         return GetArray(GetItems(validator));
     }
-
-    public static MobileContext FindMobile(int serial)
+    public static MobileContext? FindMobile(Serial serial)
     {
-        MobileContext m;
-        _worldMobiles.TryGetValue(serial, out m);
-        return m;
+        _worldMobiles.TryGetValue(serial, out MobileContext? mobile);
+        return mobile;
     }
     public static MobileContext FindMobile(IMobileValidator validator)
     {
@@ -170,13 +157,6 @@ public class WorldContext : ContextEntity
         return array;
     }
 
-    public static string GetIndex(int i)
-    {
-        if (i > _worldNames.Length)
-            i = -1;
-
-        return _worldNames[i];
-    }
 
     public static IEnumerable<ItemContext> GetItems(IItemValidator validator)
     {
@@ -212,7 +192,6 @@ public class WorldContext : ContextEntity
             yield return Mobile;
         }
     }
-
     public static void Remove(ItemContext item)
     {
         if (item != null)
@@ -223,8 +202,7 @@ public class WorldContext : ContextEntity
         if (mobile != null)
             mobile.Delete();
     }
-
-    public static ItemContext WantItem(int serial)
+    public static ItemContext WantItem(Serial serial)
     {
         ItemContext item;
 
@@ -233,7 +211,7 @@ public class WorldContext : ContextEntity
 
         return item;
     }
-    public static ItemContext WantItem(int serial, ref bool wasFound)
+    public static ItemContext WantItem(Serial serial, ref bool wasFound)
     {
         wasFound = false;
 
@@ -250,7 +228,7 @@ public class WorldContext : ContextEntity
 
         return item;
     }
-    public static MobileContext WantMobile(int serial)
+    public static MobileContext WantMobile(Serial serial)
     {
         MobileContext mobile;
 
@@ -259,7 +237,7 @@ public class WorldContext : ContextEntity
 
         return mobile;
     }
-    public static MobileContext WantMobile(int serial, ref bool wasFound)
+    public static MobileContext WantMobile(Serial serial, ref bool wasFound)
     {
         wasFound = false;
 

@@ -1,4 +1,5 @@
 ﻿namespace Client.Networking.Incoming.Items;
+
 using Client.Game.Data;
 public partial class PacketHandlers
 {
@@ -8,7 +9,7 @@ public partial class PacketHandlers
     {
         public NetState State { get; }
         public ItemEventArgs(NetState state) => State = state;
-        public int Serial { get; set; }
+        public Serial Serial { get; set; }
         public short ItemID { get; set; }
         public short Amount { get; set; }
         public short X { get; set; }
@@ -22,7 +23,7 @@ public partial class PacketHandlers
         // Might have to fix this, because we use it for MobileIncoming
         public NetState State { get; }
         public ItemIncomingEventArgs(NetState state) => State = state;
-        public int Serial { get; set; }
+        public Serial Serial { get; set; }
         public int ItemID { get; set; }
         public Layer Layer { get; set; }
         public short Hue { get; set; }
@@ -40,7 +41,7 @@ public partial class PacketHandlers
         public static void Update(NetState ns, PacketReader pvSrc)
         {
             ItemEventArgs e = new(ns);
-            e.Serial = pvSrc.ReadInt32();
+            e.Serial = (Serial)pvSrc.ReadUInt32();
             e.ItemID = pvSrc.ReadInt16();
             e.Amount = pvSrc.ReadInt16();
             e.X = pvSrc.ReadInt16();
@@ -54,7 +55,7 @@ public partial class PacketHandlers
         public static void UpdateIncoming(NetState ns, PacketReader pvSrc)
         {
             ItemIncomingEventArgs e = new ItemIncomingEventArgs(ns);
-            e.Serial = pvSrc.ReadInt32();
+            e.Serial = (Serial)pvSrc.ReadUInt32();
             if (e.Serial != 0x00)
             {
                 e.ItemID = pvSrc.ReadUInt16();

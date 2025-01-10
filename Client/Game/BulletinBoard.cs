@@ -1,6 +1,7 @@
 ﻿namespace Client.Game;
 using System.Text;
 using Client.Game.Context;
+using Client.Game.Data;
 using Client.Game.Data.BulletinBoard;
 using Client.Networking;
 public partial class PacketHandlers
@@ -42,24 +43,22 @@ public partial class PacketHandlers
                 return Encoding.UTF8.GetString(buffer, 0, length);
             };
 
-            ItemContext board, temp, thread;
-            Int32 serial;
+            ItemContext? board, temp, thread;
+            Serial serial;
             Action act = delegate
             {
-                board = ItemContext.Acquire(pvSrc.ReadInt32());
+                board = ItemContext.Acquire((Serial)pvSrc.ReadUInt32());
                 if (board == null)
                     return;
 
-                temp = ItemContext.Acquire(pvSrc.ReadInt32());
+                temp = ItemContext.Acquire((Serial)pvSrc.ReadUInt32());
                 if (temp == null)
                     return;
 
                 thread = null;
-                serial = pvSrc.ReadInt32();
-                if (serial >= 0x4000000)
-                {
+                serial = (Serial)pvSrc.ReadUInt32();
+                if (serial >= World.ItemOffset)
                     thread = ItemContext.Acquire(serial);
-                }
 
                 string p, s, t;
 
@@ -78,7 +77,7 @@ public partial class PacketHandlers
             switch (type)
             {
                 case BulletinBoardType.Display:
-                    e.Item = ItemContext.Acquire(pvSrc.ReadInt32());
+                    e.Item = ItemContext.Acquire((Serial)pvSrc.ReadUInt32());
                     break;
                 case BulletinBoardType.SetBody:
                     act.Invoke();
