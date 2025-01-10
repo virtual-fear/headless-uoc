@@ -1,6 +1,4 @@
 ﻿namespace Client.Networking.Incoming;
-
-
 public enum ProtocolExtensionType
 {
     Accept = 0,

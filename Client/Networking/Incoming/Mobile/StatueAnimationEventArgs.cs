@@ -1,8 +1,8 @@
 ﻿namespace Client.Networking.Incoming;
-public sealed class UpdateStatueAnimationEventArgs : EventArgs
+public sealed class StatueAnimationEventArgs : EventArgs
 {
     public NetState State { get; }
-    public UpdateStatueAnimationEventArgs(NetState state) => State = state;
+    public StatueAnimationEventArgs(NetState state) => State = state;
     public int Mobile { get; set; }
     public byte Status { get; set; }
     public byte Animation { get; set; }
@@ -10,12 +10,12 @@ public sealed class UpdateStatueAnimationEventArgs : EventArgs
 }
 public partial class Mobile
 {
-    public static event PacketEventHandler<UpdateStatueAnimationEventArgs>? OnStatueAnimation;
+    public static event PacketEventHandler<StatueAnimationEventArgs>? OnStatueAnimation;
 
     [PacketHandler(0x11, length: 17, ingame: true, extCmd: true)]
     protected static void Received_StatueAnimation(NetState ns, PacketReader pvSrc)
     {
-        var e = new UpdateStatueAnimationEventArgs(ns);
+        var e = new StatueAnimationEventArgs(ns);
         pvSrc.Seek(3, SeekOrigin.Current);
         //pvSrc.ReadInt16();  //  0x19
         //pvSrc.ReadByte();   //  0x05
