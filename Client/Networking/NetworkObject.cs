@@ -256,10 +256,10 @@ public sealed class NetworkObject : NetState
                     if (packetID < 0)
                         break;
 
-                    PacketHandler handler = PacketHandlers.GetHandler(packetID);
+                    PacketHandler? handler = PacketHandlers.GetHandler(packetID);
                     if (handler == null)
                     {
-                        Logger.Log($"Server -> Client: Unhandled packed (0x{packetID:X2}, {m_Stream.Input.GetPacketLength()})", LogColor.Invalid);
+                        Logger.Log($"Server -> Client: Unhandled packet (0x{packetID:X2}, {m_Stream.Input.GetPacketLength()})", LogColor.Invalid);
                         Span<byte> badBuffer = Stream.Input.Dequeue(Stream.Input.Count).AsSpan();
                         new PacketReader(badBuffer, false, (byte)packetID, "Unknown").Trace(true);
                         break;

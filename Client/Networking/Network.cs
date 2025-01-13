@@ -3,7 +3,6 @@
     using System.Net;
     using System.Net.Sockets;
     using Arguments;
-    using Client.Game.Accounting;
     using Client.Networking.Data;
     using Client.Networking.Outgoing;
 
@@ -22,18 +21,29 @@
             public const bool EnabledLingering = false;
         }
 
-        public static readonly object SharedLock = new object();
+        internal static readonly object SharedLock = new object();
 
         /// <summary>
         ///    Network information about the current connection.
         /// </summary>
-        internal static ConnectInfo Info { get; set; }
+        public static ConnectInfo Info { get; set; }
         public static Socket? Socket { get; private set; }
         public static NetState? State { get; protected set; } 
         public static bool IsAttached => State?.IsOpen ?? false;
-        internal static async void AsyncConnect()
+        public static async Task AsyncConnect(string textAddress, int port, string un, string pw)
         {
-            String processName = Application.ProcessName;
+            var info = Network.Info;
+            var addr = IPAddress.Parse(textAddress);
+            info.EndPoint = new IPEndPoint(addr, port);
+            info.Username = un;
+            info.Password = pw;
+            info.Seed = 1;
+            Network.Info = info;
+            await AsyncConnect();
+        }
+        public static async Task AsyncConnect()
+        {
+            String processName = Application.Name;
             IPEndPoint serverEP = Network.Info.EndPoint;
             if (Socket == null || Socket.Blocking)
                 Socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
@@ -46,7 +56,7 @@
                 Network.Connect(new SocketEventArgs(Socket));
                 if ((State != null) && State.Attach(Socket))
                 {
-                    Logger.Log($"{State.Address}: Network cycle attached.");
+                    Logger.Log(Application.Name, $"{State.Address} attached to network.", LogColor.Info);
                     await Task.Run(delegate () { while ((State != null) && State.IsOpen) State.Slice(); });
                 }
                 else
@@ -69,7 +79,7 @@
             OnConnect += Network_OnConnect;
             OnDisconnect += Network_OnDisconnect;
             OnConstruct += Network_OnConstruct;
-            OnAttach += Network_OnAttach;
+            //OnAttach += Network_OnAttach;
             OnDetach += Network_OnDetach;
         }
 
@@ -82,7 +92,7 @@
         }
         private static void Network_OnAttach(ConnectionEventArgs e)
         {
-            Logger.Log(Application.ProcessName, $"{e.State.Address} attached to network state.", LogColor.Info);
+            Logger.Log(Application.Name, $"{e.State.Address} attached to network state.", LogColor.Info);
             ConnectInfo info = Network.Info;
             string username = info.Username ?? string.Empty;
             string password = info.Password ?? string.Empty;
@@ -96,16 +106,16 @@
                 if (State == null)
                     throw new ArgumentNullException(nameof(State));
 
-                PInitialSeed.SendBy(State);
-                State.Slice();
+                //PInitialSeed.SendBy(State);
+                //State.Slice();
                 // TODO: Build an account event management system
-                State.Login(new Account(username, password));
-                e.IsAllowed = true;
+                //State.Login(new Account(username, password));
+                //e.IsAllowed = true;
             }
         }
 
-        private static void Network_OnConstruct(NetState ns) => Logger.Log(Application.ProcessName, "Constructed network state.", LogColor.Info);
-        private static void Network_OnDisconnect(SocketEventArgs e) => Console.WriteLine(Application.ProcessName, $"{e.Address} disconnected from the server.");
+        private static void Network_OnConstruct(NetState ns) => Logger.Log(Application.Name, "Constructed network state.", LogColor.Info);
+        private static void Network_OnDisconnect(SocketEventArgs e) => Console.WriteLine(Application.Name, $"{e.Address} disconnected from the server.");
         private static void Network_OnConnect(SocketEventArgs e) => State ??= new NetworkObject();
     }
 
@@ -118,27 +128,27 @@
         /// <summary>
         ///     <see cref="Socket"/> has connected to the server
         /// </summary>
-        internal static event NetworkEventHandler<SocketEventArgs>? OnConnect;
+        public static event NetworkEventHandler<SocketEventArgs>? OnConnect;
 
         /// <summary>
         ///     <see cref="Socket"/> has disconnected from the server
         /// </summary>
-        internal static event NetworkEventHandler<SocketEventArgs>? OnDisconnect;
+        public static event NetworkEventHandler<SocketEventArgs>? OnDisconnect;
 
         /// <summary>
         ///     <see cref="NetState"/> gets constructed
         /// </summary>
-        internal static event NetworkEventHandler<NetState>? OnConstruct;
+        public static event NetworkEventHandler<NetState>? OnConstruct;
 
         /// <summary>
         ///     A connection has been established with the server using <see cref="NetState"/> and is currently being attached to the network.
         /// </summary>
-        internal static event NetworkEventHandler<ConnectionEventArgs>? OnAttach;
+        public static event NetworkEventHandler<ConnectionEventArgs>? OnAttach;
 
         /// <summary>
         ///     Server was shutdown or failed to connect, <see cref="NetState"/> failed to maintain the connection.
         /// </summary>
-        internal static event NetworkEventHandler<NetState>? OnDetach;
+        public static event NetworkEventHandler<NetState>? OnDetach;
 
         #region Methods
 

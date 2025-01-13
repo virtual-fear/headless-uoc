@@ -11,12 +11,15 @@ namespace Client
         public static Version Version => new Version(0, 0, 1, 0); // Initial alpha release
         public static Assembly Assembly { get; } = typeof(Application).Assembly;
         public static Process Process { get; } = Process.GetCurrentProcess();
-        public static string ProcessName { get; private set; } = nameof(Client);
+        public static string Name { get; private set; } = nameof(Client);
         public static Thread? Thread { get; private set; }
-        static Application() => Configure(Process);
-        private static void Configure(Process process)
+        public static Object? Instance { get; set; }
+
+        // Intended for debugging purposes
+        //static Application() => Configure(false);
+        public static void Configure(bool autoConnect = false)
         {
-            ProcessName = process.ProcessName;
+            Name = Application.Process.ProcessName;
             Thread = Thread.CurrentThread;
             Thread.Name = "Game Thread";
 
@@ -40,9 +43,12 @@ namespace Client
 
             // Setup the assistant
             Assistant.Configure();
-
-            // Run the assistant
-            Assistant.AsyncConnect();
+            
+            if (autoConnect)
+            {
+                // Run the assistant
+                Task.Run(Assistant.AsyncConnect);
+            }
         }
         private static void CurrentDomain_ProcessExit(object? sender, EventArgs e)
         {

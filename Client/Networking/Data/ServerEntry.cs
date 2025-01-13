@@ -1,5 +1,5 @@
 ﻿namespace Client.Networking.Data;
-internal struct ServerEntry
+public struct ServerEntry
 {
     public uint Index { get; }
     public string Name { get; }

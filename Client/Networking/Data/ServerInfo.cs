@@ -1,7 +1,7 @@
 using Client.Game.Data;
 
 namespace Client.Networking.Data;
-internal sealed class ServerInfo
+public sealed class ServerInfo
 {
     public static ServerInfo Instance = new ServerInfo();
     public string? Address { get; set; }

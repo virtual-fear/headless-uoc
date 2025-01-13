@@ -30,12 +30,11 @@ namespace Client
             };
         }
 
+
         public static void Configure()
         {
             PacketHandlers.RegisterAttributes();
 
-            // TODO: Create a class to handle the Configuration setup of PacketSink
-            // so when the app is run, it can determine what events need to be used
             Shard.UpdateServerList += Shard_UpdateServerList;
             Shard.OnServerAck += Shard_OnServerAck;
         }

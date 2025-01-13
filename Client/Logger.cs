@@ -12,7 +12,7 @@
         DarkMagenta = ConsoleColor.DarkMagenta,
     }
 
-    internal static class Logger
+    public static class Logger
     {
         public static event EventHandler<string>? OnLog;
         public static event EventHandler<string>? OnLogError;
@@ -20,12 +20,20 @@
         private static string Name(object o) => o is string s ? s : o is Type t ? t.Name : o == null ? "o" : o.GetType().Name;
         static Logger()
         {
-            Logger.OnLog += Logger_OnLog;
-            Logger.OnLogError += Logger_OnLogError;
-            Logger.OnPushWarning += Logger_OnPushWarning;
+            // When using the Godot instance we don't want to write to the console.
+            if (Application.Instance == null)
+            {
+                Logger.OnLog += Logger_OnLog;
+                Logger.OnLogError += Logger_OnLogError;
+                Logger.OnPushWarning += Logger_OnPushWarning;
+            }
         }
         private static void InternalLog(LogColor type, object? sender, string text)
         {
+            // Just to be sure for when using Godot we don't write to the console.
+            if (Application.Instance != null)
+                return;
+
             var typeColor = (ConsoleColor)type;
             switch(type)
             {
