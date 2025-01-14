@@ -1,7 +1,10 @@
 namespace Client
 {
     using System.Net;
+    using Client.Accounting;
+    using Client.Game.Data;
     using Client.Networking;
+    using Client.Networking.Arguments;
     using Client.Networking.Data;
     using Client.Networking.Incoming;
     using Client.Networking.Outgoing;
@@ -15,8 +18,6 @@ namespace Client
     /// </summary>
     public partial class Assistant : Network
     {
-        public static readonly Version ClientVersion = new Version(7, 0, 106, 21);
-
         static Assistant()
         {
             // TODO: Reach out to the user to get the username (or use config file) 
@@ -35,15 +36,29 @@ namespace Client
         {
             PacketHandlers.RegisterAttributes();
 
+            Network.OnAttach += Network_OnAttach;
             Shard.UpdateServerList += Shard_UpdateServerList;
             Shard.OnServerAck += Shard_OnServerAck;
+            Shard.UpdateCharacterList += Shard_UpdateCharacterList;
         }
 
-        /// <summary>
-        ///     ReceivedServerAck : 0x8C
-        /// </summary>
-        /// <param name="e"></param>
-        /// <exception cref="NotImplementedException"></exception>
+        private static void Shard_UpdateCharacterList(CharacterListEventArgs e)
+        {
+            CharInfo[]? characterList = e.Characters?.ToArray();
+            if (characterList == null || characterList.Length == 0)
+            {
+                Logger.LogError($"{nameof(Assistant)}: No characters to select.");
+                e.State.Detach();
+                return;
+            }
+            
+            CharInfo? firstCharacter = characterList.FirstOrDefault();
+            if (firstCharacter == null)
+                throw new ArgumentNullException(nameof(firstCharacter));
+
+            firstCharacter.Play();
+            Network.State?.Slice();
+        }
         private static async void Shard_OnServerAck(ServerAckEventArgs e)
         {
             Logger.Log(typeof(Assistant),
@@ -56,8 +71,6 @@ namespace Client
             Socket?.Disconnect(reuseSocket: true);
             await Task.CompletedTask;
         }
-
-        //[Obsolete("This event method is not used in the original code (used only for testing purposes)", error: false)]
         private static void Shard_UpdateServerList(ServerListReceivedEventArgs e)
         {
             if (e.ServerListEntries.Length == 0)
@@ -78,6 +91,28 @@ namespace Client
                     innerException: new ArgumentNullException(nameof(Network.State)));
             }
             Network.State.Send(PPlayServer.Instantiate((byte)shard.Index));
+        }
+        private static void Network_OnAttach(ConnectionEventArgs e)
+        {
+            Logger.Log(Application.Name, $"{e.State.Address} attached to network state.", LogColor.Info);
+            ConnectInfo info = Network.Info;
+            string username = info.Username ?? string.Empty;
+            string password = info.Password ?? string.Empty;
+            if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password))
+            {
+                Logger.LogError("Username or password is empty.");
+                return;
+            }
+            if (info.Stage == ConnectionAck.FirstLogin)
+            {
+                if (Network.State == null)
+                    throw new ArgumentNullException(nameof(Network.State));
+
+                PInitialSeed.SendBy(Network.State);
+                Network.State.Slice();
+                Network.State.Login(new Account(username, password));
+                e.IsAllowed = true;
+            }
         }
     }
 }
