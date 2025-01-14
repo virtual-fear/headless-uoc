@@ -1,8 +1,11 @@
-﻿using System.Text;
+﻿using System.Net;
+using System.Net.Sockets;
+using System.Text;
 using System.Xml;
 namespace Client;
 public static class Utility
 {
+    public static IPAddress GetIPAddress() => Dns.GetHostEntry(Dns.GetHostName()).AddressList.FirstOrDefault(ip => ip.AddressFamily == AddressFamily.InterNetwork) ?? IPAddress.None;
     public static void FormatBuffer(TextWriter output, byte[]? buffer, ConsoleColor color = ConsoleColor.Cyan)
     {
         if (buffer == null)
@@ -95,8 +98,8 @@ public static class Utility
             output.WriteLine(chars.ToString());
         }
     }
-    public static string GetText(XmlElement node, string defaultValue) => node?.InnerText ?? defaultValue;
-    public static int GetInt32(string intValue, int defaultValue)
+    internal static string GetText(XmlElement node, string defaultValue) => node?.InnerText ?? defaultValue;
+    internal static int GetInt32(string intValue, int defaultValue)
     {
         int v;
         try
@@ -110,7 +113,7 @@ public static class Utility
         }
         return v;
     }
-    public static string GetAttribute(XmlElement node, string name, string defaultValue)
+    internal static string GetAttribute(XmlElement node, string name, string defaultValue)
     {
         if (node == null)
             return defaultValue;
@@ -122,5 +125,5 @@ public static class Utility
 
         return attribute.Value;
     }
-    public static string GetText(DateTime time, string defaultValue) => time.ToBinary().ToString();
+    internal static string GetText(DateTime time, string defaultValue) => time.ToBinary().ToString();
 }
