@@ -43,6 +43,8 @@
                 case LogColor.None:
                 default: break;
             }
+
+            sender ??= ConsoleColor.Gray;
             if (sender is ConsoleColor || sender is LogColor)
                 ((ConsoleColor)sender).WriteLine(text);
         }
