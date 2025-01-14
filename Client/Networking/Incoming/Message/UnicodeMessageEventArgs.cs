@@ -20,7 +20,6 @@ public partial class Message
     protected static void ReceivedMessage_Unicode(NetState ns, PacketReader pvSrc)
     {
         UnicodeMessageEventArgs e = new UnicodeMessageEventArgs(ns);
-        pvSrc.Trace(true);
         pvSrc.Seek(0, SeekOrigin.Begin);
         e.Serial = pvSrc.ReadInt32();
         e.Graphic = pvSrc.ReadInt16();
