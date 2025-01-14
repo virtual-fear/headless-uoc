@@ -12,7 +12,7 @@ public partial class Mobile
 {
     public static event PacketEventHandler<MobileHitsEventArgs>? OnChangedHits;
 
-    [PacketHandler(0xA3, length: 9, ingame: true)]
+    [PacketHandler(0xA1, length: 9, ingame: true)]
     protected static void Received_MobileHits(NetState ns, PacketReader pvSrc)
     {
         MobileHitsEventArgs e = new(ns);

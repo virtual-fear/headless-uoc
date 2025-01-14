@@ -12,7 +12,7 @@ public partial class Mobile
 {
     public static event PacketEventHandler<MobileManaEventArgs>? OnChangedMana;
 
-    [PacketHandler(0xA3, length: 9, ingame: true)]
+    [PacketHandler(0xA2, length: 9, ingame: true)]
     protected static void Received_MobileMana(NetState ns, PacketReader pvSrc)
     {
         MobileManaEventArgs e = new(ns);
