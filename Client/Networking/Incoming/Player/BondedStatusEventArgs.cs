@@ -10,7 +10,6 @@ public sealed class BondedStatusEventArgs : EventArgs
     public byte Value02 { get; set; }
 } // (ext) packetID: 0x19
 
-[Obsolete]
 public partial class Player
 {
     [Obsolete]

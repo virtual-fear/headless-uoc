@@ -252,12 +252,12 @@ public sealed class NetworkObject : NetState
             {
                 while ((Stream.Input.Count > 0) && IsOpen)
                 {
-                    int packetID = Stream.Input.GetPacketID();
+                    var packetID = Stream.Input.GetPacketID(); // (byte)
                     if (packetID < 0)
                         break;
 
-                    PacketHandler? handler = PacketHandlers.GetHandler(packetID);
-                    if (handler == null)
+                    PacketHandler? ph = PacketHandlers.GetHandler(packetID);
+                    if (ph == null)
                     {
                         Logger.Log($"Server -> Client: Unhandled packet (0x{packetID:X2}, {m_Stream.Input.GetPacketLength()})", LogColor.Invalid);
                         Span<byte> badBuffer = Stream.Input.Dequeue(Stream.Input.Count).AsSpan();
@@ -265,18 +265,19 @@ public sealed class NetworkObject : NetState
                         break;
                     }
 
-                    int length = handler.Length <= 0 ? Stream.Input.GetPacketLength() : handler.Length;
-                    Logger.Log($"Server -> Client: {handler.Name} (0x{packetID:X2}, {handler.Length}).. length:{length} (done)", LogColor.Success);
-                    if (length < 3)
+                    int length = ph.Length <= 0 ? Stream.Input.GetPacketLength() : ph.Length;
+                    var ns = Network.State;
+                    var canRead = length > 0 && (ns != null) && (ns.ConfirmedLogin && length >= 1 || ns.Ingame && length >= 2);
+                    Logger.Log($"Server -> Client: {ph.Name} (0x{packetID:X2}, {ph.Length}).. length:{length} ({(canRead ? "in" : "out-of")})-game", LogColor.Success);
+                    if (length < 3 && !canRead)
                     {
                         Logger.PushWarning("Detaching after receiving bad packet length!");
-                        Detach();
                         break;
                     }
                     Span<byte> buffer = Stream.Input.Dequeue(length);
                     Utility.FormatBuffer(Console.Out, buffer.ToArray(), color: ConsoleColor.DarkGreen);
-                    PacketReader reader = PacketReader.Create(ref buffer, ref handler);
-                    handler.Receive(this, reader);
+                    PacketReader reader = PacketReader.Create(ref buffer, ref ph);
+                    ph.Receive(this, reader);
                     var line = $"Completed slice with {length} bytes...({(IsOpen ? "still open" : "now closed")})\n";
                     Logger.Log(line, color: IsOpen ? LogColor.Info : LogColor.Invalid);
                 }

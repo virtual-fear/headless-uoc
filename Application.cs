@@ -8,6 +8,7 @@ namespace Client
     public static class Application
     {
         public static readonly bool Is64Bit = Environment.Is64BitProcess;
+        public static readonly Version ClientVersion = new Version(7, 0, 106, 21);
         public static Version Version => new Version(0, 0, 1, 0); // Initial alpha release
         public static Assembly Assembly { get; } = typeof(Application).Assembly;
         public static Process Process { get; } = Process.GetCurrentProcess();

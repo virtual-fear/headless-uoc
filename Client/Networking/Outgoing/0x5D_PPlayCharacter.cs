@@ -1,32 +1,31 @@
-﻿namespace Client.Networking.Outgoing;
+﻿using System.Net;
 
-using Client.Game.Data;
-
+namespace Client.Networking.Outgoing;
 internal sealed class PPlayCharacter : Packet
 {
-    private PPlayCharacter() : base(0x5D, 73) { }
-    public static Packet Instantiate(CharInfo ci)
+    private PPlayCharacter() : base(0x5D, 73) { Encode = false; }
+    public static Packet Instantiate(Game.Data.CharInfo ci)
     {
         if (ci == null)
             throw new ArgumentNullException("Unable to play character, slot is invalid.", "info");
-
+        
+        NetState ns = ci.State;
+        Logger.Log(nameof(PPlayCharacter), $"Writing authID: {ns.AuthID}");
         Packet p = new PPlayCharacter();
         PacketWriter s = p.Stream;
-
-        s.Write(0xEDEDEDED);
-        s.WriteAsciiFixed(ci.Name, 30);
-
-        s.Seek(02, SeekOrigin.Current);
-        s.Write((int)31);
-
+        s.Write((uint)0xEDEDEDED);
+        s.WriteAsciiFixed(ci.Name, 30); // name
+        s.Seek(2, SeekOrigin.Current); // unknown (@36)
+        s.Write((int)0x3F); // flags
         s.Seek(24, SeekOrigin.Current);
-        s.Write(ci.Index);
-
-        NetState ns = ci.State;
-        s.Write(ns.AuthID);
-
-        Console.WriteLine("Packet:PlayCharacter AuthID: {0}", ns.AuthID);
-
+        s.Write((int)ci.Index); // charSlot
+        /**
+         *  NOTICE: PlayCharacter(state, reader)
+         *  Reading the clientIP is commented out in ModernUO.
+         *  s.Write((int)Network.ClientIP);
+         * */
+        var clientIP = Network.ClientIP.GetAddressBytes();
+        s.Write(BitConverter.ToInt32(clientIP, 0));
         return p;
     }
 }

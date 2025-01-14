@@ -2,27 +2,28 @@
 using System.Reflection;
 public partial class PacketHandlers
 {
-    private const bool DEBUG_ATTRIBUTES = true;
-
-    private static PacketHandler[] RegisteredPacket = new PacketHandler[0x100];
+    private const bool DEBUG_ATTRIBUTES = false;
+    private static PacketHandler[] RegisteredPackets = new PacketHandler[0x100];
     public static void Configure() => RegisterAttributes();
 
     [PacketHandler(0xBF, -1, ingame: true)]
     protected static void ExtendedCommand(NetState ns, PacketReader ip)
     {
-        PacketHandler? handler = GetExtendedHandler(ip.ReadInt16());
-        if (handler == null)
+        PacketHandler? ph = GetExtendedHandler((byte)ip.ReadInt16());
+        if (ph == null)
         {
             ip.Trace();
             return;
         }
-        handler.Receive(ns, ip);
+        ph.Receive(ns, ip);
     }
-    public static PacketHandler? GetHandler(int packetID) => RegisteredPacket[packetID];
-    public static PacketHandler? GetExtendedHandler(int packetID) => GetHandler(0xBF) is var ext && (ext != null) ? ext[packetID] : null;
-    internal static void RegisterAttributes()
+    public static PacketHandler? GetHandler(byte packetID) => RegisteredPackets[packetID];
+    public static PacketHandler? GetExtendedHandler(byte packetID) => RegisteredPackets[0xBF][packetID];
+    internal static void Register(PacketHandler handler) => RegisteredPackets[handler.PacketID] = handler;
+    internal static void RegisterExtended(PacketHandler handler) => RegisteredPackets[0xBF][handler.PacketID] = handler;
+    protected internal static void RegisterAttributes()
     {
-        // Register extended methods first?
+        // Sort & register extended methods first? i.e 0xBF, 0xF0
 
         var methods = Assembly.GetExecutingAssembly().GetTypes()
             .SelectMany(t =>  t.GetMethods(BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public))
@@ -34,7 +35,7 @@ public partial class PacketHandlers
             var attr = (PacketHandlerAttribute)method.GetCustomAttributes(typeof(PacketHandlerAttribute), false)[0];
             var receive = (OnPacketReceive)Delegate.CreateDelegate(typeof(OnPacketReceive), method);
             var handler = new PacketHandler(attr.PacketID, attr.Length, attr.Ingame, receive);
-            
+
             if (DEBUG_ATTRIBUTES)
                 Logger.Log(handler.ToString());
             
@@ -44,6 +45,4 @@ public partial class PacketHandlers
                 Register(handler);
         }
     }
-    protected static void Register(PacketHandler handler) => RegisteredPacket[handler.PacketID] = handler;
-    protected static void RegisterExtended(PacketHandler handler) => RegisteredPacket[0xBF][handler.PacketID] = handler;
 }

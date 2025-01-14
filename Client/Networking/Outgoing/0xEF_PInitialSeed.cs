@@ -18,10 +18,10 @@ public sealed class PInitialSeed : Packet
     public static event SeedEventHandler Construct;
     private PInitialSeed() : base(0xEF, 21) => Encode = false;
     static PInitialSeed() => PInitialSeed.Construct += UpdateVersion;
-    static void UpdateVersion(SeedEventArgs e) => e.Version = Assistant.ClientVersion;
+    static void UpdateVersion(SeedEventArgs e) => e.Version = Application.ClientVersion;
     private static Packet Instantiate(NetState state)
     {
-        SeedEventArgs e = new(state) { Version = Assistant.ClientVersion };
+        SeedEventArgs e = new(state) { Version = Application.ClientVersion };
         Construct?.Invoke(e);
         Version ver = e.Version;
         Packet packet = new PInitialSeed();

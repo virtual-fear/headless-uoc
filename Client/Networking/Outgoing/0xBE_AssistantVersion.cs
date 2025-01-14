@@ -7,7 +7,8 @@ public sealed class AssistantVersion : Packet
     private AssistantVersion(NetState ns, PacketReader ip) : base(0xBE)
     {
         base.Stream.Write((int)ip.ReadInt32());
-        base.Stream.Write(ns.Version.ToString());
+        Version cv = Application.ClientVersion;
+        base.Stream.Write(cv.ToString());
         base.Stream.Fill(sizeof(byte));
     }
     public static void SendBy(NetState ns, PacketReader ip) => ns.Send(new AssistantVersion(ns, ip));

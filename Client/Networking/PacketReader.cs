@@ -24,11 +24,11 @@ public class PacketReader
     }
     internal static PacketReader Create(
         ref Span<byte> buffer,
-        ref PacketHandler packetHandler)
+        ref PacketHandler handler)
         => new(buffer,
-            fixedSize: (packetHandler.Length != -1),
-                  cmd: (byte)packetHandler.PacketID,
-                  name: packetHandler.Name);
+            fixedSize: (handler.Length != -1),
+                  cmd: (byte)handler.PacketID,
+                  name: handler.Name);
 
     protected bool IsSafeChar(int c) => c >= 0x20 && c < 0xFFFE;
     public int Seek(int offset, SeekOrigin origin) => Index += origin switch

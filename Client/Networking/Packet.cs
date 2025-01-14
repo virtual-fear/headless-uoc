@@ -4,7 +4,7 @@ public class Packet
 {
     public byte ID { get; }
     public bool Fixed { get; }
-    public bool Encode { get; set; } = true;
+    public bool Encode { get; set; } = false;
     public Int64 Length => Stream == null ? 0 : Stream.Length;
     public PacketWriter Stream { get; }
     public Packet(byte packetID, int length = -1)

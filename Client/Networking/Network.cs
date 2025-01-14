@@ -4,7 +4,7 @@
     using System.Net.Sockets;
     using Arguments;
     using Client.Networking.Data;
-    using Client.Networking.Outgoing;
+    using Client.Networking.Incoming;
 
     /// <summary>
     ///   Using this partial class provides us with the flexibility to expose events without explicitly showing our invocation methods. 
@@ -22,13 +22,14 @@
         }
 
         internal static readonly object SharedLock = new object();
+        internal static readonly IPAddress ClientIP = Utility.GetIPAddress();
 
         /// <summary>
         ///    Network information about the current connection.
         /// </summary>
         public static ConnectInfo Info { get; set; }
         public static Socket? Socket { get; private set; }
-        public static NetState? State { get; protected set; } 
+        public static NetState? State { get; protected set; }
         public static bool IsAttached => State?.IsOpen ?? false;
         public static async Task AsyncConnect(string textAddress, int port, string un, string pw)
         {
@@ -79,7 +80,6 @@
             OnConnect += Network_OnConnect;
             OnDisconnect += Network_OnDisconnect;
             OnConstruct += Network_OnConstruct;
-            //OnAttach += Network_OnAttach;
             OnDetach += Network_OnDetach;
         }
 
@@ -90,30 +90,6 @@
             // Reconnect with the seed
             Task.Run(AsyncConnect);
         }
-        private static void Network_OnAttach(ConnectionEventArgs e)
-        {
-            Logger.Log(Application.Name, $"{e.State.Address} attached to network state.", LogColor.Info);
-            ConnectInfo info = Network.Info;
-            string username = info.Username ?? string.Empty;
-            string password = info.Password ?? string.Empty;
-            if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password))
-            {
-                Logger.LogError("Username or password is empty.");
-                return;
-            }
-            if (info.Stage == ConnectionAck.FirstLogin)
-            {
-                if (State == null)
-                    throw new ArgumentNullException(nameof(State));
-
-                //PInitialSeed.SendBy(State);
-                //State.Slice();
-                // TODO: Build an account event management system
-                //State.Login(new Account(username, password));
-                //e.IsAllowed = true;
-            }
-        }
-
         private static void Network_OnConstruct(NetState ns) => Logger.Log(Application.Name, "Constructed network state.", LogColor.Info);
         private static void Network_OnDisconnect(SocketEventArgs e) => Console.WriteLine(Application.Name, $"{e.Address} disconnected from the server.");
         private static void Network_OnConnect(SocketEventArgs e) => State ??= new NetworkObject();

@@ -6,7 +6,8 @@ public sealed class ClientVersion : Packet
     /// </summary>
     private ClientVersion(NetState ns) : base(0xBD)
     {
-        base.Stream.Write(ns.Version.ToString());
+        Version cv = Application.ClientVersion;
+        base.Stream.Write(cv.ToString());
         base.Stream.Fill();
     }
     public static void SendBy(NetState ns) => ns.Send(new ClientVersion(ns));
