@@ -1,37 +1,29 @@
-﻿namespace Client.Networking.Incoming;
-using Client.Game.Data;
+﻿using Serial = Client.Game.Data.Serial;
+using Direction = Client.Game.Data.Direction;
+namespace Client.Networking.Incoming;
 public sealed class MobileUpdateEventArgs : EventArgs
 {
     public NetState State { get; }
-    public MobileUpdateEventArgs(NetState state) => State = state;
-    public Serial Serial { get; set; }
-    public short Body { get; set; }
-    public short Hue { get; set; }
-    public byte PacketFlags { get; set; }
-    public short X { get; set; }
-    public short Y { get; set; }
-    public Direction Direction { get; set; }
-    public sbyte Z { get; set; }
-}
-public partial class Mobile
-{
-    public static event PacketEventHandler<MobileUpdateEventArgs>? OnUpdate;
-
-    [PacketHandler(0x20, length: 19, ingame: true)]
-    protected static void Received_MobileUpdate(NetState ns, PacketReader pvSrc)
+    public Serial Serial { get; }
+    public short Body { get; }
+    public short Hue { get; }
+    public byte PacketFlags { get; }
+    public short X { get; }
+    public short Y { get; }
+    public Direction Direction { get; }
+    public sbyte Z { get; }
+    internal MobileUpdateEventArgs(NetState state, PacketReader ip)
     {
-        MobileUpdateEventArgs e = new(ns);
-        e.Serial = (Serial)pvSrc.ReadUInt32();
-        e.Body = (short)pvSrc.ReadUInt16();
-        pvSrc.ReadByte();   //  0
-        e.Hue = pvSrc.ReadInt16();
-        e.PacketFlags = pvSrc.ReadByte();
-        e.X = pvSrc.ReadInt16();
-        e.Y = pvSrc.ReadInt16();
-        pvSrc.ReadInt16();  //  0
-        e.Direction = (Direction)pvSrc.ReadByte();
-        e.Z = pvSrc.ReadSByte();
-        //ns.Send(Warmode.Instantiate(false));
-        OnUpdate?.Invoke(e);
+        State = state;
+        Serial = (Serial)ip.ReadUInt32();
+        Body = (short)ip.ReadUInt16();
+        ip.ReadByte();   //  0
+        Hue = ip.ReadInt16();
+        PacketFlags = ip.ReadByte();
+        X = ip.ReadInt16();
+        Y = ip.ReadInt16();
+        ip.ReadInt16();  //  0
+        Direction = (Direction)ip.ReadByte();
+        Z = ip.ReadSByte();
     }
 }

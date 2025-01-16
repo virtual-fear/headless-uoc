@@ -1,36 +1,29 @@
-﻿namespace Client.Networking.Incoming;
-using Client.Game.Data;
+﻿using Serial = Client.Game.Data.Serial;
+using Direction = Client.Game.Data.Direction;
+namespace Client.Networking.Incoming;
 public sealed class LoginConfirmEventArgs : EventArgs
 {
     public NetState State { get; }
-    public LoginConfirmEventArgs(NetState state) => State = state;
-    public Serial Serial { get; set; } = (Serial)0;
-    public short Body { get; set; }
-    public short X { get; set; }
-    public short Y { get; set; }
-    public short Z { get; set; }
-    public Direction Direction { get; set; }
-    public short Width { get; set; }
-    public short Height { get; set; }
-}
-public partial class Shard
-{
-    public static event PacketEventHandler<LoginConfirmEventArgs>? OnLoginConfirm;
-
-    [PacketHandler(0x1B, length: 37, ingame: true)]
-    protected static void Received_LoginConfirm(NetState ns, PacketReader pvSrc)
+    public Serial Serial { get; }
+    public short Body { get; }
+    public short X { get; }
+    public short Y { get; }
+    public short Z { get; }
+    public Direction Direction { get; }
+    public short Width { get; }
+    public short Height { get; }
+    internal LoginConfirmEventArgs(NetState state, PacketReader ip)
     {
-        LoginConfirmEventArgs e = new(ns);
-        e.Serial = (Serial)pvSrc.ReadUInt32();
-        pvSrc.Seek(4, SeekOrigin.Current);
-        e.Body = pvSrc.ReadInt16();
-        e.X = pvSrc.ReadInt16();
-        e.Y = pvSrc.ReadInt16();
-        e.Z = pvSrc.ReadInt16();
-        e.Direction = (Direction)pvSrc.ReadInt16();
-        pvSrc.Seek(9, SeekOrigin.Current);
-        e.Width = pvSrc.ReadInt16();
-        e.Height = pvSrc.ReadInt16();
-        OnLoginConfirm?.Invoke(e);
+        State = state;
+        Serial = (Serial)ip.ReadUInt32();
+        ip.Seek(4, SeekOrigin.Current);
+        Body = ip.ReadInt16();
+        X = ip.ReadInt16();
+        Y = ip.ReadInt16();
+        Z = ip.ReadInt16();
+        Direction = (Direction)ip.ReadInt16();
+        ip.Seek(9, SeekOrigin.Current);
+        Width = ip.ReadInt16();
+        Height = ip.ReadInt16();
     }
 }

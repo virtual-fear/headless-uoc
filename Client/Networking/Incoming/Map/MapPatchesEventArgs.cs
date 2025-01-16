@@ -1,21 +1,13 @@
-﻿namespace Client.Networking.Incoming;
-using System.Collections;
-using Client.Game.Data;
+﻿using Hashtable = System.Collections.Hashtable;
+using WorldType = Client.Game.Data.WorldType;
+namespace Client.Networking.Incoming;
 public sealed class MapPatchesEventArgs : EventArgs
 {
     public NetState State { get; }
-    public PacketReader? Reader { get; set; }
-    public Hashtable? Table { get; set; }
-    public MapPatchesEventArgs(NetState state) => State = state;
-}
-public partial class Map
-{
-    public static event PacketEventHandler<MapPatchesEventArgs>? OnPatch;
-
-    [PacketHandler(0x18, length: 33, ingame: true, extCmd: true)]
-    protected static void ReceivedMap_Patches(NetState ns, PacketReader pvSrc)
+    public Hashtable? Table { get; }
+    internal MapPatchesEventArgs(NetState state, PacketReader pvSrc)
     {
-        MapPatchesEventArgs e = new(ns) { Reader = pvSrc };
+        State = state;
         int staticBlocks, landBlocks;
         Hashtable t = new Hashtable();
         t = Hashtable.Synchronized(t);
@@ -29,7 +21,6 @@ public partial class Map
             // [2]  ==  StaticBlock | LandBlock
             t[(WorldType)i] = new KeyValuePair<int, int>(staticBlocks, landBlocks);
         }
-        e.Table = t;
-        OnPatch?.Invoke(e);
+        Table = t;
     }
 }

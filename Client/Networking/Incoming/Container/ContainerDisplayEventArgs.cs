@@ -2,19 +2,12 @@
 public sealed class ContainerDisplayEventArgs : EventArgs
 {
     public NetState State { get; }
-    public ContainerDisplayEventArgs(NetState state) => State = state;
-    public int Container { get; set; }
-    public short GumpID { get; set; }
-}
-public partial class Container
-{
-    public static event PacketEventHandler<ContainerDisplayEventArgs>? OnDisplay;
-    [PacketHandler(0x24, length: 7, ingame: true)]
-    protected static void ReceivedContainer_Display(NetState ns, PacketReader pvSrc)
+    public int Container { get; }
+    public short GumpID { get; }
+    internal ContainerDisplayEventArgs(NetState state, PacketReader ip)
     {
-        ContainerDisplayEventArgs e = new(ns);
-        e.Container = pvSrc.ReadInt32();
-        e.GumpID = pvSrc.ReadInt16();
-        OnDisplay?.Invoke(e);
+        State = state;
+        Container = ip.ReadInt32();
+        GumpID = ip.ReadInt16();
     }
-} 
+}

@@ -6,7 +6,7 @@ public sealed class PPlayServer : Packet
     {
         Packet packet = new PPlayServer();
         packet.Stream.Write((short)index);
-        packet.Stream.Fill();
+        packet.Stream.FilltoCapacity();
         return packet;
     }
 }

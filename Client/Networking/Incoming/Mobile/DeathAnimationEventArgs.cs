@@ -1,24 +1,17 @@
-﻿namespace Client.Networking.Incoming;
-using Client.Game.Context;
-using Client.Game.Data;
+﻿using ItemContext = Client.Game.Context.ItemContext;
+using MobileContext = Client.Game.Context.MobileContext;
+using Serial = Client.Game.Data.Serial;
+namespace Client.Networking.Incoming;
 public sealed class DeathAnimationEventArgs : EventArgs
 {
     public NetState State { get; }
-    public DeathAnimationEventArgs(NetState state) => State = state;
-    public MobileContext? Mobile { get; set; }
-    public ItemContext? Corpse { get; set; }
-}
-public partial class Mobile
-{
-    public static event PacketEventHandler<DeathAnimationEventArgs>? OnDeathAnimation;
-
-    [PacketHandler(0xAF, length: 13, ingame: true)]
-    protected static void Received_DeathAnimation(NetState ns, PacketReader pvSrc)
+    public MobileContext? Mobile { get; }
+    public ItemContext? Corpse { get; }
+    internal DeathAnimationEventArgs(NetState state, PacketReader ip)
     {
-        DeathAnimationEventArgs e = new(ns);
-        e.Mobile = MobileContext.Acquire((Serial)pvSrc.ReadUInt32());
-        e.Corpse = ItemContext.Acquire((Serial)pvSrc.ReadUInt32());
-        pvSrc.ReadInt32();
-        OnDeathAnimation?.Invoke(e);
+        State = state;
+        Mobile = MobileContext.Acquire((Serial)ip.ReadUInt32());
+        Corpse = ItemContext.Acquire((Serial)ip.ReadUInt32());
+        ip.ReadInt32();
     }
 }

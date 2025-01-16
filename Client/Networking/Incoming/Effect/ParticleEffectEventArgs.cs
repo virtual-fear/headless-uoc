@@ -1,64 +1,56 @@
-﻿namespace Client.Networking.Incoming.Effects;
-using Client.Game.Data;
-public partial class Effect
+﻿using EffectType = Client.Game.Data.EffectType;
+namespace Client.Networking.Incoming.Effects;
+public sealed class ParticleEffectEventArgs : EventArgs
 {
-    public static event PacketEventHandler<ParticleEffectEventArgs>? OnParticleUpdate;
-    public sealed class ParticleEffectEventArgs : EventArgs
+    public NetState State { get; }
+    public EffectType Type { get; }
+    public int Source { get; }
+    public int Target { get; }
+    public short ItemID { get; }
+    public short SourceX { get; }
+    public short SourceY { get; }
+    public sbyte SourceZ { get; }
+    public short TargetX { get; }
+    public short TargetY { get; }
+    public sbyte TargetZ { get; }
+    public byte Speed { get; }
+    public byte Duration { get; }
+    public bool FixedDirection { get; }
+    public bool Explode { get; }
+    public int Hue { get; }
+    public int Render { get; }
+    public short Effect { get; }
+    public short ExplodeEffect { get; }
+    public short ExplodeSound { get; }
+    public int Serial { get; }
+    public byte Layer { get; }
+    public short Unknown { get; }
+    internal ParticleEffectEventArgs(NetState state, PacketReader pvSrc)
     {
-        public NetState State { get; }
-        public ParticleEffectEventArgs(NetState state) => State = state;
-        public EffectType Type { get; set; }
-        public int Source { get; set; }
-        public int Target { get; set; }
-        public short ItemID { get; set; }
-        public short SourceX { get; set; }
-        public short SourceY { get; set; }
-        public sbyte SourceZ { get; set; }
-        public short TargetX { get; set; }
-        public short TargetY { get; set; }
-        public sbyte TargetZ { get; set; }
-        public byte Speed { get; set; }
-        public byte Duration { get; set; }
-        public bool FixedDirection { get; set; }
-        public bool Explode { get; set; }
-        public int Hue { get; set; }
-        public int Render { get; set; }
-        public short Effect { get; set; }
-        public short ExplodeEffect { get; set; }
-        public short ExplodeSound { get; set; }
-        public int Serial { get; set; }
-        public byte Layer { get; set; }
-        public short Unknown { get; set; }
-    }
-
-    [PacketHandler(0xC7, length: 49, ingame: true)]
-    protected static void Received_ParticleEffect(NetState ns, PacketReader pvSrc)
-    {
-        ParticleEffectEventArgs e = new(ns);
-        e.Type = (EffectType)pvSrc.ReadByte();
-        e.Source = pvSrc.ReadInt32();
-        e.Target = pvSrc.ReadInt32();
-        e.ItemID = pvSrc.ReadInt16();
-        e.SourceX = pvSrc.ReadInt16();
-        e.SourceY = pvSrc.ReadInt16();
-        e.SourceZ = pvSrc.ReadSByte();
-        e.TargetX = pvSrc.ReadInt16();
-        e.TargetY = pvSrc.ReadInt16();
-        e.TargetZ = pvSrc.ReadSByte();
-        e.Speed = pvSrc.ReadByte();
-        e.Duration = pvSrc.ReadByte();
+        State = state;
+        Type = (EffectType)pvSrc.ReadByte();
+        Source = pvSrc.ReadInt32();
+        Target = pvSrc.ReadInt32();
+        ItemID = pvSrc.ReadInt16();
+        SourceX = pvSrc.ReadInt16();
+        SourceY = pvSrc.ReadInt16();
+        SourceZ = pvSrc.ReadSByte();
+        TargetX = pvSrc.ReadInt16();
+        TargetY = pvSrc.ReadInt16();
+        TargetZ = pvSrc.ReadSByte();
+        Speed = pvSrc.ReadByte();
+        Duration = pvSrc.ReadByte();
         pvSrc.ReadByte();   //  0x00
         pvSrc.ReadByte();   //  0x00
-        e.FixedDirection = pvSrc.ReadBoolean();
-        e.Explode = pvSrc.ReadBoolean();
-        e.Hue = pvSrc.ReadInt32();
-        e.Render = pvSrc.ReadInt32();   //  RenderMode
-        e.Effect = pvSrc.ReadInt16();
-        e.ExplodeEffect = pvSrc.ReadInt16();
-        e.ExplodeSound = pvSrc.ReadInt16();
-        e.Serial = pvSrc.ReadInt32();
-        e.Layer = pvSrc.ReadByte();
-        e.Unknown = pvSrc.ReadInt16();
-        OnParticleUpdate?.Invoke(e);
+        FixedDirection = pvSrc.ReadBoolean();
+        Explode = pvSrc.ReadBoolean();
+        Hue = pvSrc.ReadInt32();
+        Render = pvSrc.ReadInt32();   //  RenderMode
+        Effect = pvSrc.ReadInt16();
+        ExplodeEffect = pvSrc.ReadInt16();
+        ExplodeSound = pvSrc.ReadInt16();
+        Serial = pvSrc.ReadInt32();
+        Layer = pvSrc.ReadByte();
+        Unknown = pvSrc.ReadInt16();
     }
 }

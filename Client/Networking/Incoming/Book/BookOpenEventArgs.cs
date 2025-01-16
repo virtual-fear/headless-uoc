@@ -2,29 +2,17 @@
 public sealed class BookOpenEventArgs : EventArgs
 {
     public NetState State { get; }
-    public bool Supported { get; }
-    public BookOpenEventArgs(NetState state, bool supported)
+    public bool Supported { get; } = false;
+    public string Title { get; }
+    public string Author { get; }
+    internal BookOpenEventArgs(NetState state, PacketReader ip)
     {
         State = state;
-        Supported = supported;
-    }
-    public string Title { get; set; } = string.Empty;
-    public string Author { get; set; } = string.Empty;
-}
-public partial class Book
-{
-    public static event PacketEventHandler<BookOpenEventArgs>? Open;
-
-    [PacketHandler(0xD4, length: -1, ingame: true)]
-    protected static void ReceivedBook_Open(NetState ns, PacketReader pvSrc)
-    {
-        BookOpenEventArgs e = new(ns, false);
-        pvSrc.ReadInt32();
-        pvSrc.ReadBoolean();
-        pvSrc.ReadBoolean();
-        pvSrc.ReadInt16();
-        e.Title = pvSrc.ReadString(pvSrc.ReadInt16());
-        e.Author = pvSrc.ReadString(pvSrc.ReadInt16());
-        Open?.Invoke(e);
+        ip.ReadInt32();
+        ip.ReadBoolean();
+        ip.ReadBoolean();
+        ip.ReadInt16();
+        Title = ip.ReadString(ip.ReadInt16());
+        Author = ip.ReadString(ip.ReadInt16());
     }
 }

@@ -4,28 +4,17 @@
 public sealed class BondedStatusEventArgs : EventArgs
 {
     public NetState State { get; }
-    public BondedStatusEventArgs(NetState state) => State = state;
     public int Serial { get; set; }
     public byte Value01 { get; set; }
     public byte Value02 { get; set; }
-} // (ext) packetID: 0x19
-
-public partial class Player
-{
-    [Obsolete]
-    public static event PacketEventHandler<BondedStatusEventArgs>? Player_BondedStatus;
-
-    [Obsolete("StatLockInfo is the same")]
-    //[PacketHandler(0x19, length: 11, ingame: true, extCmd: true)]
-    protected static void Receive_BondedStatus(NetState ns, PacketReader pvSrc)
+    internal BondedStatusEventArgs(NetState state, PacketReader ip)
     {
-        BondedStatusEventArgs e = new BondedStatusEventArgs(ns);
+        State = state;
         byte v1, v2;
-        v1 = pvSrc.ReadByte();
-        e.Serial = pvSrc.ReadInt32();
-        v2 = pvSrc.ReadByte();
-        e.Value01 = v1;
-        e.Value02 = v2;
-        Player_BondedStatus?.Invoke(e);
+        v1 = ip.ReadByte();
+        Serial = ip.ReadInt32();
+        v2 = ip.ReadByte();
+        Value01 = v1;
+        Value02 = v2;
     }
-}
+} // (ext) packetID: 0x19

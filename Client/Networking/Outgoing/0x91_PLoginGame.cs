@@ -33,10 +33,10 @@ internal sealed class PLoginGame : Packet
         Packet packet = new PLoginGame();
         if (e.Allowed)
         {
-            packet.Stream.WriteUInt32_BE(e.Seed);
-            packet.Stream.WriteAsciiFixed(un, 30);
-            packet.Stream.WriteAsciiFixed(pw, 30);
-            packet.Stream.Fill();
+            packet.Stream.Write((uint)e.Seed);
+            packet.Stream.WriteAscii(un, 30);
+            packet.Stream.WriteAscii(pw, 30);
+            packet.Stream.FilltoCapacity();
             return packet;
         }
         return null;

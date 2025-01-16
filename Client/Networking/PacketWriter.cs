@@ -1,245 +1,213 @@
-﻿using System;
-using System.Buffers.Binary;
-using System.IO;
+﻿namespace Client.Networking;
+using System;
+using System.Runtime.ExceptionServices;
 using System.Text;
 
-namespace Client.Networking
+/// <summary>
+///     Write methods by default are BigEndian
+/// </summary>
+public class PacketWriter
+
 {
-    public class PacketWriter : IDisposable
+    protected byte[] Buffer;
+    protected readonly int Capacity;
+    public byte Command { get; }
+    public int Length => Buffer.Length;
+    public int Index { get; protected set; }
+    public PacketWriter(int capacity = 32)
     {
-        private static byte[] m_Buffer = new byte[4];
-
-        private int m_Capacity;
-        private MemoryStream m_Stream;
-
-        public PacketWriter()
-            : this(64)
+        Buffer = new byte[capacity];
+        Capacity = capacity;
+    }
+    
+    public void EnsureCapacity(int additionalCapacity)
+    {
+        if (Index + additionalCapacity > Buffer.Length)
         {
+            Array.Resize(ref Buffer, Math.Max(Buffer.Length * 2, Index + additionalCapacity));
+        }
+    }
+    protected bool IsSafeChar(int c) => c >= 0x20 && c < 0xFFFE;
+    public void FilltoCapacity() => FillwithZeros(count: Capacity - Index);
+    public void FillwithZeros(int count)
+    {
+        EnsureCapacity(count);
+        for (int i = 0; i < count; i++)
+            Buffer[Index++] = 0x00;
+    }
+    public void Seek(int offset, SeekOrigin origin)
+    {
+        Index = origin switch
+        {
+            SeekOrigin.Begin => offset,
+            SeekOrigin.Current => Index + offset,
+            SeekOrigin.End => Buffer.Length - offset,
+            _ => throw new ArgumentOutOfRangeException(nameof(origin))
+        };
+    }
+    public void Write(bool value) => Write((byte)(value ? 1 : 0));
+    public void Write(sbyte value) => Write((byte)value);
+    public void Write(byte value)
+    {
+        EnsureCapacity(1);
+        Buffer[Index++] = value;
+    }
+    public void Write(byte[] buffer, int offset, int length)
+    {
+        EnsureCapacity(length);
+        Array.Copy(buffer, offset, Buffer, Index, length);
+        Index += length;
+    }
+    public void WriteAscii(string value)
+    {
+        if (string.IsNullOrEmpty(value))
+        {
+            Write((byte)0);
+            return;
         }
 
-        internal PacketWriter(int capacity)
+        for(int i = 0; i < value.Length; i++)
+            Write((byte)value[i]);
+        
+        Write((byte)0);
+    }
+    public void WriteAscii(string value, int fixedLength)
+    {
+        EnsureCapacity(fixedLength);
+        int i;
+        for (i = 0; i < fixedLength && i < value.Length; i++)
         {
-            m_Stream = new MemoryStream((m_Capacity = capacity));
+            Buffer[Index++] = (byte)value[i];
         }
-
-        public Stream UnderlyingStream => m_Stream;
-        public int Capacity => m_Capacity;
-        public long Length => m_Stream.Length;
-
-        public byte[] Compile()
+        for (; i < fixedLength; i++)
         {
-            lock (m_Stream)
+            Buffer[Index++] = 0;
+        }
+    }
+    public void WriteUnicodeLESafe(string value, int fixedLength)
+    {
+        EnsureCapacity(fixedLength * 2);
+        int i;
+        for (i = 0; i < fixedLength && i < value.Length; i++)
+        {
+            char c = value[i];
+            if (IsSafeChar(c))
             {
-                m_Stream.Flush();
-                return m_Stream.ToArray();
-            }
-        }
-
-        public void Flush()
-        {
-            lock (m_Stream)
-                m_Stream.Flush();
-        }
-
-        protected void Flush(int count)
-        {
-            Flush(0, count);
-        }
-
-        protected void Flush(int offset, int count)
-        {
-            Write(m_Buffer, offset, count);
-        }
-
-        public void Write(byte[] buffer)
-        {
-            lock (buffer)
-            {
-                Write((int)buffer.Length);
-                m_Stream.Write(buffer, 0, buffer.Length);
-            }
-        }
-
-        public void Write(bool value)
-        {
-            Write((byte)(value ? 1 : 0));
-        }
-
-        public void Write(byte value)
-        {
-            m_Stream.WriteByte(value);
-        }
-
-        public void Write(short value)
-        {
-            lock (m_Buffer)
-            {
-                m_Buffer[0] = (byte)(value >> 8);
-                m_Buffer[1] = (byte)(value >> 0);
-                Flush(0, 2);
-            }
-        }
-
-        public void WriteUInt32_BE(uint value)
-        {
-            lock(m_Stream)
-            {
-                Span<byte> buffer = stackalloc byte[4];
-                BinaryPrimitives.WriteUInt32BigEndian(buffer, value);
-                m_Stream.Write(buffer);
-            }
-        }
-
-        public void WriteInt32_LE(uint value)
-        {
-            lock (m_Buffer)
-            {
-                var buffer = BitConverter.GetBytes(value);
-                if (!BitConverter.IsLittleEndian)
-                    Array.Reverse(buffer);
-
-                m_Buffer[0] = buffer[0];
-                m_Buffer[1] = buffer[1];
-                m_Buffer[2] = buffer[2];
-                m_Buffer[3] = buffer[3];
-                Flush();
-            }
-        }
-
-        public void Write(int value)
-        {
-            lock (m_Buffer)
-            {
-                m_Buffer[0] = (byte)(value >> 24);
-                m_Buffer[1] = (byte)(value >> 16);
-                m_Buffer[2] = (byte)(value >> 08);
-                m_Buffer[3] = (byte)(value >> 00);
-                Flush(0, 4);
-            }
-        }
-
-        public void Write(long value)
-        {
-            lock (m_Buffer)
-            {
-                m_Buffer[0] = (byte)(value >> 56);
-                m_Buffer[1] = (byte)(value >> 48);
-                m_Buffer[2] = (byte)(value >> 40);
-                m_Buffer[4] = (byte)(value >> 32);
-                Flush(0, 4);
-                m_Buffer[0] = (byte)(value >> 24);
-                m_Buffer[1] = (byte)(value >> 16);
-                m_Buffer[2] = (byte)(value >> 08);
-                m_Buffer[3] = (byte)(value >> 00);
-                Flush(0, 4);
-            }
-        }
-
-        public void Write(sbyte value)
-        {
-            Write((byte)value);
-        }
-
-        public void Write(ushort value)
-        {
-            Write((short)value);
-        }
-
-        public void Write(uint value)
-        {
-            Write((int)value);
-        }
-
-        public void Write(ulong value)
-        {
-            Write((long)value);
-        }
-
-        public void Write(string value)
-        {
-            Write(Encoding.ASCII.GetBytes(value));
-        }
-
-        public void WriteUnicode(string text)
-        {
-            Write(Encoding.BigEndianUnicode.GetBytes(text));
-        }
-
-        /// <summary>
-        /// Writes a fixed-length ASCII-encoded string value to the underlying stream. To fit (size), the string content is either truncated or padded with null characters.
-        /// </summary>
-        public void WriteAsciiFixed(string text, int size)
-        {
-            if (text == null)
-                text = String.Empty;
-
-            int length = text.Length;
-
-            if (text.Length > size)
-                length = size;
-
-            if (length > 0)
-            {
-                Write(Encoding.ASCII.GetBytes(text.ToCharArray()), 0, length);
-            }
-
-            size -= length;
-
-            if (size > 0)
-            {
-                Fill(size);
-            }
-        }
-
-        public void Write(byte[] buffer, int offset, int count)
-        {
-            m_Stream.Write(buffer, offset, count);
-        }
-
-        /// <summary>
-        /// Fills the stream from the current position up to (capacity) with 0x00's
-        /// </summary>
-        public void Fill()
-        {
-            Fill((int)(m_Capacity - m_Stream.Length));
-        }
-
-        /// <summary>
-        /// Writes a number of 0x00 byte values to the underlying stream.
-        /// </summary>
-        public void Fill(int count)
-        {
-            if (m_Stream.Position != m_Stream.Length)
-            {
-                Write(new byte[count], 0, count);
+                Buffer[Index++] = (byte)c;
+                Buffer[Index++] = (byte)(c >> 8);
             }
             else
             {
-                m_Stream.SetLength((m_Stream.Length + count));
-                m_Stream.Position = m_Stream.Length;
+                Buffer[Index++] = (byte)'?';
+                Buffer[Index++] = 0x00;
             }
         }
-
-        /// <summary>
-        /// Offsets the current position from an origin.
-        /// </summary>
-        public long Seek(long offset, SeekOrigin loc)
+        for (; i < fixedLength; i++)
         {
-            return m_Stream.Seek(offset, loc);
+            Buffer[Index++] = 0x00;
+            Buffer[Index++] = 0x00;
         }
+    }
+    public void WriteUnicode(string value)
+    {
 
-        #region IDisposable Members
-
-        public void Dispose()
+        foreach (char c in value)
         {
-            m_Capacity = 0;
-            if (m_Stream != null)
-            {
-                m_Stream.Dispose();
-                m_Stream = null;
-            }
+            Write((byte)(c >> 8));
+            Write((byte)c);
         }
-
-        #endregion IDisposable Members
+        Write((ushort)0x00);
+    }
+    public void WriteUnicode(string value, int fixedLength)
+    {
+        EnsureCapacity(fixedLength * 2);
+        int i;
+        for (i = 0; i < fixedLength && i < value.Length; i++)
+        {
+            Buffer[Index++] = (byte)(value[i] >> 8);
+            Buffer[Index++] = (byte)value[i];
+        }
+        for (; i < fixedLength; i++)
+        {
+            Buffer[Index++] = 0;
+            Buffer[Index++] = 0;
+        }
+    }
+    public void WriteunicodeLE(string value)
+    {
+        for(int i = 0; i<  value.Length; i++)
+        {
+            char c = value[i];
+            Write((byte)c);
+            Write((byte)(c >> 8));
+        }
+        Write((ushort)0);
+    }
+    public void WriteUnicodeLE(string value, int fixedLength)
+    {
+        EnsureCapacity(fixedLength * 2);
+        int i;
+        for (i = 0; i < fixedLength && i < value.Length; i++)
+        {
+            Buffer[Index++] = (byte)value[i];
+            Buffer[Index++] = (byte)(value[i] >> 8);
+        }
+        for (; i < fixedLength; i++)
+        {
+            Buffer[Index++] = 0;
+            Buffer[Index++] = 0;
+        }
+    }
+    public void WriteUTF8(string value)
+    {
+        byte[] buffer = Encoding.UTF8.GetBytes(value);
+        Write(buffer, 0, buffer.Length);
+        Write((byte)0);
+    }
+    public void Write(short value)
+    {
+        Write((byte)(value >> 8));
+        Write((byte)value);
+    }
+    public void Write(int value)
+    {
+        Write((byte)(value >> 24));
+        Write((byte)(value >> 16));
+        Write((byte)(value >> 8));
+        Write((byte)value);
+    }
+    public void Write(ushort value)
+    {
+        Write((byte)(value >> 8));
+        Write((byte)value);
+    }
+    public void WriteLE(ushort value)
+    {
+        Write((byte)value);
+        Write((byte)(value >> 8));
+    }
+    public void Write(uint value)
+    {
+        Write((byte)(value >> 24));
+        Write((byte)(value >> 16));
+        Write((byte)(value >> 8));
+        Write((byte)value);
+    }
+    public void WriteLE(uint value)
+    {
+        Write((byte)value);
+        Write((byte)(value >> 8));
+        Write((byte)(value >> 16));
+        Write((byte)(value >> 24));
+    }
+    public byte[] Compile() => Buffer[..Index];
+    public void Trace()
+    {
+        ConsoleColor color = Console.ForegroundColor;
+        Console.ForegroundColor = ConsoleColor.Cyan;
+        Console.WriteLine($"(Tracing Packet) ( {Command} 0x{Command:X} ).. Size:{Index}");
+        Console.ForegroundColor = color;
+        Console.WriteLine();
     }
 }
+

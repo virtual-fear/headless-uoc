@@ -25,8 +25,8 @@ namespace Client
             Info = new ConnectInfo()
             {
                 EndPoint = new IPEndPoint(IPAddress.Parse("127.0.0.1"), 2593),
-                Username = "admin",
-                Password = "admin",
+                Username = "admin2",
+                Password = "admin2",
                 Seed = 1 
             };
         }
@@ -37,9 +37,9 @@ namespace Client
             PacketHandlers.RegisterAttributes();
 
             Network.OnAttach += Network_OnAttach;
-            Shard.UpdateServerList += Shard_UpdateServerList;
+            Shard.OnUpdate_ServerList += Shard_UpdateServerList;
             Shard.OnServerAck += Shard_OnServerAck;
-            Shard.UpdateCharacterList += Shard_UpdateCharacterList;
+            Shard.OnCharacterList += Shard_UpdateCharacterList;
         }
 
         private static void Shard_UpdateCharacterList(CharacterListEventArgs e)
@@ -84,7 +84,7 @@ namespace Client
                 Logger.Log("No shards are currently available", LogColor.Warning);
                 return;
             }
-            Logger.Log("  > Connecting to the first shard available!", LogColor.DarkMagenta);
+            Logger.Log("  > Connecting to the first shard available!", LogColor.Info);
             if (Network.State == null)
             {
                 throw new InvalidOperationException("Invalid network state",

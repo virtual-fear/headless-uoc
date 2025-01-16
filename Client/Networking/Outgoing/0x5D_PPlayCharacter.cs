@@ -10,11 +10,10 @@ internal sealed class PPlayCharacter : Packet
             throw new ArgumentNullException("Unable to play character, slot is invalid.", "info");
         
         NetState ns = ci.State;
-        Logger.Log(nameof(PPlayCharacter), $"Writing authID: {ns.AuthID}");
         Packet p = new PPlayCharacter();
         PacketWriter s = p.Stream;
         s.Write((uint)0xEDEDEDED);
-        s.WriteAsciiFixed(ci.Name, 30); // name
+        s.WriteAscii(ci.Name, 30); // name
         s.Seek(2, SeekOrigin.Current); // unknown (@36)
         s.Write((int)0x3F); // flags
         s.Seek(24, SeekOrigin.Current);

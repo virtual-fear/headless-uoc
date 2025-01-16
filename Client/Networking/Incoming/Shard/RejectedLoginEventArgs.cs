@@ -1,15 +1,11 @@
 ﻿namespace Client.Networking.Incoming;
-public partial class Shard
+public sealed class RejectedLoginEventArgs : EventArgs
 {
-    private static void RejectedLogin()
-        => Logger.LogError("Login rejection received, not fully implemented yet!");
-
-    [PacketHandler(0x53, length: -1, ingame: false)]
-    public static void Received_Rejection_0x53(NetState ns, PacketReader pvSrc) => RejectedLogin();
-
-    [PacketHandler(0x82, length: -1, ingame: false)]
-    public static void Received_Rejection_0x82(NetState ns, PacketReader pvSrc) => RejectedLogin();
-
-    [PacketHandler(0x85, length: -1, ingame: false)]
-    public static void Received_Rejection_0x85(NetState ns, PacketReader pvSrc) => RejectedLogin();
+    public NetState State { get; }
+    public byte Command { get; }
+    internal RejectedLoginEventArgs(NetState state, byte cmd)
+    {
+        State = state;
+        Command = cmd;
+    }
 }

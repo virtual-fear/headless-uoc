@@ -2,18 +2,10 @@
 public sealed class SpeedControlEventArgs : EventArgs
 {
     public NetState State { get; }
-    public SpeedControlEventArgs(NetState state) => State = state;
-    public int Value { get; set; }
-}
-public partial class Shard
-{
-    public static event PacketEventHandler<SpeedControlEventArgs>? SpeedControlUpdate;
-
-    [PacketHandler(0x26, length: 3, ingame: true, extCmd: true)]
-    protected static void ExtendedUpdate(NetState ns, PacketReader pvSrc)
+    public int Value { get; }
+    internal SpeedControlEventArgs(NetState state, PacketReader ip)
     {
-        SpeedControlEventArgs e = new(ns);
-        e.Value = pvSrc.ReadByte();
-        SpeedControlUpdate?.Invoke(e);
+        State = state;
+        Value = ip.ReadByte();
     }
 }

@@ -1,37 +1,30 @@
-﻿namespace Client.Networking.Incoming;
-using Client.Game.Data;
-using Client.Networking;
+﻿using Serial = Client.Game.Data.Serial;
+using Direction = Client.Game.Data.Direction;
+using Notoriety = Client.Game.Data.Notoriety;
+namespace Client.Networking.Incoming;
 public sealed class MobileMovingEventArgs : EventArgs
 {
     public NetState State { get; }
-    public MobileMovingEventArgs(NetState state) => State = state;
-    public Serial Serial { get; set; }
-    public short Body { get; set; }
-    public short X { get; set; }
-    public short Y { get; set; }
-    public sbyte Z { get; set; }
-    public Direction Direction { get; set; }
-    public short Hue { get; set; }
-    public byte PacketFlags { get; set; }
-    public Notoriety Notoriety { get; set; }
-}
-public partial class Mobile
-{
-    public static event PacketEventHandler<MobileMovingEventArgs>? OnMoving;
-
-    [PacketHandler(0x77, length: 17, ingame: true)]
-    protected static void Received_MobileMoving(NetState ns, PacketReader pvSrc)
+    public Serial Serial { get; }
+    public short Body { get; }
+    public short X { get; }
+    public short Y { get; }
+    public sbyte Z { get; }
+    public Direction Direction { get; }
+    public short Hue { get; }
+    public byte PacketFlags { get; }
+    public Notoriety Notoriety { get; }
+    internal MobileMovingEventArgs(NetState state, PacketReader ip)
     {
-        MobileMovingEventArgs e = new(ns);
-        e.Serial = (Serial)pvSrc.ReadUInt32();
-        e.Body = pvSrc.ReadInt16();
-        e.X = pvSrc.ReadInt16();
-        e.Y = pvSrc.ReadInt16();
-        e.Z = pvSrc.ReadSByte();
-        e.Direction = (Direction)pvSrc.ReadByte();
-        e.Hue = pvSrc.ReadInt16();
-        e.PacketFlags = pvSrc.ReadByte();
-        e.Notoriety = (Notoriety)pvSrc.ReadByte();
-        OnMoving?.Invoke(e);
+        State = state;
+        Serial = (Serial)ip.ReadUInt32();
+        Body = ip.ReadInt16();
+        X = ip.ReadInt16();
+        Y = ip.ReadInt16();
+        Z = ip.ReadSByte();
+        Direction = (Direction)ip.ReadByte();
+        Hue = ip.ReadInt16();
+        PacketFlags = ip.ReadByte();
+        Notoriety = (Notoriety)ip.ReadByte();
     }
 }

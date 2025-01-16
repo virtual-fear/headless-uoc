@@ -21,6 +21,7 @@
             public const bool EnabledLingering = false;
         }
 
+        private static readonly object ConnectLock = new object();
         internal static readonly object SharedLock = new object();
         internal static readonly IPAddress ClientIP = Utility.GetIPAddress();
 
@@ -58,7 +59,14 @@
                 if ((State != null) && State.Attach(Socket))
                 {
                     Logger.Log(Application.Name, $"{State.Address} attached to network.", LogColor.Info);
-                    await Task.Run(delegate () { while ((State != null) && State.IsOpen) State.Slice(); });
+                    await Task.Run(delegate ()
+                    {
+                        lock (Network.ConnectLock)
+                        {
+                            while ((State != null) && State.IsOpen)
+                                State.Slice();
+                        }
+                    });//.GetAwaiter().GetResult();
                 }
                 else
                 {
@@ -72,6 +80,7 @@
             catch (Exception error)
             {
                 Logger.LogError(what: error.Message);
+                State?.Detach();
             }
             await Task.CompletedTask;
         }
@@ -85,13 +94,14 @@
 
         private static void Network_OnDetach(NetState ns)
         {
-            Logger.PushWarning($"{ns.Address}: Detached network state");
+            OnDetach -= Network_OnDetach;
+            Logger.Log($"{ns.Address}: Detached network state");
 
             // Reconnect with the seed
             Task.Run(AsyncConnect);
         }
         private static void Network_OnConstruct(NetState ns) => Logger.Log(Application.Name, "Constructed network state.", LogColor.Info);
-        private static void Network_OnDisconnect(SocketEventArgs e) => Console.WriteLine(Application.Name, $"{e.Address} disconnected from the server.");
+        private static void Network_OnDisconnect(SocketEventArgs e) => Logger.Log(Application.Name, $"{e.Address} disconnected from the server.");
         private static void Network_OnConnect(SocketEventArgs e) => State ??= new NetworkObject();
     }
 

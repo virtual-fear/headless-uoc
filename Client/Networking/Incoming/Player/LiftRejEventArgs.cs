@@ -1,22 +1,12 @@
-﻿namespace Client.Networking.Incoming;
-using Client.Game.Data;
+﻿using LRReason = Client.Game.Data.LRReason;
+namespace Client.Networking.Incoming;
 public sealed class LiftRejEventArgs : EventArgs
 {
     public NetState State { get; }
-    public LiftRejEventArgs(NetState state) => State = state;
-    public LRReason Reason { get; set; }
-}
-public partial class LiftRej
-{
-    public static event PacketEventHandler<LiftRejEventArgs>? OnLiftRej;
-
-    [PacketHandler(0x27, length: 2, ingame: true)]
-    protected static void Receive_LiftRej(NetState ns, PacketReader pvSrc)
+    public LRReason Reason { get; }
+    internal LiftRejEventArgs(NetState state, PacketReader ip)
     {
-        LiftRejEventArgs e = new(ns)
-        {
-            Reason = (LRReason)pvSrc.ReadByte()
-        };
-        OnLiftRej?.Invoke(e);
+        State = state;
+        Reason = (LRReason)ip.ReadByte();
     }
 }

@@ -1,6 +1,7 @@
 ﻿namespace Client.Game.Context;
 using Client.Game.Data;
 using Client.Networking.Incoming;
+
 public interface IItemValidator
 {
     bool IsValid(ItemContext check);
@@ -17,8 +18,8 @@ public sealed class ItemContext : ContextEntity
     static ItemContext() => Configure();
     private static void Configure()
     {
-        Item.OnUpdate += Item_OnUpdate;
-        Item.OnUpdateIncoming += Item_OnUpdateIncoming;
+        World.OnCreateWorldItem += Item_OnCreateWorldItem;
+        World.OnWorldItemIncoming += Item_OnUpdateIncoming;
     }
 
     private static void ItemContext_OnRemove(RemoveEventArgs e)
@@ -26,14 +27,14 @@ public sealed class ItemContext : ContextEntity
         Acquire(e.Serial)?.Delete();
     }
 
-    private static void Item_OnUpdateIncoming(ItemIncomingEventArgs e)
+    private static void Item_OnUpdateIncoming(WorldItemIncomingEventArgs e)
     {
         var item = Acquire(e.Serial);
         item.ID = e.ItemID;
         item.Hue = e.Hue;
         item.Layer = e.Layer;
     }
-    private static void Item_OnUpdate(ItemEventArgs e)
+    private static void Item_OnCreateWorldItem(WorldItemEventArgs e)
     {
         var item = Acquire(e.Serial);
         item.ID = e.ItemID;

@@ -1,7 +1,7 @@
 ﻿namespace Client.Game;
 using Client.Game.Compression;
 using Client.Networking;
-public static class Gumps
+public partial class Gumps
 {
     public const bool MoongateConfirmation = false;
 
@@ -9,7 +9,6 @@ public static class Gumps
         "Dost thou wish to step into the moongate? Continue to enter the gate, Cancel to stay here",
     };
 
-    private static byte[]? m_CompBuffer;
     public static void HandleGump(int serial, int dialog, int xOffset, int yOffset, string layout, string[] text)
     {
         TextWriter output = Console.Out;
@@ -36,35 +35,4 @@ public static class Gumps
         }
     }
 
-    public static PacketReader GetCompressedReader(PacketReader pvSrc)
-    {
-        if (m_CompBuffer == null)
-            m_CompBuffer = new byte[0x1000];  //  4096
-
-        int compressedLength = pvSrc.ReadInt32();
-        if (compressedLength == 0)
-            return new PacketReader(
-                   buffer: m_CompBuffer.AsSpan(),
-                fixedSize: false,
-                      cmd: 0x00,
-                     name: "Gump Subset");
-
-        int decompressedLength = pvSrc.ReadInt32();
-        if (decompressedLength == 0)
-            return new PacketReader(
-                 buffer: m_CompBuffer.AsSpan(start: 0, length: 3),
-              fixedSize: false,
-                    cmd: 0x00,
-                   name: "Gump Subset");
-
-        byte[] buffer = pvSrc.ReadBytes(compressedLength - 4);
-        if (decompressedLength > m_CompBuffer.Length)
-            m_CompBuffer = new byte[decompressedLength + 0xFFFF & -4096]; // 4095
-        ZLib.Unpack(m_CompBuffer, ref decompressedLength, buffer, buffer.Length);
-        return new PacketReader(
-            buffer: m_CompBuffer.AsSpan(start: 0, length: decompressedLength),
-            fixedSize: true,
-            cmd: 0x00,
-            name: "Gump Subset");
-    }
 }

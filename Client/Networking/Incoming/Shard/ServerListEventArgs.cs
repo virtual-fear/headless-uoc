@@ -1,46 +1,30 @@
-﻿namespace Client.Networking.Incoming;
-
-using System.Threading.Tasks.Dataflow;
-using Client.Networking.Data;
+﻿using ServerEntry = Client.Networking.Data.ServerEntry;
+namespace Client.Networking.Incoming;
 public sealed class ServerListReceivedEventArgs : EventArgs
 {
-    public ServerEntry[]? ServerListEntries { get; set; }
-}
-public partial class Shard
-{
-    public static event PacketEventHandler<ServerListReceivedEventArgs>? UpdateServerList;
-
-    [PacketHandler(0xA8, length: -1, ingame: false)]
-    protected static void Received_ServerList(NetState state, PacketReader pvSrc)
+    public NetState State { get; }
+    public ServerEntry[]? ServerListEntries { get; }
+    internal ServerListReceivedEventArgs(NetState state, PacketReader ip)
     {
-        Logger.PushWarning("Received server list");
+        State = state;
         // OutgoingAccountPackets.cs : SendAccountLoginAck(this NetState ns);
-        //writer.Write((byte)0x5D);
-        //writer.Write((ushort)info.Length);
-        byte flags = pvSrc.ReadByte(); // 0x5D (Unknown)
-        ushort count = pvSrc.ReadUInt16(); // info.Length
-        List<ServerEntry> serverList = new();
-        for (ushort i = 0; i < count; i++)
+        var unknown_0x5D = ip.ReadByte();
+        ServerListEntries = new ServerEntry[ip.ReadUInt16()];
+        if (ServerListEntries.Length > 0)
         {
-            serverList.Add(new ServerEntry(
-                (uint)pvSrc.ReadInt16(),    // i
-                pvSrc.ReadStringSafe(32), // name
-                pvSrc.ReadByte(), // full percent
-                pvSrc.ReadByte(), // time zone
-                pvSrc.ReadUInt32() // raw ip
-            ));
+            Logger.Log("[Servers]");
+            for (int i = 0; i < ServerListEntries.Length; i++)
+            {
+                var entry = new ServerEntry(
+                    index: ip.ReadUInt16(),
+                     name: ip.ReadStringSafe(32),
+                     percentFull: ip.ReadByte(),
+                        timeZone: ip.ReadByte(),
+                         address: ip.ReadUInt32());
+
+                ServerListEntries[i] = entry;
+                Logger.Log($"  ({i + 1}) {entry.Name} ({entry.PercentFull}%)", LogColor.Info);
+            }
         }
-        ServerInfo.Instance.Servers = serverList.ToArray();
-        Logger.Log("Received the list of available servers");
-
-        int entryIdx = 1;
-        foreach (var entry in ServerInfo.Instance.Servers)
-            Logger.Log($"  {entryIdx++}) {entry.Name} ({entry.PercentFull}%)", LogColor.Info);
-
-        ServerListReceivedEventArgs e = new()
-        {
-            ServerListEntries = ServerInfo.Instance.Servers
-        };
-        UpdateServerList?.Invoke(e);
     }
 }

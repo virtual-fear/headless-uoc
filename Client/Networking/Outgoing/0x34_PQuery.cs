@@ -8,7 +8,7 @@
         private static Packet Instantiate(byte type, int serial)
         {
             Packet packet = new PQuery();
-            packet.Stream.Fill(4); // sizeof(int)
+            packet.Stream.FillwithZeros(4); // sizeof(int)
             packet.Stream.Write(type);
             packet.Stream.Write(serial);
             return packet;

@@ -1,26 +1,19 @@
-﻿namespace Client.Networking.Incoming;
+﻿using PPing = Client.Networking.Outgoing.PPing;
+namespace Client.Networking.Incoming;
+
+/// <summary>
+///     Server is requesting a ping.
+/// </summary>
 public sealed class PingReqEventArgs : EventArgs
 {
     public NetState State { get; }
-    public PingReqEventArgs(NetState state) => State = state;
-    public byte Ping { get; set; }
-}
-    
-/// <summary>
-///     The server is requesting a ping.
-/// </summary>
-public partial class Player
-{
-    public static event PacketEventHandler<PingReqEventArgs>? OnPingAck;
-
-    [PacketHandler(0x73, length: 2, ingame: true)]
-    protected static void Receive_PingAck(NetState ns, PacketReader pvSrc)
+    public byte Value { get; }
+    internal PingReqEventArgs(NetState state, PacketReader ip)
     {
-        PingReqEventArgs e = new(ns);
-        Packet p = Outgoing.PPing.Instantiate(pvSrc);
-        pvSrc.Seek(-1, SeekOrigin.Current);
-        e.Ping = pvSrc.ReadByte();
-        ns.Send(p);
-        OnPingAck?.Invoke(e);
+        State = state;
+        Value = ip.ReadByte();
     }
+
+    static PingReqEventArgs() => Player.OnPingAck += Player_OnPingAck;
+    private static void Player_OnPingAck(PingReqEventArgs e) => e.State.Send(PPing.Write(e.Value));
 }

@@ -25,9 +25,9 @@ internal sealed class PLoginAccount : Packet
         Packet packet = new PLoginAccount();
         if (e.Allowed)
         {
-            packet.Stream.WriteAsciiFixed(e.Username, 30);
-            packet.Stream.WriteAsciiFixed(e.Password, 30);
-            packet.Stream.Fill();
+            packet.Stream.WriteAscii(e.Username, 30);
+            packet.Stream.WriteAscii(e.Password, 30);
+            packet.Stream.FilltoCapacity();
             return packet;
         }
         return null;

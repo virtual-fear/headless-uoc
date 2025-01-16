@@ -59,7 +59,7 @@ public class MobileContext : ContextEntity
     {
         Mobile.OnAnimation += Mobile_OnAnimation;
         Mobile.OnChangedAttributes += Mobile_OnChangedAttributes;
-        Mobile.ReceivedDamage += Mobile_ReceivedDamage;
+        Mobile.OnMobileDamage += Mobile_ReceivedDamage;
         Mobile.OnChangedHits += Mobile_OnChangedHits;
         Mobile.OnIncoming += Mobile_OnIncoming;
         Mobile.OnChangedMana += Mobile_OnChangedMana;

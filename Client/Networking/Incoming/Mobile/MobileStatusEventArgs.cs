@@ -1,92 +1,84 @@
-﻿namespace Client.Networking.Incoming;
-using Client.Game.Data;
-public class MobileStatusEventArgs : EventArgs
-    {
-        public NetState State { get; }
-        public MobileStatusEventArgs(NetState state) => State = state;
-        public Serial Serial { get; set; }
-        public string? Name { get; set; }
-        public short Hits { get; set; }
-        public short MaxHits { get; set; }
-        public bool IsPet { get; set; }
-        public byte Type { get; set; }
-        public byte Gender { get; set; }
-        public short Str { get; set; }
-        public short Dex { get; set; }
-        public short Int { get; set; }
-        public short Stam { get; set; }
-        public short MaxStam { get; set; }
-        public short Mana { get; set; }
-        public short MaxMana { get; set; }
-        public int TotalGold { get; set; }
-        public short Armor { get; set; }
-        public short Weight { get; set; }
-        public short MaxWeight { get; set; }
-        public byte RaceID { get; set; }
-        public short StatCap { get; set; }
-        public byte Followers { get; set; }
-        public byte MaxFollowers { get; set; }
-        public short FireResistance { get; set; }
-        public short ColdResistance { get; set; }
-        public short PoisonResistance { get; set; }
-        public short EnergyResistance { get; set; }
-        public short Luck { get; set; }
-        public short MinimumWeaponDamage { get; set; }
-        public short MaximumWeaponDamage { get; set; }
-        public int TithingPoints { get; set; }
-    }
-public partial class Mobile
+﻿using Serial = Client.Game.Data.Serial;
+namespace Client.Networking.Incoming;
+public sealed class MobileStatusEventArgs : EventArgs
 {
-    public static event PacketEventHandler<MobileStatusEventArgs>? OnStatus;
-
-    [PacketHandler(0x11, length: -1, ingame: true)]
-    protected static void Received_MobileStatus(NetState ns, PacketReader pvSrc)
+    public NetState State { get; }
+    public Serial Serial { get; }
+    public string? Name { get; }
+    public short Hits { get; }
+    public short MaxHits { get; }
+    public bool IsPet { get; }
+    public byte Type { get; }
+    public byte Gender { get; }
+    public short Str { get; }
+    public short Dex { get; }
+    public short Int { get; }
+    public short Stam { get; }
+    public short MaxStam { get; }
+    public short Mana { get; }
+    public short MaxMana { get; }
+    public int TotalGold { get; }
+    public short Armor { get; }
+    public short Weight { get; }
+    public short MaxWeight { get; }
+    public byte RaceID { get; }
+    public short StatCap { get; }
+    public byte Followers { get; }
+    public byte MaxFollowers { get; }
+    public short FireResistance { get; }
+    public short ColdResistance { get; }
+    public short PoisonResistance { get; }
+    public short EnergyResistance { get; }
+    public short Luck { get; }
+    public short MinimumWeaponDamage { get; }
+    public short MaximumWeaponDamage { get; }
+    public int TithingPoints { get; }
+    public MobileStatusEventArgs(NetState state, PacketReader ip)
     {
-        MobileStatusEventArgs e = new(ns);
-        e.Serial = (Serial)pvSrc.ReadUInt32();
-        e.Name = pvSrc.ReadString(30);
-        e.Hits = pvSrc.ReadInt16();
-        e.MaxHits = pvSrc.ReadInt16();
-        e.IsPet = pvSrc.ReadBoolean();
-        byte type = pvSrc.ReadByte();
+        State = state;
+        Serial = (Serial)ip.ReadUInt32();
+        Name = ip.ReadString(30);
+        Hits = ip.ReadInt16();
+        MaxHits = ip.ReadInt16();
+        IsPet = ip.ReadBoolean();
+        byte type = ip.ReadByte();
         if (type > 0)
         {
-            e.Gender = pvSrc.ReadByte(); // (0x0:male, 0x1:female)
-            e.Str = pvSrc.ReadInt16();
-            e.Dex = pvSrc.ReadInt16();
-            e.Int = pvSrc.ReadInt16();
-            e.Stam = pvSrc.ReadInt16();
-            e.MaxStam = pvSrc.ReadInt16();
-            e.Mana = pvSrc.ReadInt16();
-            e.MaxMana = pvSrc.ReadInt16();
-            e.TotalGold = pvSrc.ReadInt32();
-            e.Armor = pvSrc.ReadInt16();
-            e.Weight = pvSrc.ReadInt16();
+            Gender = ip.ReadByte(); // (0x0:male, 0x1:female)
+            Str = ip.ReadInt16();
+            Dex = ip.ReadInt16();
+            Int = ip.ReadInt16();
+            Stam = ip.ReadInt16();
+            MaxStam = ip.ReadInt16();
+            Mana = ip.ReadInt16();
+            MaxMana = ip.ReadInt16();
+            TotalGold = ip.ReadInt32();
+            Armor = ip.ReadInt16();
+            Weight = ip.ReadInt16();
             if (type >= 5)
             {
-                pvSrc.ReadInt16();  //  MaxWeight
-                pvSrc.ReadByte();   //  RaceID
+                ip.ReadInt16();  //  MaxWeight
+                ip.ReadByte();   //  RaceID
             }
-            e.StatCap = pvSrc.ReadInt16();
-            e.Followers = pvSrc.ReadByte();
-            e.MaxFollowers = pvSrc.ReadByte();
+            StatCap = ip.ReadInt16();
+            Followers = ip.ReadByte();
+            MaxFollowers = ip.ReadByte();
             if (type >= 4)
             {
-                e.FireResistance = pvSrc.ReadInt16();
-                e.ColdResistance = pvSrc.ReadInt16();
-                e.PoisonResistance = pvSrc.ReadInt16();
-                e.EnergyResistance = pvSrc.ReadInt16();
-                e.Luck = pvSrc.ReadInt16();
-                e.MinimumWeaponDamage = pvSrc.ReadInt16();
-                e.MaximumWeaponDamage = pvSrc.ReadInt16();
-                e.TithingPoints = pvSrc.ReadInt32();
+                FireResistance = ip.ReadInt16();
+                ColdResistance = ip.ReadInt16();
+                PoisonResistance = ip.ReadInt16();
+                EnergyResistance = ip.ReadInt16();
+                Luck = ip.ReadInt16();
+                MinimumWeaponDamage = ip.ReadInt16();
+                MaximumWeaponDamage = ip.ReadInt16();
+                TithingPoints = ip.ReadInt32();
                 if (type >= 6)
                 {
                     for (int i = 0; i < 15; ++i)
-                        pvSrc.ReadInt16();  //  GetAOSStatus
+                        ip.ReadInt16();  //  GetAOSStatus
                 }
             }
         }
-        OnStatus?.Invoke(e);
     }
 }

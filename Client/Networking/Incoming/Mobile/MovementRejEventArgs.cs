@@ -1,28 +1,20 @@
-﻿namespace Client.Networking.Incoming;
-using Client.Game.Data;
+﻿using Direction = Client.Game.Data.Direction;
+namespace Client.Networking.Incoming;
 public sealed class MovementRejEventArgs : EventArgs
 {
     public NetState State { get; }
-    public MovementRejEventArgs(NetState state) => State = state;
-    public byte Sequence { get; set; }
-    public short X { get; set; }
-    public short Y { get; set; }
-    public Direction Direction { get; set; }
-    public sbyte Z { get; set; }
-}
-public partial class Mobile
-{
-    public static event PacketEventHandler<MovementRejEventArgs>? OnMovementRej;
-
-    [PacketHandler(0x21, length: 8, ingame: true)]
-    protected static void Received_MovementRej(NetState ns, PacketReader pvSrc)
+    public byte Sequence { get; }
+    public short X { get; }
+    public short Y { get; }
+    public Direction Direction { get; }
+    public sbyte Z { get; }
+    internal MovementRejEventArgs(NetState state, PacketReader ip)
     {
-        MovementRejEventArgs e = new(ns);
-        e.Sequence = pvSrc.ReadByte();
-        e.X = pvSrc.ReadInt16();
-        e.Y = pvSrc.ReadInt16();
-        e.Direction = (Direction)pvSrc.ReadByte();
-        e.Z = pvSrc.ReadSByte();
-        OnMovementRej?.Invoke(e);
+        State = state;
+        Sequence = ip.ReadByte();
+        X = ip.ReadInt16();
+        Y = ip.ReadInt16();
+        Direction = (Direction)ip.ReadByte();
+        Z = ip.ReadSByte();
     }
 }

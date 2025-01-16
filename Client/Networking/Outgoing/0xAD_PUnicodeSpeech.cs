@@ -11,12 +11,12 @@ public sealed class PUnicodeSpeech : Packet
         Packet packet = new PUnicodeSpeech();
         packet.Stream.Write((byte)type);
         packet.Stream.Write((short)hue);
-        packet.Stream.Fill(sizeof(short)); // Font: RunUO doesn't read this
-        packet.Stream.Write(Localization.Language);
+        packet.Stream.FillwithZeros(sizeof(short)); // Font: RunUO doesn't read this
+        packet.Stream.WriteAscii(Localization.Language);
         bool encode = (type & MessageType.Encoded) != 0x0;
         if (!encode)
         {
-            packet.Stream.Write(text);
+            packet.Stream.WriteAscii(text);
         }
         else
         {

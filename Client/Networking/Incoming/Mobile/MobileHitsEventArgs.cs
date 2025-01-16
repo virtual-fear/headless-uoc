@@ -1,24 +1,16 @@
-﻿namespace Client.Networking.Incoming;
-using Client.Game.Data;
+﻿using Serial = Client.Game.Data.Serial;
+namespace Client.Networking.Incoming;
 public sealed class MobileHitsEventArgs : EventArgs
 {
     public NetState State { get; }
-    public MobileHitsEventArgs(NetState state) => State = state;
-    public Serial Serial { get; set; }
-    public short HitsMax { get; set; }
-    public short Hits { get; set; }
-}
-public partial class Mobile
-{
-    public static event PacketEventHandler<MobileHitsEventArgs>? OnChangedHits;
-
-    [PacketHandler(0xA1, length: 9, ingame: true)]
-    protected static void Received_MobileHits(NetState ns, PacketReader pvSrc)
+    public Serial Serial { get; }
+    public short HitsMax { get; }
+    public short Hits { get; }
+    internal MobileHitsEventArgs(NetState state, PacketReader ip)
     {
-        MobileHitsEventArgs e = new(ns);
-        e.Serial = (Serial)pvSrc.ReadUInt32();
-        e.HitsMax = pvSrc.ReadInt16();
-        e.Hits = pvSrc.ReadInt16();
-        OnChangedHits?.Invoke(e);
+        State = state;
+        Serial = (Serial)ip.ReadUInt32();
+        HitsMax = ip.ReadInt16();
+        Hits = ip.ReadInt16();
     }
 }

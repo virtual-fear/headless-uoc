@@ -1,24 +1,16 @@
-﻿namespace Client.Networking.Incoming;
-using Client.Game.Data;
+﻿using Serial = Client.Game.Data.Serial;
+namespace Client.Networking.Incoming;
 public sealed class MobileStamEventArgs : EventArgs
 {
     public NetState State { get; }
-    public MobileStamEventArgs(NetState state) => State = state;
-    public Serial Serial { get; set; }
-    public short StamMax { get; set; }
-    public short Stam { get; set; }
-}
-public partial class Mobile
-{
-    public static event PacketEventHandler<MobileStamEventArgs>? OnChangedStamina;
-
-    [PacketHandler(0xA3, length: 9, ingame: true)]
-    protected static void Received_MobileStam(NetState ns, PacketReader pvSrc)
+    public Serial Serial { get; }
+    public short StamMax { get; }
+    public short Stam { get; }
+    internal MobileStamEventArgs(NetState state, PacketReader ip)
     {
-        MobileStamEventArgs e = new(ns);
-        e.Serial = (Serial)pvSrc.ReadUInt16();
-        e.StamMax = pvSrc.ReadInt16();
-        e.Stam = pvSrc.ReadInt16();
-        OnChangedStamina?.Invoke(e);
+        State = state;
+        Serial = (Serial)ip.ReadUInt16();
+        StamMax = ip.ReadInt16();
+        Stam = ip.ReadInt16();
     }
 }

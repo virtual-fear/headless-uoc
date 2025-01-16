@@ -7,7 +7,7 @@ public class Packet
     public bool Encode { get; set; } = false;
     public Int64 Length => Stream == null ? 0 : Stream.Length;
     public PacketWriter Stream { get; }
-    public Packet(byte packetID, int length = -1)
+    public Packet(byte packetID, int length = 0)
     {
         // 0x00 : packetID
         // 0x01 :   length << 8 (short #2)
@@ -17,8 +17,8 @@ public class Packet
 
         if (Fixed = (length <= 0))
             length = 32;
-        
-        Stream = new PacketWriter(length);
+
+        Stream = new PacketWriter(capacity: length);
         Stream.Write((byte)packetID);
         if (Fixed)
             Stream.Write((ushort)0);
@@ -30,10 +30,11 @@ public class Packet
     {
         if (Fixed)
         {
-            Stream.Seek(1L, SeekOrigin.Begin);
-            Stream.Write((ushort)Stream.Length);
+            var packetLength = Stream.Index;
+            Stream.Seek(1, SeekOrigin.Begin);
+            Stream.Write((ushort)packetLength);
+            Stream.Seek(packetLength, SeekOrigin.Begin);
         }
-        Stream.Flush();
         return Stream.Compile();
     }
     public override string ToString() => $"{GetType().Name} (0x{ID:X2}, {Length})";

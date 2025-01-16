@@ -12,7 +12,7 @@ namespace Client.Networking.Outgoing
         private static Packet Instantiate()
         {
             Packet packet = new PLanguage();
-            packet.Stream.WriteAsciiFixed(PLanguage.Current, 4);
+            packet.Stream.WriteAscii(PLanguage.Current, 4);
             return packet;
         }
     }

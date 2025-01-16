@@ -2,26 +2,18 @@
 public sealed class SecureTradeEventArgs : EventArgs
 {
     public NetState State { get; }
-    public SecureTradeEventArgs(NetState state) => State = state;
-    public int Them { get; set; }
-    public int FirstContainer { get; set; }
-    public int SecondContainer { get; set; }
-    public string? Name { get; set; }
-}
-public partial class Player
-{
-    public static event PacketEventHandler<SecureTradeEventArgs>? OnSecureTrade;
-
-    [PacketHandler(0x6F, length: -1, ingame: true)]
-    protected static void Receive_SecureTrade(NetState ns, PacketReader pvSrc)
+    public int Them { get; }
+    public int FirstContainer { get; }
+    public int SecondContainer { get; }
+    public string? Name { get; }
+    internal SecureTradeEventArgs(NetState state, PacketReader ip)
     {
-        SecureTradeEventArgs e = new(ns);
-        pvSrc.ReadByte();   //  0   :   runuo:display
-        e.Them = pvSrc.ReadInt32();
-        e.FirstContainer = pvSrc.ReadInt32();
-        e.SecondContainer = pvSrc.ReadInt32();
-        pvSrc.ReadBoolean();    //  always true
-        e.Name = pvSrc.ReadString(30);
-        OnSecureTrade?.Invoke(e);
+        State = state;
+        ip.ReadByte();   //  0   :   runuo:display
+        Them = ip.ReadInt32();
+        FirstContainer = ip.ReadInt32();
+        SecondContainer = ip.ReadInt32();
+        ip.ReadBoolean();    //  always true
+        Name = ip.ReadString(30);
     }
 }

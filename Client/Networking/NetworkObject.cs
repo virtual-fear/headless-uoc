@@ -65,20 +65,23 @@ public sealed class NetworkObject : NetState
     }
     public override void Detach()
     {
-        if (m_IsOpen)
+        lock (Network.SharedLock)
         {
-            m_IsOpen = false;
-            try
+            if (m_IsOpen)
             {
-                m_Socket.Shutdown(SocketShutdown.Both);
+                m_IsOpen = false;
+                try
+                {
+                    m_Socket.Shutdown(SocketShutdown.Both);
+                }
+                catch { }
+                try
+                {
+                    m_Socket.Close();
+                }
+                catch { }
+                Network.Detach(this);
             }
-            catch { }
-            try
-            {
-                m_Socket.Close();
-            }
-            catch { }
-            Network.Detach(this);
         }
     }
     private void InternalFailure(Exception exception)
@@ -95,8 +98,9 @@ public sealed class NetworkObject : NetState
         {
             if (m_IsOpen)
             {
-                Logger.LogError("Internal network has stopped working..");
-                Logger.Log($"\tReason: {reason}\n");
+                if (Ingame)
+                    Logger.LogError($"Reason: {reason}");
+                
                 Detach();
             }
         }
@@ -115,7 +119,7 @@ public sealed class NetworkObject : NetState
                 {
                     InternalFailure(exception);
                 }
-            }
+            }   
         }
     }
     private void EndReceive(IAsyncResult asyncResult)
@@ -124,16 +128,16 @@ public sealed class NetworkObject : NetState
         {
             if (m_Socket == null) { return; }
             int length = m_Socket.EndReceive(asyncResult);
-            if (length <= 0) { return; }
+            if (length <= 0)
+                throw new SocketException(errorCode: (int)SocketError.NotConnected);            
             lock (m_Stream.Input)
-            {
                 m_Stream.Crypto.Decrypt(m_RecvBuffer, 0, length, m_Stream.Input);
-            }
             Receive();
         }
         catch (SocketException ex)
         {
-            Detach();
+            InternalFailure(ex);
+
         }
         catch (Exception exception)
         {
@@ -254,7 +258,7 @@ public sealed class NetworkObject : NetState
                 {
                     var packetID = Stream.Input.GetPacketID(); // (byte)
                     if (packetID < 0)
-                        break;
+                        break;   
 
                     PacketHandler? ph = PacketHandlers.GetHandler(packetID);
                     if (ph == null)
@@ -268,18 +272,18 @@ public sealed class NetworkObject : NetState
                     int length = ph.Length <= 0 ? Stream.Input.GetPacketLength() : ph.Length;
                     var ns = Network.State;
                     var canRead = length > 0 && (ns != null) && (ns.ConfirmedLogin && length >= 1 || ns.Ingame && length >= 2);
-                    Logger.Log($"Server -> Client: {ph.Name} (0x{packetID:X2}, {ph.Length}).. length:{length} ({(canRead ? "in" : "out-of")})-game", LogColor.Success);
+                    Logger.Log($"Server -> Client: {ph.Name} (0x{packetID:X2}, {ph.Length}).. length:{length} ({(canRead ? "in" : "out-of")})-game", LogColor.Info);
                     if (length < 3 && !canRead)
                     {
                         Logger.PushWarning("Detaching after receiving bad packet length!");
                         break;
                     }
                     Span<byte> buffer = Stream.Input.Dequeue(length);
-                    Utility.FormatBuffer(Console.Out, buffer.ToArray(), color: ConsoleColor.DarkGreen);
+                    Utility.FormatBuffer(Console.Out, buffer.ToArray(), color: ConsoleColor.DarkGray);
                     PacketReader reader = PacketReader.Create(ref buffer, ref ph);
                     ph.Receive(this, reader);
-                    var line = $"Completed slice with {length} bytes...({(IsOpen ? "still open" : "now closed")})\n";
-                    Logger.Log(line, color: IsOpen ? LogColor.Info : LogColor.Invalid);
+                    var line = $"Sliced network event ({length} byte{(length == 1 ? string.Empty : "s")})\n";
+                    Logger.Log(line, color: IsOpen ? LogColor.Success : LogColor.Invalid);
                 }
             }
         }

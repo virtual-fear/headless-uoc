@@ -4,9 +4,22 @@ using Client.Game.Data;
 public sealed class DisplayContextMenuEventArgs : EventArgs
 {
     public NetState? State { get; }
-    public DisplayContextMenuEventArgs(NetState state) => State = state;
-    public int MenuTarget { get; set; }
-    public ContextMenuEntry[]? Entries { get; set; }
+    public int MenuTarget { get; }
+    public ContextMenuEntry[]? Entries { get; }
+    internal DisplayContextMenuEventArgs(NetState state, PacketReader pvSrc)
+    {
+        pvSrc.ReadInt16();
+        MenuTarget = pvSrc.ReadInt32();
+        ContextMenuEntry[] entries = new ContextMenuEntry[pvSrc.ReadByte()];
+        for (int i = 0; i < entries.Length; ++i)
+        {
+            ContextMenuEntry ent = new(pvSrc.ReadInt32());
+            entries[pvSrc.ReadInt16()] = ent;
+            ent.Flags = (CMEFlags)pvSrc.ReadInt16();
+
+        }
+        Entries = entries;
+    }
 }
 
 /// <summary>
@@ -212,26 +225,4 @@ public partial class ContextMenu
         }
     }
 
-}
-public partial class Display
-{
-    public static event PacketEventHandler<DisplayContextMenuEventArgs>? UpdateContextMenu;
-
-    [PacketHandler(0x14, length: -1, ingame: true, extCmd: true)]
-    protected static void ReceivedDisplay_ContextMenu(NetState ns, PacketReader pvSrc)
-    {
-        DisplayContextMenuEventArgs e = new(ns);
-        pvSrc.ReadInt16();
-        e.MenuTarget = pvSrc.ReadInt32();
-        ContextMenuEntry[] entries = new ContextMenuEntry[pvSrc.ReadByte()];
-        for (int i = 0; i < entries.Length; ++i)
-        {
-            ContextMenuEntry ent = new(pvSrc.ReadInt32());
-            entries[pvSrc.ReadInt16()] = ent;
-            ent.Flags = (CMEFlags)pvSrc.ReadInt16();
-
-        }
-        e.Entries = entries;
-        UpdateContextMenu?.Invoke(e);
-    }
 }

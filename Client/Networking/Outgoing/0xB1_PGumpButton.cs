@@ -8,7 +8,7 @@ public sealed class PGumpButton : Packet
         packet.Stream.Write((int)serial);
         packet.Stream.Write((int)dialogID);
         packet.Stream.Write((int)buttonID);
-        packet.Stream.Fill(2);
+        packet.Stream.FillwithZeros(2);
         return packet;
     }
 }

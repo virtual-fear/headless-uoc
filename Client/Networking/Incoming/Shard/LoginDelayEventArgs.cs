@@ -1,8 +1,6 @@
 ﻿namespace Client.Networking.Incoming;
-public partial class Shard
+public sealed class LoginDelayEventArgs : EventArgs
 {
-    [PacketHandler(0xFD, length: -1, ingame: false)]
-    protected static void Received_LoginDelay(NetState state, PacketReader pvSrc)
-        => Logger.LogError("LoginDelay received, not fully implemented yet.");
-
+    public NetState State { get; }
+    internal LoginDelayEventArgs(NetState state) => State = state;
 }

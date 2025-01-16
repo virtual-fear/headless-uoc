@@ -7,14 +7,52 @@ public enum ProtocolExtensionType
     Runebooks = 3,
     Guardline = 4,
 }
+
 public sealed class ProtocolExtensionEventArgs : EventArgs
 {
     public NetState State { get; }
-    public ProtocolExtensionEventArgs(NetState state) => State = state;
-    public ProtocolExtensionType Type { get; set; }
-    public PartyMemberInfo[]? Party { get; set; }
-    public GuildMemberInfo[]? Guild { get; set; }
+    public ProtocolExtensionType Type { get; }
+    public PartyMemberInfo[]? Party { get; }
+    public GuildMemberInfo[]? Guild { get; }
+    internal ProtocolExtensionEventArgs(NetState state, PacketReader pvSrc)
+    {
+        State = state;
+        Type = (ProtocolExtensionType)pvSrc.ReadByte();
+        switch (Type)
+        {
+            case ProtocolExtensionType.Accept:
+                pvSrc.ReadByte();
+                break;
+
+            case ProtocolExtensionType.PartyTrack:
+                List<PartyMemberInfo> party = new();
+                while (pvSrc.ReadInt32() != 0x00)
+                {
+                    pvSrc.Seek(-4, SeekOrigin.Current);
+                    party.Add(PartyMemberInfo.Instantiate(pvSrc));
+                }
+                Party = party.ToArray();
+                party.Clear();
+                break;
+
+            case ProtocolExtensionType.GuildTrack:
+                List<GuildMemberInfo> guild = new();
+                while (pvSrc.ReadInt32() != 0x00)
+                {
+                    pvSrc.Seek(-4, SeekOrigin.Current);
+                    guild.Add(GuildMemberInfo.Instantiate(pvSrc));
+                }
+                Guild = guild.ToArray();
+                guild.Clear();
+                break;
+
+            default:
+                pvSrc.Trace();
+                return;
+        }
+    }
 }
+
 public sealed class GuildMemberInfo
 {
     public int Serial { get; }
@@ -46,47 +84,4 @@ public sealed class PartyMemberInfo
         MapID = pvSrc.ReadByte();
     }
     public static PartyMemberInfo Instantiate(PacketReader pvSrc) => new PartyMemberInfo(pvSrc);
-}
-public partial class Shard
-{
-    public static event PacketEventHandler<ProtocolExtensionEventArgs>? OnProtocolExtension;
-
-    [PacketHandler(0xF0, length: -1, ingame: true)]
-    protected static void Received_ProtocolExtension(NetState ns, PacketReader pvSrc)
-    {
-        ProtocolExtensionEventArgs e = new(ns);
-        ProtocolExtensionType type = (ProtocolExtensionType)pvSrc.ReadByte();
-        e.Type = type;
-        switch (type)
-        {
-            case ProtocolExtensionType.Accept:
-                pvSrc.ReadByte();
-                break;
-
-            case ProtocolExtensionType.PartyTrack:
-                List<PartyMemberInfo> party = new();
-                while (pvSrc.ReadInt32() != 0x00)
-                {
-                    pvSrc.Seek(-4, SeekOrigin.Current);
-                    party.Add(PartyMemberInfo.Instantiate(pvSrc));
-                }
-                e.Party = party.ToArray();
-                break;
-
-            case ProtocolExtensionType.GuildTrack:
-                List<GuildMemberInfo> guild = new();
-                while (pvSrc.ReadInt32() != 0x00)
-                {
-                    pvSrc.Seek(-4, SeekOrigin.Current);
-                    guild.Add(GuildMemberInfo.Instantiate(pvSrc));
-                }
-                e.Guild = guild.ToArray();
-                break;
-
-            default:
-                pvSrc.Trace();
-                return;
-        }
-        OnProtocolExtension?.Invoke(e);
-    }
 }
