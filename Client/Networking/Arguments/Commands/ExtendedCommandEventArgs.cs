@@ -20,7 +20,7 @@ public sealed class ExtendedCommandEventArgs : EventArgs
         if (eventArgs == null)
             throw new ArgumentNullException(nameof(eventArgs));
 
-        if (eventArgs.Handler is var h && (h != null))
+        if (eventArgs.Handler is var h)
         {
             if (h == null)
             {
