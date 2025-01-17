@@ -1,4 +1,4 @@
-﻿namespace Client.Networking.Outgoing;
+﻿namespace Client.Networking.Packets;
 public sealed class PMapChange : Packet
 {
     private PMapChange() : base(0xBF) => base.Stream.Write((short)0x08);

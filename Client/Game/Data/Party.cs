@@ -1,7 +1,7 @@
 ﻿using MobileContext = Client.Game.Context.MobileContext;
 namespace Client.Game.Data;
 using Client.Networking;
-using Client.Networking.Outgoing;
+using Client.Networking.Packets;
 
 public delegate void PartyHandler(Packet packet);
 public sealed class Party

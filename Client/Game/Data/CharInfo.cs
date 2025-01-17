@@ -1,6 +1,6 @@
 ﻿namespace Client.Game.Data;
 using Client.Networking;
-using Client.Networking.Outgoing;
+using Client.Networking.Packets;
 public sealed class CharInfo
 {
     public NetState State { get; }

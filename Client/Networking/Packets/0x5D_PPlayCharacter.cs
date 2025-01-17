@@ -1,6 +1,6 @@
 ﻿using System.Net;
 
-namespace Client.Networking.Outgoing;
+namespace Client.Networking.Packets;
 internal sealed class PPlayCharacter : Packet
 {
     private PPlayCharacter() : base(0x5D, 73) { Encode = false; }

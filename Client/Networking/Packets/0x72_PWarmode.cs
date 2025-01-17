@@ -1,4 +1,4 @@
-﻿namespace Client.Networking.Outgoing;
+﻿namespace Client.Networking.Packets;
 public sealed class PWarmode : Packet
 {
     private PWarmode() : base(0x72, 5) { }

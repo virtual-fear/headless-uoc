@@ -1,4 +1,4 @@
-﻿namespace Client.Networking.Outgoing;
+﻿namespace Client.Networking.Packets;
 public sealed class PPaperdollOpen : Packet
 {
     private PPaperdollOpen() : base(0x06, 5) { }

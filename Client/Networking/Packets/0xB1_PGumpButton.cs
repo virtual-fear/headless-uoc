@@ -1,4 +1,4 @@
-﻿namespace Client.Networking.Outgoing;
+﻿namespace Client.Networking.Packets;
 public sealed class PGumpButton : Packet
 {
     private PGumpButton() : base(0xB1) { }

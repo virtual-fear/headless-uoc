@@ -7,7 +7,7 @@ namespace Client
     using Client.Networking;
     using Client.Networking.Arguments;
     using Client.Networking.Data;
-    using Client.Networking.Outgoing;
+    using Client.Networking.Packets;
 
     /// <summary>
     ///     An event driven network client, built for ModernUO.

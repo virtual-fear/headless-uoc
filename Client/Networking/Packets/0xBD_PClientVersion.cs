@@ -1,6 +1,6 @@
 ﻿using System.Net.Sockets;
 
-namespace Client.Networking.Outgoing;
+namespace Client.Networking.Packets;
 public sealed class PClientVersion : Packet
 {
     /// <summary>

@@ -1,4 +1,4 @@
-﻿namespace Client.Networking.Outgoing;
+﻿namespace Client.Networking.Packets;
 public sealed class PPartyMessage : Packet
 {
     public PPartyMessage(string text) : base(0xBF)

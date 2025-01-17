@@ -2,7 +2,7 @@
 using System.Net;
 using Client.Networking;
 using Client.Networking.Arguments;
-using Client.Networking.Outgoing;
+using Client.Networking.Packets;
 public struct ShardData
 {
     public byte Index { get; }

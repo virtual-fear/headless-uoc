@@ -1,4 +1,4 @@
-﻿namespace Client.Networking.Outgoing;
+﻿namespace Client.Networking.Packets;
 public sealed class PQueryGuardline : Packet
 {
     private PQueryGuardline() : base(240) { }

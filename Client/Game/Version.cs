@@ -1,5 +1,5 @@
 ﻿using Client.Networking;
-using Client.Networking.Outgoing;
+using Client.Networking.Packets;
 
 namespace Client.Game;
 static class Version

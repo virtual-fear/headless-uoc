@@ -1,6 +1,6 @@
 ﻿using System.Globalization;
 
-namespace Client.Networking.Outgoing
+namespace Client.Networking.Packets
 {
     public class PLanguage : Packet
     {

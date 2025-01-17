@@ -1,4 +1,4 @@
-﻿using PPing = Client.Networking.Outgoing.PPing;
+﻿using PPing = Client.Networking.Packets.PPing;
 namespace Client.Networking.Arguments;
 
 using Client.Game;

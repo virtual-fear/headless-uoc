@@ -1,4 +1,4 @@
-﻿namespace Client.Networking.Outgoing;
+﻿namespace Client.Networking.Packets;
 public sealed class PPlayServer : Packet
 {
     private PPlayServer() : base(0xA0, 3) => Encode = false;

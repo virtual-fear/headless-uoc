@@ -1,4 +1,4 @@
-﻿namespace Client.Networking.Outgoing;
+﻿namespace Client.Networking.Packets;
 internal sealed class PLoginGame : Packet
 {
     public static event LoginEventHandler<SecondLoginAuthEventArgs>? Instantiated;

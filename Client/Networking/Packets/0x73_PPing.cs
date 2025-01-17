@@ -1,4 +1,4 @@
-﻿namespace Client.Networking.Outgoing;
+﻿namespace Client.Networking.Packets;
 public class PPing : Packet
 {
     private PPing() : base(0x73, 0x02) { }

@@ -6,7 +6,7 @@ namespace Client.Networking;
 
 using Client.Game.Data;
 using Client.Networking.Arguments;
-using PLoginAccount = Outgoing.PLoginAccount;
+using PLoginAccount = Packets.PLoginAccount;
 public sealed class NetworkObject : NetState
 {
     public bool ShouldRebuild { get; private set; } = true;
