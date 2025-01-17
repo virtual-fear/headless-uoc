@@ -1,15 +1,11 @@
 ﻿namespace Client.Networking.Packets;
+using Client.Networking.Arguments;
 public sealed class PAssistantVersion : Packet
 {
-    /// <summary>
-    ///     Requesting Assistant
-    /// </summary>
-    private PAssistantVersion(NetState ns, PacketReader ip) : base(0xBE)
+    internal PAssistantVersion(AssistVersionEventArgs args) : base(0xBE)
     {
-        base.Stream.Write((int)ip.ReadInt32());
-        Version cv = Application.ClientVersion;
-        base.Stream.WriteAscii(cv.ToString());
+        base.Stream.Write(args.Version);
+        base.Stream.WriteAscii(args.Text);
         base.Stream.FillwithZeros(sizeof(byte));
     }
-    public static void SendBy(NetState ns, PacketReader ip) => ns.Send(new PAssistantVersion(ns, ip));
 }
