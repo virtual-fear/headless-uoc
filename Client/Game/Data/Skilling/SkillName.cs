@@ -1,4 +1,4 @@
-﻿namespace Client.Game.Data.Skilling;
+﻿namespace Client.Game.Data;
 public enum SkillName
 {
     Alchemy = 0,

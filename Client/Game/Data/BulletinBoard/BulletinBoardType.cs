@@ -1,4 +1,4 @@
-﻿namespace Client.Game.Data.BulletinBoard;
+﻿namespace Client.Game.Data;
 public enum BulletinBoardType
 {
     Display = 0,

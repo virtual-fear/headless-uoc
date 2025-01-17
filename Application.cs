@@ -17,7 +17,7 @@ namespace Client
         public static Object? Instance { get; set; }
 
         // Intended for debugging purposes
-        //static Application() => Configure(autoConnect: true);
+        static Application() => Configure(autoConnect: true);
         public static void Configure(bool autoConnect = false)
         {
             Name = Application.Process.ProcessName;

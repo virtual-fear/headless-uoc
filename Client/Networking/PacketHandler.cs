@@ -40,7 +40,7 @@ namespace Client.Networking
     }
 
     [CompilerGenerated]
-    [AttributeUsage(AttributeTargets.Method, AllowMultiple = true)]
+    [AttributeUsage(AttributeTargets.Event | AttributeTargets.Method, AllowMultiple = true)]
     public class PacketHandlerAttribute : Attribute
     {
         public byte PacketID { get; }
@@ -64,13 +64,16 @@ namespace Client.Networking
         public short Length { get; }
         public bool Ingame { get; }
         private OnPacketReceive OnReceive { get; }
-        public string Name => OnReceive != null ? OnReceive.Method.Name : GetType().Name;
-        public PacketHandler(byte packetID, short length, bool ingame, OnPacketReceive receive)
+        public string Name { get; }
+        public PacketHandler(byte packetID, short length, bool ingame, OnPacketReceive receive, string? name = default)
         {
             PacketID = packetID;
             Length = length;
             Ingame = ingame;
             OnReceive = receive;
+            name ??= receive.Method.Name;
+            Name = name ?? $"(unknown:{packetID}:X2";
+
         }
         public PacketHandler? this[int packetID] 
         {

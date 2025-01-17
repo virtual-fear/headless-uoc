@@ -1,4 +1,4 @@
-﻿namespace Client.Game.Data.Skilling;
+﻿namespace Client.Game.Data;
 
 using Client.Game.Context;
 public sealed class SkillList

@@ -4,7 +4,6 @@
     using System.Net.Sockets;
     using Arguments;
     using Client.Networking.Data;
-    using Client.Networking.Incoming;
 
     /// <summary>
     ///   Using this partial class provides us with the flexibility to expose events without explicitly showing our invocation methods. 

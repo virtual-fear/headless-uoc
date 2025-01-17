@@ -1,10 +1,10 @@
 ﻿using System.Net;
 using System.Net.Sockets;
-namespace Client.Networking;
+using Client.Game;
 using Client.Game.Context;
 using Client.Game.Data;
-using Client.Networking.Incoming;
-
+using Client.Networking.Arguments;
+namespace Client.Networking;
 public abstract class NetState : Network
 {
     static NetState()
@@ -24,7 +24,7 @@ public abstract class NetState : Network
     }
 
     public NetState() : base() => Construct(this);
-    public Version? Version { get; private set; }
+    public System.Version? Version { get; private set; }
     public int AuthID { get; protected set; }
     public IAccount? Account { get; protected set; }
     public MobileContext? Mobile { get; protected set; }

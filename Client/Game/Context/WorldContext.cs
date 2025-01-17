@@ -1,7 +1,7 @@
 ﻿namespace Client.Game.Context;
 
 using Client.Game.Data;
-using Client.Networking.Incoming;
+using Client.Networking.Arguments;
 
 public class WorldContext : ContextEntity
 {

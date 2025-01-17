@@ -1,4 +1,4 @@
-﻿namespace Client.Game.Data.Skilling;
+﻿namespace Client.Game.Data;
 public enum SkillLock : byte
 {
     Up = 0,

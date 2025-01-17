@@ -2,17 +2,17 @@ namespace Client
 {
     using System.Net;
     using Client.Accounting;
+    using Client.Game;
     using Client.Game.Data;
     using Client.Networking;
     using Client.Networking.Arguments;
     using Client.Networking.Data;
-    using Client.Networking.Incoming;
     using Client.Networking.Outgoing;
 
     /// <summary>
     ///     An event driven network client, built for ModernUO.
     ///     <para>Currently supporting <c>.NET Framework v6.0</c></para>
-    ///     It is recommended to use this class to handle and maintain the network events.
+    ///     It is recommended to use this class to handle and maintain assisted network events.
     ///     <para>Game events that are network related can be subscribed outside of this class to 
     ///     interact parallel with external game objects.</para>
     /// </summary>
@@ -25,8 +25,8 @@ namespace Client
             Info = new ConnectInfo()
             {
                 EndPoint = new IPEndPoint(IPAddress.Parse("127.0.0.1"), 2593),
-                Username = "admin2",
-                Password = "admin2",
+                Username = "admin",
+                Password = "admin",
                 Seed = 1 
             };
         }
@@ -34,12 +34,13 @@ namespace Client
 
         public static void Configure()
         {
-            PacketHandlers.RegisterAttributes();
-
             Network.OnAttach += Network_OnAttach;
             Shard.OnUpdate_ServerList += Shard_UpdateServerList;
             Shard.OnServerAck += Shard_OnServerAck;
             Shard.OnCharacterList += Shard_UpdateCharacterList;
+
+            PacketHandlers.RegisterAttributes();
+            PacketHandlers.RegisterAttributeEvents();
         }
 
         private static void Shard_UpdateCharacterList(CharacterListEventArgs e)
@@ -71,7 +72,7 @@ namespace Client
             Socket?.Disconnect(reuseSocket: true);
             await Task.CompletedTask;
         }
-        private static void Shard_UpdateServerList(ServerListReceivedEventArgs e)
+        private static void Shard_UpdateServerList(ServerListEventArgs e)
         {
             if (e.ServerListEntries.Length == 0)
             {

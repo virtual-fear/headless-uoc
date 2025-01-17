@@ -1,4 +1,4 @@
-﻿namespace Client.Game.Data.BulletinBoard;
+﻿namespace Client.Game.Data;
 public struct BulletinBoardItem
 {
     public int ItemID { get; set; }

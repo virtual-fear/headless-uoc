@@ -1,4 +1,4 @@
-﻿namespace Client.Game.Data.BulletinBoard;
+﻿namespace Client.Game.Data;
 
 using Client.Game.Context;
 public sealed class BulletinBoardHeader

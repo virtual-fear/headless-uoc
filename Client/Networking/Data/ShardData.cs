@@ -1,7 +1,7 @@
 ﻿namespace Client.Networking.Data;
 using System.Net;
 using Client.Networking;
-using Client.Networking.Incoming;
+using Client.Networking.Arguments;
 using Client.Networking.Outgoing;
 public struct ShardData
 {
