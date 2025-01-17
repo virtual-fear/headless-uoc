@@ -39,7 +39,6 @@ namespace Client
             Shard.OnServerAck += Shard_OnServerAck;
             Shard.OnCharacterList += Shard_UpdateCharacterList;
 
-            PacketHandlers.RegisterAttributes();
             PacketHandlers.RegisterAttributeEvents();
         }
 

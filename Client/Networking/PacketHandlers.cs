@@ -9,30 +9,6 @@ public partial class PacketHandlers
     public static PacketHandler? GetExtendedHandler(byte packetID) => RegisteredPackets[0xBF][packetID];
     internal static void Register(PacketHandler handler) => RegisteredPackets[handler.PacketID] = handler;
     internal static void RegisterExtended(PacketHandler handler) => RegisteredPackets[0xBF][handler.PacketID] = handler;
-    protected internal static void RegisterAttributes()
-    {
-        // Sort & register extended methods first? i.e 0xBF, 0xF0
-
-        var methods = Assembly.GetExecutingAssembly().GetTypes()
-            .SelectMany(t =>  t.GetMethods(BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public))
-            .Where(m => m.GetCustomAttributes(typeof(PacketHandlerAttribute), false).Length > 0)
-            .ToList();
-
-        foreach (var method in methods)
-        {
-            var attr = (PacketHandlerAttribute)method.GetCustomAttributes(typeof(PacketHandlerAttribute), false)[0];
-            var receive = (OnPacketReceive)Delegate.CreateDelegate(typeof(OnPacketReceive), method);
-            var handler = new PacketHandler(attr.PacketID, attr.Length, attr.Ingame, receive);
-
-            //if (DEBUG_ATTRIBUTES)
-            Logger.Log(handler.ToString());
-
-            if (attr.ExtendedCommand)
-                RegisterExtended(handler);
-            else
-                Register(handler);
-        }
-    }
     protected internal static void RegisterAttributeEvents()
     {
         const BindingFlags bindingAttr = BindingFlags.DeclaredOnly | BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic;
@@ -43,15 +19,6 @@ public partial class PacketHandlers
                           {
                               var attributes = info.GetCustomAttributes(typeof(PacketHandlerAttribute), inherit: false);
                               return attributes.Length > 0 && attributes[0] is PacketHandlerAttribute attr;
-                              //{
-                              //    return attr.PacketID switch
-                              //    {
-                              //        0xBF => true, // extension
-                              //        0xF0 => true, // extension
-                              //        _ => attr.ExtendedCommand == false
-                              //    };
-                              //}
-                              //return false;
                           })
                           .ToList();
 
