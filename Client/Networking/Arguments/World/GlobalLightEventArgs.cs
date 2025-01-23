@@ -12,6 +12,5 @@ public sealed class GlobalLightEventArgs : EventArgs
         Level = ip.ReadSByte();
     }
     static GlobalLightEventArgs() => Update += GlobalLightEventArgs_Update;
-
-    private static void GlobalLightEventArgs_Update(GlobalLightEventArgs e) => World.LightGlobalValue = e.Level;
+    private static void GlobalLightEventArgs_Update(GlobalLightEventArgs e) => World.Instance.GlobalLightValue = e.Level;
 }

@@ -17,6 +17,11 @@ public partial class World : Entity
     public static event WorldEventChangedValue<Mobile>? ChangedCurrentPlayer;
     public static event WorldEventChangedValue<byte>? ChangedTileRange;
     public static event WorldEventChangedValue<int>? ChangedSpeed;
+    public static event WorldEventChangedValue<sbyte>? ChangedGlobalLightValue;
+    public static event WorldEventChangedValue<sbyte>? ChangedPersonalLightValue;
+    public static event WorldEventChangedValue<byte>? ChangedSeason;
+    public static event WorldEventChangedValue<bool>? ChangedSeasonHasAudio;
+    public static event WorldEventChangedValue<WeatherEventArgs>? ChangedWeather;
 
     #region Storage for items and mobiles
 
@@ -94,7 +99,6 @@ public partial class World : Entity
     {
         ChangedTileRange += World_ChangedTileRange;
     }
-
     private static void World_ChangedTileRange(World w, byte from, byte to)
         => Logger.Log($"The world tile range: {from} now set to {to}");
     internal static void Pause(NetState ns)
@@ -134,6 +138,11 @@ public partial class World : Entity
 
     private byte _worldTileRange = 18;
     private int _worldSpeedControl = 1;
+    private sbyte _worldGlobalLightValue = 1;
+    private sbyte _worldPersonalLightValue = 1;
+    private byte _worldSeason = 0;
+    private bool _worldSeasonHasAudio = false;
+    private WeatherEventArgs? _worldWeather = null;
 
     /// <summary>
     ///     The range of tiles we can view from our player.
@@ -166,11 +175,77 @@ public partial class World : Entity
             }
         }
     }
+    public sbyte GlobalLightValue
+    {
+        get => _worldGlobalLightValue;
+        internal set
+        {
+            var oldValue = _worldGlobalLightValue;
+            if (oldValue != value)
+            {
+                _worldGlobalLightValue = value;
+                Logger.Log($"The world light value has changed to {value}");
+                ChangedGlobalLightValue?.Invoke(this, from: oldValue, to: value);
+            }
+        }
+    }
+    public sbyte PersonalLightValue
+    {
+        get => _worldPersonalLightValue;
+        internal set
+        {
+            var oldValue = _worldPersonalLightValue;
+            if (oldValue != value)
+            {
+                _worldPersonalLightValue = value;
+                Logger.Log($"The world light value has changed to {value}");
+                ChangedPersonalLightValue?.Invoke(this, from: oldValue, to: value);
+            }
+        }
+    }
+    public byte Season
+    {
+        get => _worldSeason;
+        internal set
+        {
+            var oldValue = _worldSeason;
+            if (oldValue != value)
+            {
+                _worldSeason = value;
+                Logger.Log($"The world light value has changed to {value}");
+                ChangedSeason?.Invoke(this, from: oldValue, to: value);
+            }
+        }
+    }
+    public bool SeasonHasAudio
+    {
+        get => _worldSeasonHasAudio;
+        internal set
+        {
+            var oldValue = _worldSeasonHasAudio;
+            if (oldValue != value)
+            {
+                _worldSeasonHasAudio = value;
+                Logger.Log($"The world light value has changed to {value}");
+                ChangedSeasonHasAudio?.Invoke(this, from: oldValue, to: value);
+            }
+        }
+    }
+    public WeatherEventArgs? Weather
+    {
+        get => _worldWeather;
+        internal set
+        {
+            var oldValue = _worldWeather;
+            if (oldValue != value)
+            {
+                _worldWeather = value;
+                Logger.Log($"The world light value has changed to {value}");
+                if (oldValue == null)
+                    return;
 
-    public static sbyte LightGlobalValue { get; internal set; }
-    public static sbyte LightPersonalValue { get; internal set; }
-    public static byte Season { get; internal set; }
-    public static bool SeasonHasAudio { get; internal set; }
-    public static WeatherEventArgs Weather { get; internal set; }
-    
+                ChangedWeather?.Invoke(this, from: oldValue, to: value);
+            }
+        }
+    }
 }

@@ -14,5 +14,5 @@ public sealed class PersonalLightEventArgs : EventArgs
         Level = ip.ReadSByte();
     }
     static PersonalLightEventArgs() => Update += PersonalLightEventArgs_Update;
-    private static void PersonalLightEventArgs_Update(PersonalLightEventArgs e) => World.LightPersonalValue = e.Level;
+    private static void PersonalLightEventArgs_Update(PersonalLightEventArgs e) => World.Instance.PersonalLightValue = e.Level;
 }

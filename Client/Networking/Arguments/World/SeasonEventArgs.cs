@@ -18,7 +18,7 @@ public sealed class SeasonChangeEventArgs : EventArgs
     static SeasonChangeEventArgs() => Update += SeasonChangeEventArgs_Update;
     private static void SeasonChangeEventArgs_Update(SeasonChangeEventArgs e)
     {
-        World.Season = e.Value;
-        World.SeasonHasAudio = e.Sound;
+        World.Instance.SeasonHasAudio = e.Sound;
+        World.Instance.Season = e.Value;
     }
 }
