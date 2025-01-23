@@ -157,6 +157,7 @@ public partial class World : Entity
             if (oldValue != value)
             {
                 _worldTileRange = value;
+                Logger.Log($"[World] Range of tiles set to {value}");
                 ChangedTileRange?.Invoke(this, from: oldValue, to: value);
             }
         }
@@ -170,7 +171,7 @@ public partial class World : Entity
             if (oldValue != value)
             {
                 _worldSpeedControl = value;
-                Logger.Log($"The world speed has changed to {value}");
+                Logger.Log($"[World] Speed control changed to {value}");
                 ChangedSpeed?.Invoke(this, from: oldValue, to: value);
             }
         }
@@ -198,7 +199,7 @@ public partial class World : Entity
             if (oldValue != value)
             {
                 _worldPersonalLightValue = value;
-                Logger.Log($"The world light value has changed to {value}");
+                Logger.Log($"Your personal light value has changed to {value}");
                 ChangedPersonalLightValue?.Invoke(this, from: oldValue, to: value);
             }
         }
@@ -212,7 +213,7 @@ public partial class World : Entity
             if (oldValue != value)
             {
                 _worldSeason = value;
-                Logger.Log($"The world light value has changed to {value}");
+                Logger.Log($"The season has changed to {value}");
                 ChangedSeason?.Invoke(this, from: oldValue, to: value);
             }
         }
@@ -226,7 +227,7 @@ public partial class World : Entity
             if (oldValue != value)
             {
                 _worldSeasonHasAudio = value;
-                Logger.Log($"The world light value has changed to {value}");
+                Logger.Log($"[World] Audio for the season ({(value ? "yes" : "no")})");
                 ChangedSeasonHasAudio?.Invoke(this, from: oldValue, to: value);
             }
         }
@@ -240,7 +241,7 @@ public partial class World : Entity
             if (oldValue != value)
             {
                 _worldWeather = value;
-                Logger.Log($"The world light value has changed to {value}");
+                Logger.Log($"[World] Weather changed to {value}");
                 if (oldValue == null)
                     return;
 
