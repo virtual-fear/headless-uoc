@@ -19,6 +19,8 @@ public sealed class Point3D : IPoint3D
         get => _z;
         internal set => _z = value;
     }
+
+    public override string ToString() => $"({X}, {Y}, {Z})";
 }
 
 public delegate void EntityEventHandler<T>(IEntity e, T from, T to);
