@@ -1,7 +1,10 @@
-﻿using Serial = Client.Game.Data.Serial;
-namespace Client.Networking.Arguments;
+﻿namespace Client.Networking.Arguments;
+using Client.Game;
+using Client.Game.Data;
 public sealed class MobileAnimationEventArgs : EventArgs
 {
+    [PacketHandler(0x6E, length: 14, ingame: true)]
+    private static event PacketEventHandler<MobileAnimationEventArgs>? Update;
     public NetState State { get; }
     public Serial Serial { get; }
     public int Action { get; }
@@ -10,7 +13,7 @@ public sealed class MobileAnimationEventArgs : EventArgs
     public bool Forward { get; }
     public bool Repeat { get; }
     public byte Delay { get; }
-    internal MobileAnimationEventArgs(NetState state, PacketReader ip)
+    private MobileAnimationEventArgs(NetState state, PacketReader ip)
     {
         State = state;
         Serial = (Serial)ip.ReadUInt32();
@@ -21,4 +24,7 @@ public sealed class MobileAnimationEventArgs : EventArgs
         Repeat = ip.ReadBoolean();
         Delay = ip.ReadByte();
     }
+    static MobileAnimationEventArgs() => Update += MobileAnimationEventArgs_Update;
+    private static void MobileAnimationEventArgs_Update(MobileAnimationEventArgs e)
+        => Mobile.Acquire(e.Serial).Update(e);
 }

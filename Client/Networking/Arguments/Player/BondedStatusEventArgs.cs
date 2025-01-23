@@ -3,6 +3,8 @@
 [Obsolete]
 public sealed class BondedStatusEventArgs : EventArgs
 {
+    //[PacketHandler(0x19, length: 11, ingame: true, extCmd: true)]
+    //public static event PacketEventHandler<BondedStatusEventArgs>? Player_BondedStatus;
     public NetState State { get; }
     public int Serial { get; set; }
     public byte Value01 { get; set; }

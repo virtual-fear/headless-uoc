@@ -1,5 +1,4 @@
-﻿using MobileContext = Client.Game.Context.MobileContext;
-namespace Client.Game.Data;
+﻿namespace Client.Game.Data;
 using Client.Networking;
 using Client.Networking.Packets;
 
@@ -8,13 +7,13 @@ public sealed class Party
 {
     public const int MaxCapacity = 10;
     public PartyHandler? Handler { get; set; }
-    public List<MobileContext> Members { get; } = new(MaxCapacity);
+    public List<Mobile> Members { get; } = new(MaxCapacity);
     public PartyState State { get; set; } = PartyState.Alone;
     public static Party Create() => new();
-    public MobileContext? Leader => Members.Count > 0 ? Members[0] : null;
-    public void AddMembers(IEnumerable<MobileContext> mobiles)
+    public Mobile? Leader => Members.Count > 0 ? Members[0] : null;
+    public void AddMembers(IEnumerable<Mobile> mobiles)
     {
-        foreach (MobileContext m in mobiles)
+        foreach (Mobile m in mobiles)
         {
             if (m == null)
                 continue;

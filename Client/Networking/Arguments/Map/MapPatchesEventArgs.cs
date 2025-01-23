@@ -1,11 +1,14 @@
-﻿using Hashtable = System.Collections.Hashtable;
-using WorldType = Client.Game.Data.WorldType;
-namespace Client.Networking.Arguments;
+﻿namespace Client.Networking.Arguments;
+using System.Collections;
+using Client.Game;
+using Client.Game.Data;
 public sealed class MapPatchesEventArgs : EventArgs
 {
+    [PacketHandler(0x18, length: 33, ingame: true, extCmd: true)]
+    private static event PacketEventHandler<MapPatchesEventArgs>? Update;
     public NetState State { get; }
     public Hashtable? Table { get; }
-    internal MapPatchesEventArgs(NetState state, PacketReader pvSrc)
+    private MapPatchesEventArgs(NetState state, PacketReader pvSrc)
     {
         State = state;
         int staticBlocks, landBlocks;
@@ -23,4 +26,8 @@ public sealed class MapPatchesEventArgs : EventArgs
         }
         Table = t;
     }
+
+    static MapPatchesEventArgs() => Update += MapPatchesEventArgs_Update;
+    private static void MapPatchesEventArgs_Update(MapPatchesEventArgs e)
+        => Map.Patches(e.State, e.Table);
 }

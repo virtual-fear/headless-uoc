@@ -2,7 +2,7 @@
 public sealed class ExtendedCommandEventArgs : EventArgs
 {
     [PacketHandler(0xBF, length: -1, ingame: true)]
-    public static event PacketEventHandler<ExtendedCommandEventArgs>? Receive;
+    private static event PacketEventHandler<ExtendedCommandEventArgs>? Update;
     public NetState State { get; }
     public byte PacketID { get; }
     public PacketHandler? Handler { get; }
@@ -14,7 +14,7 @@ public sealed class ExtendedCommandEventArgs : EventArgs
         Handler = PacketHandlers.GetExtendedHandler(PacketID);
         Input = ip;
     }
-    static ExtendedCommandEventArgs() => Receive += ExtendedCommandEventArgs_Receive;
+    static ExtendedCommandEventArgs() => Update += ExtendedCommandEventArgs_Receive;
     private static void ExtendedCommandEventArgs_Receive(ExtendedCommandEventArgs eventArgs)
     {
         if (eventArgs == null)

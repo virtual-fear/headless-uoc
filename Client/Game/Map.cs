@@ -1,16 +1,20 @@
 ﻿namespace Client.Game;
+using System.Collections;
 using Client.Networking;
-using Client.Networking.Arguments;
 public class Map
 {
-    [PacketHandler(0x8, length: 6, ingame: true, extCmd: true)]
-    public static event PacketEventHandler<MapChangeEventArgs>? OnChange;
+    internal static void Change(NetState ns, byte index)
+    {
+        Logger.Log(ns.Address, $"Changed map index to {index}");
+    }
 
-    [PacketHandler(0x56, length: 11, ingame: true)]
-    public static event PacketEventHandler<MapCommandEventArgs>? OnCommand;
+    internal static void Command(NetState ns, int mapItem, byte cmd, byte number, int x, int y)
+    {
+        Logger.Log(ns.Address, $"Map item {mapItem} command {cmd} number {number} x {x} y {y}");
+    }
 
-    //[Obsolete] public static event PacketEventHandler<MapDetailsEventArgs>? OnDetails;
-
-    [PacketHandler(0x18, length: 33, ingame: true, extCmd: true)]
-    public static event PacketEventHandler<MapPatchesEventArgs>? OnPatch;
+    internal static void Patches(NetState ns, Hashtable? table)
+    {
+        Logger.Log(ns.Address, "Received map patches");
+    }
 }

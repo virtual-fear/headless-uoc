@@ -1,12 +1,18 @@
-﻿using MusicName = Client.Game.Data.MusicName;
-namespace Client.Networking.Arguments;
+﻿namespace Client.Networking.Arguments;
+using Client.Game;
+using Client.Game.Data;
 public sealed class PlayMusicEventArgs : EventArgs
 {
+    [PacketHandler(0x6D, length: 3, ingame: true)]
+    private static event PacketEventHandler<PlayMusicEventArgs>? Update;
     public NetState State { get; }
     public MusicName Name { get; }
-    internal PlayMusicEventArgs(NetState state, PacketReader ip)
+    private PlayMusicEventArgs(NetState state, PacketReader ip)
     {
         State = state;
         Name = (MusicName)ip.ReadInt16();
     }
+
+    static PlayMusicEventArgs() => Update += PlayMusicEventArgs_Update;
+    private static void PlayMusicEventArgs_Update(PlayMusicEventArgs e) => World.PlayMusic(from: e.State, e.Name);
 }

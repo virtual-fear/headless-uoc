@@ -1,38 +1,42 @@
-﻿using EffectType = Client.Game.Data.EffectType;
-using Serial = Client.Game.Data.Serial;
-namespace Client.Networking.Arguments;
+﻿namespace Client.Networking.Arguments;
+using Client.Game;
+using Client.Game.Data;
 public sealed class HuedEffectEventArgs : EventArgs
 {
+    [PacketHandler(0xC0, length: 36, ingame: true)]
+    private static event PacketEventHandler<HuedEffectEventArgs>? Update;
     public NetState State { get; }
     public EffectType Type { get; }
-    public Serial From { get; }
-    public Serial To { get; }
+    public Serial Source { get; }
+    public Serial Target { get; }
     public short ItemID { get; }
-    public short SourceX { get; }
-    public short SourceY { get; }
-    public sbyte SourceZ { get; }
-    public short DestX { get; }
-    public short DestY { get; }
-    public sbyte DestZ { get; }
+    public IPoint3D From { get; }
+    public IPoint3D To { get; }
     public byte Speed { get; }
     public byte Duration { get; }
     public bool IsFixedDirection { get; }
     public bool IsExploding { get; }
     public int Hue { get; }
     public int RenderMode { get; }
-    internal HuedEffectEventArgs(NetState state, PacketReader ip)
+    private HuedEffectEventArgs(NetState state, PacketReader ip)
     {
         State = state;
         Type = (EffectType)ip.ReadByte();
-        From = (Serial)ip.ReadUInt32();
-        To = (Serial)ip.ReadUInt32();
+        Source = (Serial)ip.ReadUInt32();
+        Target = (Serial)ip.ReadUInt32();
         ItemID = ip.ReadInt16();
-        SourceX = ip.ReadInt16();
-        SourceY = ip.ReadInt16();
-        SourceZ = ip.ReadSByte();
-        DestX = ip.ReadInt16();
-        DestY = ip.ReadInt16();
-        DestZ = ip.ReadSByte();
+        From = new Point3D()
+        {
+            X = ip.ReadInt16(),
+            Y = ip.ReadInt16(),
+            Z = ip.ReadSByte()
+        };
+        To = new Point3D()
+        {
+            X = ip.ReadInt16(),
+            Y = ip.ReadInt16(),
+            Z = ip.ReadSByte()
+        };
         Speed = ip.ReadByte();
         Duration = ip.ReadByte();
         ip.ReadByte(); // 0
@@ -42,4 +46,7 @@ public sealed class HuedEffectEventArgs : EventArgs
         Hue = ip.ReadInt32();
         RenderMode = ip.ReadInt32();
     }
+    static HuedEffectEventArgs() => Update += HuedEffectEventArgs_Update;
+    private static void HuedEffectEventArgs_Update(HuedEffectEventArgs e)
+        => Effect.Enqueue(e.State, e.Type, e.Source, e.Target, e.ItemID, e.From, e.To, e.Hue, e.Speed, e.Duration, e.IsFixedDirection, e.IsExploding, e.RenderMode);
 }

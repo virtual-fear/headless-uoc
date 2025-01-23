@@ -1,12 +1,13 @@
-﻿using Layer = Client.Game.Data.Layer;
-using LayerInfo = Client.Game.Data.LayerInfo;
-namespace Client.Networking.Arguments;
+﻿namespace Client.Networking.Arguments;
+using Game.Data;
 public sealed class CorpseEquipEventArgs : EventArgs
 {
+    [PacketHandler(0x89, length: -1, ingame: true)]
+    private static event PacketEventHandler<CorpseEquipEventArgs>? Update;
     public NetState State { get; }
     public int Beheld { get; }
     public LayerInfo[]? Layers { get; }
-    internal CorpseEquipEventArgs(NetState state, PacketReader ip)
+    private CorpseEquipEventArgs(NetState state, PacketReader ip)
     {
         State = state;
         Beheld = ip.ReadInt32();
@@ -17,4 +18,6 @@ public sealed class CorpseEquipEventArgs : EventArgs
         Layers = l.ToArray();
     }
 
+    static CorpseEquipEventArgs() => Update += CorpseEquipEventArgs_Update;
+    private static void CorpseEquipEventArgs_Update(CorpseEquipEventArgs e) => Game.World.CorpseEquip(e);
 }

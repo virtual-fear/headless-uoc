@@ -1,23 +1,42 @@
 ﻿namespace Client.Game;
+using System;
+using System.Collections.Generic;
 using Client.Networking;
 using Client.Networking.Arguments;
 public partial class Display
 {
-    [PacketHandler(0x14, length: -1, ingame: true, extCmd: true)]
-    public static event PacketEventHandler<DisplayContextMenuEventArgs>? UpdateContextMenu;
+    internal static void ShowBook(NetState state, string title, string author)
+    {
+        throw new NotImplementedException();
+    }
 
-    [PacketHandler(0x10, length: -1, ingame: true, extCmd: true)]
-    public static event PacketEventHandler<DisplayEquipInfoEventArgs>? UpdateEquipmentInfo;
+    internal static void ShowContextMenu(NetState ns, int menuSerial, ContextMenuEntry[] entries)
+    {
+        throw new NotImplementedException();
+    }
 
-    [PacketHandler(0xB8, length: -1, ingame: true)]
-    public static event PacketEventHandler<DisplayProfileEventArgs>? UpdateProfile;
+    internal static void ShowEquipInfo(NetState ns, int itemID, int number, bool identified, string? name, List<EquipInfoAttribute> attributes)
+    {
+        throw new NotImplementedException();
+    }
 
-    [PacketHandler(0x95, length: 9, ingame: true)]
-    public static event PacketEventHandler<HuePickerEventArgs>? UpdateHuePicker;
+    internal static void ShowHuePicker(NetState state, int serial, short itemID)
+    {
+        throw new NotImplementedException();
+    }
 
-    [PacketHandler(0x88, length: 66, ingame: true)]
-    public static event PacketEventHandler<PaperdollEventArgs>? UpdatePaperdoll;
+    internal static void ShowPaperdoll(NetState state, Mobile mobile, string text, bool draggable)
+    {
+        throw new NotImplementedException();
+    }
 
-    [PacketHandler(0x7C, length: -1, ingame: true)]
-    public static event PacketEventHandler<QuestionMenuEventArgs>? UpdateQuestionMenu;
+    internal static void ShowProfile(NetState ns, Mobile mob, string header, string footer, string body)
+    {
+        throw new NotImplementedException();
+    }
+
+    internal static void ShowQuestionMenu(NetState ns, int menuSerial, string? question, string[]? answers)
+    {
+        throw new NotImplementedException();
+    }
 }

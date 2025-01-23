@@ -1,14 +1,15 @@
 ﻿namespace Client.Game.Data;
 
-using Client.Game.Context;
+using Client.Game;
+
 public sealed class BulletinBoardHeader
 {
-    public ItemContext Board { get; }
-    public ItemContext Thread { get; }
+    public Item Board { get; }
+    public Item? Thread { get; }
     public string Poster { get; }
     public string Subject { get; }
     public string Time { get; }
-    public BulletinBoardHeader(ItemContext board, ItemContext thread, string poster, string subject, string time)
+    public BulletinBoardHeader(Item board, Item? thread, string poster, string subject, string time)
     {
         Board = board;
         Thread = thread;

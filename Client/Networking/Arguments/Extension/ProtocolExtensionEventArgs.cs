@@ -10,6 +10,8 @@ public enum ProtocolExtensionType
 
 public sealed class ProtocolExtensionEventArgs : EventArgs
 {
+    [PacketHandler(0xF0, length: -1, ingame: true)]
+    public static event PacketEventHandler<ProtocolExtensionEventArgs>? Update; // TODO: Move data types in EventArgs to Client.Game.Data
     public NetState State { get; }
     public ProtocolExtensionType Type { get; }
     public PartyMemberInfo[]? Party { get; }

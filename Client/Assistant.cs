@@ -35,62 +35,8 @@ namespace Client
         public static void Configure()
         {
             Network.OnAttach += Network_OnAttach;
-            Shard.OnUpdate_ServerList += Shard_UpdateServerList;
-            Shard.OnServerAck += Shard_OnServerAck;
-            Shard.OnCharacterList += Shard_UpdateCharacterList;
 
             PacketHandlers.RegisterAttributeEvents();
-        }
-
-        private static void Shard_UpdateCharacterList(CharacterListEventArgs e)
-        {
-            CharInfo[]? characterList = e.Characters?.ToArray();
-            if (characterList == null || characterList.Length == 0)
-            {
-                Logger.LogError($"{nameof(Assistant)}: No characters to select.");
-                e.State.Detach();
-                return;
-            }
-            
-            CharInfo? firstCharacter = characterList.FirstOrDefault();
-            if (firstCharacter == null)
-                throw new ArgumentNullException(nameof(firstCharacter));
-
-            firstCharacter.Play();
-            Network.State?.Slice();
-        }
-        private static async void Shard_OnServerAck(ServerAckEventArgs e)
-        {
-            Logger.Log(typeof(Assistant),
-                       "Received acknowledgement from the server.", color: LogColor.Info);
-            Logger.Log($"{new string(' ', nameof(Assistant).Length + -4)}Seed:0x{e.Seed:X4}", color: LogColor.Success);
-            var v = Network.Info;
-            v.Seed = e.Seed;
-            v.Stage = ConnectionAck.SecondLogin;
-            Info = v;
-            Socket?.Disconnect(reuseSocket: true);
-            await Task.CompletedTask;
-        }
-        private static void Shard_UpdateServerList(ServerListEventArgs e)
-        {
-            if (e.ServerListEntries.Length == 0)
-            {
-                Logger.Log("No shard entries are currently available", LogColor.Warning);
-                return;
-            }
-            var shard = e.ServerListEntries.FirstOrDefault();
-            if (shard.Name.Length == 0)
-            {
-                Logger.Log("No shards are currently available", LogColor.Warning);
-                return;
-            }
-            Logger.Log("  > Connecting to the first shard available!", LogColor.Info);
-            if (Network.State == null)
-            {
-                throw new InvalidOperationException("Invalid network state",
-                    innerException: new ArgumentNullException(nameof(Network.State)));
-            }
-            Network.State.Send(PPlayServer.Instantiate((byte)shard.Index));
         }
         private static void Network_OnAttach(ConnectionEventArgs e)
         {

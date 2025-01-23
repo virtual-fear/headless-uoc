@@ -1,6 +1,4 @@
 ﻿namespace Client.Game.Data;
-using Client.Game.Context;
-
 public interface IPoint2D
 {
     short X { get; }
@@ -10,14 +8,15 @@ public interface IPoint3D : IPoint2D
 {
     sbyte Z { get; }
 }
-public interface IEntity : IPoint3D
+public interface IEntity
 {
     Serial Serial { get; }
+    IPoint3D Location { get; }
 }
 public interface IAccount
 {
     string Username { get; }
     string Password { get; set; }
-    MobileContext this[int index] { get; set; }
+    Mobile this[int index] { get; set; }
     void Delete();
 }

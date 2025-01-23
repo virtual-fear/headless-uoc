@@ -1,7 +1,10 @@
-﻿using Serial = Client.Game.Data.Serial;
-namespace Client.Networking.Arguments;
+﻿namespace Client.Networking.Arguments;
+using Client.Game;
+using Client.Game.Data;
 public sealed class MobileStatusEventArgs : EventArgs
 {
+    [PacketHandler(0x11, length: -1, ingame: true)]
+    private static event PacketEventHandler<MobileStatusEventArgs>? Update;
     public NetState State { get; }
     public Serial Serial { get; }
     public string? Name { get; }
@@ -33,7 +36,7 @@ public sealed class MobileStatusEventArgs : EventArgs
     public short MinimumWeaponDamage { get; }
     public short MaximumWeaponDamage { get; }
     public int TithingPoints { get; }
-    public MobileStatusEventArgs(NetState state, PacketReader ip)
+    private MobileStatusEventArgs(NetState state, PacketReader ip)
     {
         State = state;
         Serial = (Serial)ip.ReadUInt32();
@@ -81,4 +84,8 @@ public sealed class MobileStatusEventArgs : EventArgs
             }
         }
     }
+
+    static MobileStatusEventArgs() => Update += MobileStatusEventArgs_Update;
+    private static void MobileStatusEventArgs_Update(MobileStatusEventArgs e)
+        => Mobile.Acquire(e.Serial).UpdateStatus(e);
 }

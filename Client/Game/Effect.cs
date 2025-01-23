@@ -1,17 +1,34 @@
 ﻿namespace Client.Game;
+
+using System;
+using Client.Game.Data;
 using Client.Networking;
-using Client.Networking.Arguments;
 public partial class Effect
 {
-    [PacketHandler(0x23, length: 26, ingame: true)]
-    public static event PacketEventHandler<DragEffectEventArgs>? OnDragUpdate;
+    internal static void Enqueue(NetState ns, EffectType type, 
+        Serial src, Serial target, short itemID, IPoint3D from, IPoint3D to, 
+        short hue, short amount)
+    {
+        throw new NotImplementedException();
+    }
 
-    [PacketHandler(0xC0, length: 36, ingame: true)]
-    public static event PacketEventHandler<HuedEffectEventArgs>? OnHuedUpdate;
+    internal static void Enqueue(NetState ns, EffectType type, 
+        Serial src, Serial target, short itemID, IPoint3D from, IPoint3D to, 
+        int hue, byte speed, byte duration, bool fixedDirection, bool isExploding, int renderMode)
+    {
+        throw new NotImplementedException();
+    }
 
-    [PacketHandler(0xC7, length: 49, ingame: true)]
-    public static event PacketEventHandler<ParticleEffectEventArgs>? OnParticleUpdate;
+    internal static void Enqueue(NetState ns, EffectType type, 
+        Serial src, Serial target, short itemID, IPoint3D from, IPoint3D to, 
+        int hue, byte speed, byte duration, bool fixedDirection, bool isExploding, int renderMode,
+        short effectID, short explodeEffect, short explodeSound, int serial, byte layer, short unknown)
+    {
+        throw new NotImplementedException();
+    }
 
-    [PacketHandler(0x70, length: 28, ingame: true)]
-    public static event PacketEventHandler<ScreenEffectEventArgs>? OnScreenUpdate;
+    internal static void Enqueue(NetState ns, ScreenEffectType type)
+    {
+        throw new NotImplementedException();
+    }
 }

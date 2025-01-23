@@ -1,7 +1,7 @@
 ﻿namespace Client.Game.Data;
 public enum MusicName
 {
-    Invalid = -1,
+    None = -1,
     OldUlt01 = 0,
     Create1,
     DragFlit,

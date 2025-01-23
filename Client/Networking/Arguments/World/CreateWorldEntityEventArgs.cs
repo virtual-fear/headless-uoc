@@ -1,6 +1,9 @@
 ﻿namespace Client.Networking.Arguments;
+using Client.Game;
 public sealed class CreateWorldEntityEventArgs
 {
+    [PacketHandler(0xF3, length: 26, ingame: true)]
+    public static event PacketEventHandler<CreateWorldEntityEventArgs>? Update;
     public int Type { get; }
     public int GraphicsID { get; }
     public ushort Amount { get; }
@@ -8,7 +11,7 @@ public sealed class CreateWorldEntityEventArgs
     public byte Light { get; }
     public int Flags { get; }
     public ushort ItemID { get; }
-    internal CreateWorldEntityEventArgs(NetState ns, PacketReader pvSrc, bool isHS = false)
+    private CreateWorldEntityEventArgs(NetState ns, PacketReader pvSrc, bool isHS = false)
     {
         if (pvSrc.ReadInt16() != 0x1)
         {
@@ -23,4 +26,7 @@ public sealed class CreateWorldEntityEventArgs
         Flags = pvSrc.ReadInt32();
         ItemID = Type switch { 0 or 1 or 2 => (ushort)(GraphicsID & (isHS ? 0xFFFF : 0x7FFF)), _ => 0 };
     }
+
+    static CreateWorldEntityEventArgs() => Update += CreateWorldEntityEventArgs_Update;
+    private static void CreateWorldEntityEventArgs_Update(CreateWorldEntityEventArgs e) => World.CreateEntity(e);
 }

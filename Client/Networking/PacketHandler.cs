@@ -95,10 +95,10 @@ namespace Client.Networking
                 }
             }
         }
-        public void Receive(NetState state, PacketReader pvSrc)
+        public void Receive(NetState state, PacketReader ip)
         {
             ReceivedHits += 1;
-            OnReceive.Invoke(state, pvSrc);
+            OnReceive.Invoke(state, ip);
         }
         public override string ToString() => $"0x{PacketID:X2} ({Length}) {Name} ({(Ingame ? "in-game" : "out-of-game")})";
     }

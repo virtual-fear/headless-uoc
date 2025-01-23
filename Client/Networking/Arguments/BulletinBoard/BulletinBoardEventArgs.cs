@@ -1,17 +1,15 @@
 ﻿namespace Client.Networking.Arguments;
-using BulletinBoardType = Game.Data.BulletinBoardType;
-using BulletinBoardBody = Game.Data.BulletinBoardBody;
-using BulletinBoardHeader = Game.Data.BulletinBoardHeader;
-using ItemContext = Game.Context.ItemContext;
 using System.Text;
-using Client.Game.Data;
 using Client.Game;
+using Client.Game.Data;
 
 public sealed class BulletinBoardEventArgs : EventArgs
 {
+    [PacketHandler(0x71, length: -1, ingame: true)]
+    private static event PacketEventHandler<BulletinBoardEventArgs>? Update;
     public NetState State { get; }
     public bool Supported { get; } = false;
-    public BulletinBoardEventArgs(NetState state, PacketReader pvSrc)
+    internal BulletinBoardEventArgs(NetState state, PacketReader pvSrc)
     {
         State = state;
         Type = (BulletinBoardType)pvSrc.ReadByte();
@@ -31,22 +29,22 @@ public sealed class BulletinBoardEventArgs : EventArgs
             return Encoding.UTF8.GetString(buffer, 0, length);
         };
 
-        ItemContext? board, temp, thread;
+        Item? board, temp, thread;
         Serial serial;
         Action act = delegate
         {
-            board = ItemContext.Acquire((Serial)pvSrc.ReadUInt32());
+            board = Item.Acquire((Serial)pvSrc.ReadUInt32());
             if (board == null)
                 return;
 
-            temp = ItemContext.Acquire((Serial)pvSrc.ReadUInt32());
+            temp = Item.Acquire((Serial)pvSrc.ReadUInt32());
             if (temp == null)
                 return;
 
             thread = null;
             serial = (Serial)pvSrc.ReadUInt32();
             if (serial >= World.ItemOffset)
-                thread = ItemContext.Acquire(serial);
+                thread = Item.Acquire(serial);
 
             string p, s, t;
 
@@ -64,7 +62,7 @@ public sealed class BulletinBoardEventArgs : EventArgs
         switch (Type)
         {
             case BulletinBoardType.Display:
-                Item = ItemContext.Acquire((Serial)pvSrc.ReadUInt32());
+                Item = Item.Acquire((Serial)pvSrc.ReadUInt32());
                 break;
             case BulletinBoardType.SetBody:
                 act.Invoke();
@@ -91,7 +89,10 @@ public sealed class BulletinBoardEventArgs : EventArgs
         }
     }
     public BulletinBoardType? Type { get; set; }
-    public ItemContext? Item { get; set; }
+    public Item? Item { get; set; }
     public BulletinBoardHeader? Header { get; set; }
     public BulletinBoardBody? Body { get; set; }
+    static BulletinBoardEventArgs() => Update += BulletinBoardEventArgs_Update;
+    private static void BulletinBoardEventArgs_Update(BulletinBoardEventArgs e)
+        => BulletinBoard.Update(e.State, e.Type, e.Item, e.Header, e.Body);
 }

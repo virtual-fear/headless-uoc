@@ -3,7 +3,7 @@ using Client.Networking.Packets;
 public sealed class AssistVersionEventArgs : EventArgs
 {
     [PacketHandler(0xBE, length: 7, ingame: false)]
-    public static event PacketEventHandler<AssistVersionEventArgs>? OnUpdate;
+    private static event PacketEventHandler<AssistVersionEventArgs>? Update;
     public NetState State { get; } 
     public int Version { get; }
     public string Text { get; }
@@ -13,6 +13,6 @@ public sealed class AssistVersionEventArgs : EventArgs
         Version = ip.ReadInt32();
         Text = Application.ClientVersion.ToString();
     }
-    static AssistVersionEventArgs() => OnUpdate += AssistVersionEventArgs_OnUpdate;
-    private static void AssistVersionEventArgs_OnUpdate(AssistVersionEventArgs e) => e.State?.Send(new PAssistantVersion(e));
+    static AssistVersionEventArgs() => Update += AssistVersionEventArgs_Update;
+    private static void AssistVersionEventArgs_Update(AssistVersionEventArgs e) => e.State?.Send(new PAssistantVersion(e));
 }

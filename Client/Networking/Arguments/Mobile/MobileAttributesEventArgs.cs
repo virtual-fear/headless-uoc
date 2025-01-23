@@ -1,7 +1,10 @@
-﻿using Serial = Client.Game.Data.Serial;
-namespace Client.Networking.Arguments;
+﻿namespace Client.Networking.Arguments;
+using Client.Game;
+using Client.Game.Data;
 public sealed class MobileAttributesEventArgs : EventArgs
 {
+    [PacketHandler(0x2D, length: 17, ingame: true)]
+    private static event PacketEventHandler<MobileAttributesEventArgs>? Update;
     public NetState State { get; }
     public Serial Serial { get; }
     public short MaxHits { get; }
@@ -10,7 +13,7 @@ public sealed class MobileAttributesEventArgs : EventArgs
     public short Mana { get; }
     public short MaxStam { get; }
     public short Stam { get; }
-    internal MobileAttributesEventArgs(NetState state, PacketReader ip)
+    private MobileAttributesEventArgs(NetState state, PacketReader ip)
     {
         State = state;
         Serial = (Serial)ip.ReadUInt32();
@@ -21,4 +24,7 @@ public sealed class MobileAttributesEventArgs : EventArgs
         MaxStam = ip.ReadInt16();
         Stam = ip.ReadInt16();
     }
+    static MobileAttributesEventArgs() => Update += MobileAttributesEventArgs_Update;
+    private static void MobileAttributesEventArgs_Update(MobileAttributesEventArgs e)
+        => Mobile.Acquire(e.Serial).UpdateAttributes(e.Hits, e.MaxHits, e.Mana, e.MaxMana, e.Stam, e.MaxStam);
 }

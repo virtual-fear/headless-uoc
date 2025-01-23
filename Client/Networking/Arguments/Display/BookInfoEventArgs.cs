@@ -1,6 +1,7 @@
 ﻿namespace Client.Networking.Arguments;
 public sealed class BookInfoEventArgs : EventArgs
 {
+    // TODO: Add support for this packet
     [PacketHandler(0x66, length: -1, ingame: true)]
     public static event PacketEventHandler<BookInfoEventArgs>? Update;
     public NetState State { get; }

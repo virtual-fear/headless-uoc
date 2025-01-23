@@ -1,8 +1,13 @@
 ﻿namespace Client.Game;
+
+using System;
+using Client.Game.Data;
 using Client.Networking;
 using Client.Networking.Arguments;
 public static class BulletinBoard
 {
-    [PacketHandler(0x71, length: -1, ingame: true)]
-    public static event PacketEventHandler<BulletinBoardEventArgs>? UpdateBulletinBoard;
+    internal static void Update(NetState state, BulletinBoardType? type, Item? item, BulletinBoardHeader? header, BulletinBoardBody? body)
+    {
+        throw new NotImplementedException();
+    }
 }

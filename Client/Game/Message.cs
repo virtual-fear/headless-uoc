@@ -1,20 +1,22 @@
 ﻿namespace Client.Game;
+using System;
+using Client.Game.Data;
 using Client.Networking;
-using Client.Networking.Arguments;
+
 public static class Message
 {
-    [PacketHandler(0x1C, length: -1, ingame: true)]
-    public static event PacketEventHandler<AsciiMessageEventArgs>? OnASCII;
+    internal static void Add(NetState from, IEntity ent, short graphic, byte messageType, short hue, short font, string? name, string? text, string? arguments)
+    {
+        Logger.Log(from.Address, $"Serial:{ent.Serial} (gfx:{graphic}, type:{messageType}, hue:{hue}, font:{font}, name:{name}, text:{text}, args:{arguments})");
+    }
 
-    [PacketHandler(0xCC, length: -1, ingame: true)]
-    public static event PacketEventHandler<LocalizedMessageAffixEventArgs>? OnLocalizedAffix;
+    internal static void Add(NetState from, IEntity ent, short graphic, byte messageType, short hue, short font, string? name, string? text)
+    {
+        Logger.Log(from.Address, $"Serial:{ent.Serial} (gfx:{graphic}, type:{messageType}, hue:{hue}, font:{font}, name:{name}, text:{text}");
+    }
 
-    [PacketHandler(0xC1, length: -1, ingame: true)]
-    public static event PacketEventHandler<LocalizedMessageEventArgs>? OnLocalized;
-
-    [PacketHandler(0xA6, length: -1, ingame: true)]
-    public static event PacketEventHandler<ScrollMessageEventArgs>? Chat_OnScrollMessage;
-
-    [PacketHandler(0xAE, length: -1, ingame: true)]
-    public static event PacketEventHandler<UnicodeMessageEventArgs>? OnUnicode;
+    internal static void AddScrollEntry(byte type, int tip, string? text)
+    {
+        throw new NotImplementedException();
+    }
 }

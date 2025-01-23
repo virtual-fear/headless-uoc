@@ -1,14 +1,17 @@
 ﻿namespace Client.Game;
+using System;
+using Client.Game.Data;
 using Client.Networking;
-using Client.Networking.Arguments;
 public partial class Container
 {
-    [PacketHandler(0x3C, length: -1, ingame: true)]
-    public static event PacketEventHandler<ContainerContentEventArgs>? OnContent;
-
-    [PacketHandler(0x25, length: 20, ingame: true)]
-    public static event PacketEventHandler<ContainerContentUpdateEventArgs>? OnContentUpdate;
-
-    [PacketHandler(0x24, length: 7, ingame: true)]
-    public static event PacketEventHandler<ContainerDisplayEventArgs>? OnDisplay;
+    internal static void Display(NetState ns, int containerID, short gumpID)
+    {
+        throw new NotImplementedException();
+    }
+    internal static void DisplayContent(NetState ns, ContainerItem[]? items)
+    {
+    }
+    internal static void DisplayContentUpdate(NetState ns, int serial, ushort iD, ushort amount, short x, short y, int parent, short hue)
+    {
+    }
 }

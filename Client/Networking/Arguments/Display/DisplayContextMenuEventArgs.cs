@@ -1,18 +1,19 @@
 ﻿namespace Client.Networking.Arguments;
-
-using Client.Game.Context;
+using Client.Game;
 using Client.Game.Data;
 using Client.Networking;
-
 public sealed class DisplayContextMenuEventArgs : EventArgs
 {
-    public NetState? State { get; }
-    public int MenuTarget { get; }
-    public ContextMenuEntry[]? Entries { get; }
-    internal DisplayContextMenuEventArgs(NetState state, PacketReader pvSrc)
+    [PacketHandler(0x14, length: -1, ingame: true, extCmd: true)]
+    private static event PacketEventHandler<DisplayContextMenuEventArgs> Update;
+    public NetState State { get; }
+    public int MenuSerial { get; }
+    public ContextMenuEntry[] Entries { get; }
+    private DisplayContextMenuEventArgs(NetState state, PacketReader pvSrc)
     {
+        State = state;
         pvSrc.ReadInt16();
-        MenuTarget = pvSrc.ReadInt32();
+        MenuSerial = pvSrc.ReadInt32();
         ContextMenuEntry[] entries = new ContextMenuEntry[pvSrc.ReadByte()];
         for (int i = 0; i < entries.Length; ++i)
         {
@@ -23,6 +24,9 @@ public sealed class DisplayContextMenuEventArgs : EventArgs
         }
         Entries = entries;
     }
+    static DisplayContextMenuEventArgs() => Update += DisplayContextMenuEventArgs_Update;
+    private static void DisplayContextMenuEventArgs_Update(DisplayContextMenuEventArgs e)
+        => Display.ShowContextMenu(e.State, e.MenuSerial, e.Entries);
 }
 
 /// <summary>
@@ -36,7 +40,7 @@ public class ContextMenuEntry
     private bool m_Enabled;
     private int m_Range;
     private CMEFlags m_Flags;
-    private ContextMenu m_Owner;
+    private ContextMenu? m_Owner;
 
     /// <summary>
     /// Gets or sets additional <see cref="CMEFlags">flags</see> used in client communication.
@@ -50,7 +54,7 @@ public class ContextMenuEntry
     /// <summary>
     /// Gets or sets the <see cref="ContextMenu" /> that owns this entry.
     /// </summary>
-    public ContextMenu Owner
+    public ContextMenu? Owner
     {
         get { return m_Owner; }
         set { m_Owner = value; }
@@ -162,12 +166,12 @@ public partial class ContextMenu
     public const bool ExtendedCommand = true;
 
     /// <summary>
-    /// Gets the <see cref="MobileContext" /> who opened this ContextMenu.
+    /// Gets the <see cref="Mobile" /> who opened this ContextMenu.
     /// </summary>
-    public MobileContext From { get; }
+    public Mobile From { get; }
 
     /// <summary>
-    /// Gets an object of the <see cref="MobileContext" /> or <see cref="ItemContext" /> for which this ContextMenu is on.
+    /// Gets an object of the <see cref="Mobile" /> or <see cref="Item" /> for which this ContextMenu is on.
     /// </summary>
     public object Target { get; }
 
@@ -180,25 +184,25 @@ public partial class ContextMenu
     /// Instantiates a new ContextMenu instance.
     /// </summary>
     /// <param name="from">
-    /// The <see cref="MobileContext" /> who opened this ContextMenu.
+    /// The <see cref="Mobile" /> who opened this ContextMenu.
     /// <seealso cref="From" />
     /// </param>
     /// <param name="target">
-    /// The <see cref="MobileContext" /> or <see cref="ItemContext" /> for which this ContextMenu is on.
+    /// The <see cref="Mobile" /> or <see cref="Item" /> for which this ContextMenu is on.
     /// <seealso cref="Target" />
     /// </param>
-    public ContextMenu(MobileContext from, object target)
+    public ContextMenu(Mobile from, object target)
     {
         From = from;
         Target = target;
 
         List<ContextMenuEntry> list = new();
 
-        if (target is MobileContext)
+        if (target is Mobile)
         {
             //((Mobile)target).GetContextMenuEntries(from, list);
         }
-        else if (target is ItemContext)
+        else if (target is Item)
         {
             //((Item)target).GetContextMenuEntries(from, list);
         }

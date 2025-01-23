@@ -3,7 +3,7 @@ using Client.Networking.Packets;
 public sealed class ClientVersionEventArgs : EventArgs
 {
     [PacketHandler(0xBD, length: 3, ingame: false)]
-    public static event PacketEventHandler<ClientVersionEventArgs>? OnUpdate;
+    private static event PacketEventHandler<ClientVersionEventArgs>? Update;
     public NetState State { get; }
     public string Text { get; }
     internal ClientVersionEventArgs(NetState state, PacketReader ip)
@@ -11,6 +11,6 @@ public sealed class ClientVersionEventArgs : EventArgs
         State = state;
         Text = Application.ClientVersion.ToString();
     }
-    static ClientVersionEventArgs() => OnUpdate += ClientVersionEventArgs_OnUpdate;
+    static ClientVersionEventArgs() => Update += ClientVersionEventArgs_OnUpdate;
     private static void ClientVersionEventArgs_OnUpdate(ClientVersionEventArgs e) => e.State?.Send(new PClientVersion(e));
 }

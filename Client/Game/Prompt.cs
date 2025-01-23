@@ -1,11 +1,14 @@
 ﻿namespace Client.Game;
+using System;
 using Client.Networking;
-using Client.Networking.Arguments;
-public static class Prompt
+public partial class Prompt
 {
-    [PacketHandler(0x9A, length: -1, ingame: true)]
-    public static event PacketEventHandler<PromptAsciiEventArgs>? UpdateASCII;
-
-    [PacketHandler(0xC2, length: -1, ingame: true)]
-    public static event PacketEventHandler<PromptUnicodeEventArgs>? OnUnicode;
+    internal static void OnASCII(NetState state, int serial, int promptID, string? text)
+    {
+        throw new NotImplementedException();
+    }
+    internal static void OnUnicode(NetState state, int serial, int promptID)
+    {
+        throw new NotImplementedException();
+    }
 }

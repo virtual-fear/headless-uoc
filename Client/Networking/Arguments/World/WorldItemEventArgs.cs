@@ -1,7 +1,10 @@
-﻿using Serial = Client.Game.Data.Serial;
+﻿using Client.Game;
+using Serial = Client.Game.Data.Serial;
 namespace Client.Networking.Arguments;
 public sealed class WorldItemEventArgs : EventArgs
 {
+    [PacketHandler(0x1A, length: -1, ingame: true)]
+    public static event PacketEventHandler<WorldItemEventArgs>? Update;
     public NetState State { get; }
     public Serial Serial { get; }
     public short ItemID { get; }
@@ -60,4 +63,6 @@ public sealed class WorldItemEventArgs : EventArgs
         if (hasFlags)
             flags = ip.ReadByte();
     }
+    static WorldItemEventArgs() => Update += WorldItemEventArgs_Update;
+    private static void WorldItemEventArgs_Update(WorldItemEventArgs e) => Item.Acquire(e.Serial).Update(e);
 }

@@ -1,11 +1,14 @@
 ﻿namespace Client.Networking.Arguments;
-public class VendorBuyListEventArgs : EventArgs
+using Client.Game;
+public sealed class VendorBuyListEventArgs : EventArgs
 {
+    [PacketHandler(0x74, length: -1, ingame: true)]
+    private static event PacketEventHandler<VendorBuyListEventArgs>? Update;
     public NetState State { get; }
     public int MenuSerial { get; }
     public int[] Prices { get; }
     public string[] Names { get; }
-    internal VendorBuyListEventArgs(NetState state, PacketReader ip)
+    private VendorBuyListEventArgs(NetState state, PacketReader ip)
     {
         // TODO: Fix localization
         State = state;
@@ -25,4 +28,7 @@ public class VendorBuyListEventArgs : EventArgs
         Prices = p;
         Names = n;
     }
+
+    static VendorBuyListEventArgs() => Update += VendorBuyListEventArgs_Update;
+    private static void VendorBuyListEventArgs_Update(VendorBuyListEventArgs e) => Vendor.OnBuy(e.MenuSerial, e.Names, e.Prices);
 }

@@ -1,19 +1,24 @@
-﻿using MobileContext = Client.Game.Context.MobileContext;
-using Serial = Client.Game.Data.Serial;
-namespace Client.Networking.Arguments;
+﻿namespace Client.Networking.Arguments;
+using Client.Game;
+using Client.Game.Data;
 public sealed class DisplayProfileEventArgs : EventArgs
 {
+    [PacketHandler(0xB8, length: -1, ingame: true)]
+    public static event PacketEventHandler<DisplayProfileEventArgs> Update;
     public NetState State { get; }
-    public MobileContext? Mobile { get; }
-    public string? Header { get; }
-    public string? Footer { get; }
-    public string? Body { get; }
-    internal DisplayProfileEventArgs(NetState state, PacketReader ip)
+    public Mobile Mobile { get; }
+    public string Header { get; }
+    public string Footer { get; }
+    public string Body { get; }
+    private DisplayProfileEventArgs(NetState state, PacketReader ip)
     {
         State = state;
-        Mobile = MobileContext.Acquire((Serial)ip.ReadUInt32());
+        Mobile = Mobile.Acquire((Serial)ip.ReadUInt32());
         Header = ip.ReadString();
         Footer = ip.ReadUnicodeString();
         Body = ip.ReadUnicodeString();
     }
+    static DisplayProfileEventArgs() => Update += DisplayProfileEventArgs_Update;
+    private static void DisplayProfileEventArgs_Update(DisplayProfileEventArgs e)
+        => Display.ShowProfile(e.State, e.Mobile, e.Header, e.Footer, e.Body);
 }

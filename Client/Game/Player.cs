@@ -1,59 +1,72 @@
 ﻿namespace Client.Game;
+using System;
+using System.Collections.Generic;
+using Client.Game.Data;
 using Client.Networking;
 using Client.Networking.Arguments;
 public static class Player
 {
-    //[PacketHandler(0x19, length: 11, ingame: true, extCmd: true)]
-    //public static event PacketEventHandler<BondedStatusEventArgs>? Player_BondedStatus;
+    public static int Combatant { get; internal set; }
+    public static bool IsDead { get; internal set; }
+    public static ToggleSpecialAbilityEventArgs? SpecialAbility { get; internal set; }
+    public static bool Warmode { get; internal set; }
+    internal static void ClearWeaponAbility(NetState state)
+    {
+        throw new NotImplementedException();
+    }
 
-    [PacketHandler(0xBA, length: 6, ingame: true)]
-    public static event PacketEventHandler<CancelArrowEventArgs>? OnCancelArrow;
+    internal static void EquipItem(int mobSerial, int itemSerial, object itemID, Layer layer, short hue)
+    {
+        throw new NotImplementedException();
+    }
 
-    [PacketHandler(0xAA, length: 5, ingame: true)]
-    public static event PacketEventHandler<ChangeCombatantEventArgs>? OnChangeCombatant;
+    internal static void LiftRej(NetState state, LRReason reason)
+    {
+        throw new NotImplementedException();
+    }
 
-    [PacketHandler(0x21, length: 5, ingame: true, extCmd: true)]
-    public static event PacketEventHandler<ClearWeaponAbilityEventArgs>? OnClearWeaponAbility;
+    internal static void OnCancelArrow()
+    {
+        throw new NotImplementedException();
+    }
 
-    [PacketHandler(0x2C, length: 2, ingame: true)]
-    public static event PacketEventHandler<DeathStatusEventArgs>? OnDeathStatus;
+    internal static void OnFight(byte flag, int attacker, int defender)
+    {
+        throw new NotImplementedException();
+    }
 
-    [PacketHandler(0x2E, length: 15, ingame: true)]
-    public static event PacketEventHandler<EquipUpdateEventArgs>? OnEquipmentUpdate;
+    internal static void OnMultiTarget(MultiTargetEventArgs e)
+    {
+        throw new NotImplementedException();
+    }
 
-    [PacketHandler(0x2F, length: 10, ingame: true)] // RunUO: Swing
-    public static event PacketEventHandler<FightingEventArgs>? OnFighting;
+    internal static void OnServerChange(NetState state, IPoint3D location, short xMap, short yMap)
+    {
+        throw new NotImplementedException();
+    }
 
-    [PacketHandler(0x17, length: 12, ingame: true)]
-    public static event PacketEventHandler<HealthbarEventArgs>? UpdateHealthbar;
+    internal static void OnSkillUpdate(NetState state, byte type, List<Networking.Arguments.SkillInfo> skills)
+    {
+        throw new NotImplementedException();
+    }
 
-    [PacketHandler(0x27, length: 2, ingame: true)]
-    public static event PacketEventHandler<LiftRejEventArgs>? OnLiftRej;
+    internal static void OnTarget(NetState state, int targetID, TargetFlags flags)
+    {
+        throw new NotImplementedException();
+    }
 
-    [PacketHandler(0x99, length: 26, ingame: true)]
-    public static event PacketEventHandler<MultiTargetEventArgs>? OnMultiTarget;
+    internal static void Trade(NetState state, int firstContainer, string? name, int them, int secondContainer)
+    {
+        throw new NotImplementedException();
+    }
 
-    [PacketHandler(0x73, length: 2, ingame: true)]
-    public static event PacketEventHandler<PingReqEventArgs>? OnPingAck;
+    internal static void UpdateHealthbar(NetState ns, Mobile mob, HealthbarType type, byte level)
+    {
+        Logger.Log(ns.Address, $"Updating healthbar for mobile: {mob.Serial} ({mob.Name})");
+    }
 
-    [PacketHandler(0x6F, length: -1, ingame: true)]
-    public static event PacketEventHandler<SecureTradeEventArgs>? OnSecureTrade;
-
-    [PacketHandler(0x76, length: 16, ingame: true)]
-    public static event PacketEventHandler<ServerChangeEventArgs>? OnServerChange;
-
-    [PacketHandler(0x3A, length: -1, ingame: true)]
-    public static event PacketEventHandler<SkillUpdateEventArgs>? OnSkillUpdate;
-
-    [PacketHandler(0x1B, length: 23, ingame: true, extCmd: true)]
-    public static event PacketEventHandler<SpellbookContentEventArgs>? UpdateSpellbookContent; // (ext) packetID: 0x1B
-
-    [PacketHandler(0x19, length: 12, ingame: true, extCmd: true)]
-    public static event PacketEventHandler<StatLockInfoEventArgs>? UpdateStatLockInfo; // (ext) packetID: 0x19 (TODO-Fix: Same as bonded status?
-
-    [PacketHandler(0x6C, length: 19, ingame: true)]
-    public static event PacketEventHandler<TargetReqEventArgs>? OnTargetRequest;
-
-    [PacketHandler(0x25, length: 7, ingame: true, extCmd: true)]
-    public static event PacketEventHandler<ToggleSpecialAbilityEventArgs>? OnToggleSpecialAbility;
+    internal static void UpdateSpellbook(NetState state, int item, short graphic, short offset, long content)
+    {
+        throw new NotImplementedException();
+    }
 }

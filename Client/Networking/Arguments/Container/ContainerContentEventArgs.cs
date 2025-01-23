@@ -1,10 +1,13 @@
-﻿using ContainerItem = Client.Game.Data.ContainerItem;
-namespace Client.Networking.Arguments;
+﻿namespace Client.Networking.Arguments;
+using Client.Game;
+using Client.Game.Data;
 public sealed class ContainerContentEventArgs : EventArgs
 {
+    [PacketHandler(0x3C, length: -1, ingame: true)]
+    private static event PacketEventHandler<ContainerContentEventArgs>? Update;
     public NetState State { get; }
-    public ContainerItem[]? Items { get; }
-    internal ContainerContentEventArgs(NetState state, PacketReader pvSrc)
+    public ContainerItem[] Items { get; }
+    private ContainerContentEventArgs(NetState state, PacketReader pvSrc)
     {
         State = state;
         ContainerItem[] items = new ContainerItem[pvSrc.ReadUInt16()];
@@ -23,4 +26,8 @@ public sealed class ContainerContentEventArgs : EventArgs
         }
         Items = items;
     }
+
+    static ContainerContentEventArgs() => Update += ContainerContentEventArgs_Update;
+    private static void ContainerContentEventArgs_Update(ContainerContentEventArgs e)
+        => Container.DisplayContent(e.State, e.Items);
 }

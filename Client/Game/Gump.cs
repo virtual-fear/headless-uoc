@@ -8,18 +8,6 @@ public class Gump
     private static readonly string[] m_Strings = new string[] {
         "Dost thou wish to step into the moongate? Continue to enter the gate, Cancel to stay here",
     };
-    #region Networking Events
-
-    [PacketHandler(0x04, length: 13, ingame: true, extCmd: true)]
-    public static event PacketEventHandler<ClosedGumpEventArgs>? OnClose;
-
-    [PacketHandler(0xB0, length: -1, ingame: true)]
-    public static event PacketEventHandler<DisplayGumpEventArgs>? OnDisplayGump;
-
-    [PacketHandler(0xDD, length: -1, ingame: true)]
-    public static event PacketEventHandler<DisplayPackedGumpEventArgs>? OnDisplayPackedGump;
-
-    #endregion
 
     private static byte[]? _compressedBuffer;
     internal static PacketReader GetCompressedReader(PacketReader pvSrc)
@@ -77,5 +65,14 @@ public class Gump
             //GServerGump toAdd = new GServerGump( serial, dialog, xOffset, yOffset, layout, text );
             //Gumps.Desktop.Children.Add( toAdd );
         }
+    }
+    internal static void Close(NetState ns, int typeID, int buttonID)
+    {
+        Logger.Log(ns.Address, $"(Gump) Close typeID:{typeID} buttonID:{buttonID}");
+    }
+
+    internal static void Display(NetState ns, int serial, int typeID, int gumpX, int gumpY, string? layout, string[]? text)
+    {
+        Logger.Log(ns.Address, $"(Gump) Display serial:{serial} typeID:{typeID} gumpX:{gumpX} gumpY:{gumpY} layout:{layout} text:{text}");
     }
 }

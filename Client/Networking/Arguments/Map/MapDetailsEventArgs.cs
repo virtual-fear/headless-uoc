@@ -1,6 +1,8 @@
 ﻿namespace Client.Networking.Arguments;
 public sealed class MapDetailsEventArgs : EventArgs
 {
+    // TODO: Add [PacketHandler]
+    private static event PacketEventHandler<MapDetailsEventArgs>? Update;
     public NetState State { get; }
     public int MapItem { get; set; }
     public int XStart { get; set; }
@@ -11,7 +13,7 @@ public sealed class MapDetailsEventArgs : EventArgs
     public int Height { get; set; }
 
     [Obsolete("Unused", error: true)]
-    public MapDetailsEventArgs(NetState state, PacketReader pvSrc)
+    private MapDetailsEventArgs(NetState state, PacketReader pvSrc)
     {
         State = state;
         MapItem = pvSrc.ReadInt32();
@@ -23,5 +25,10 @@ public sealed class MapDetailsEventArgs : EventArgs
         YEnd = pvSrc.ReadInt16();
         Width = pvSrc.ReadInt16();
         Height = pvSrc.ReadInt16();
+    }
+
+    static MapDetailsEventArgs() => Update += MapDetailsEventArgs_Update;
+    private static void MapDetailsEventArgs_Update(MapDetailsEventArgs e)
+    {
     }
 }

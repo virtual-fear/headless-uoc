@@ -1,18 +1,27 @@
 ﻿namespace Client.Networking.Arguments;
+using Client.Game;
+using Client.Game.Data;
+
 public sealed class LocalizedMessageEventArgs : EventArgs
 {
+    [PacketHandler(0xC1, length: -1, ingame: true)]
+    private static event PacketEventHandler<LocalizedMessageEventArgs>? Update;
     public NetState State { get; }
-    public int Serial { get; }
+    public IEntity Entity { get; }
     public short Graphic { get; }
     public byte MessageType { get; }
     public short Hue { get; }
     public short Font { get; }
     public string? Name { get; }
     public string? Text { get; }
-    internal LocalizedMessageEventArgs(NetState state, PacketReader pvSrc)
+    private LocalizedMessageEventArgs(NetState state, PacketReader pvSrc)
     {
         State = state;
-        Serial = pvSrc.ReadInt32();
+        Serial serial = (Serial)pvSrc.ReadUInt32();
+        if (serial.IsMobile)
+            Entity = Mobile.Acquire(serial);
+        else
+            Entity = Item.Acquire(serial);
         Graphic = pvSrc.ReadInt16();
         MessageType = pvSrc.ReadByte();
         Hue = pvSrc.ReadInt16();
@@ -22,4 +31,7 @@ public sealed class LocalizedMessageEventArgs : EventArgs
         Text = pvSrc.ReadUnicodeStringLE();
     }
 
+    static LocalizedMessageEventArgs() => Update += LocalizedMessageEventArgs_Update;
+    private static void LocalizedMessageEventArgs_Update(LocalizedMessageEventArgs e)
+        => Message.Add(e.State, e.Entity, e.Graphic, e.MessageType, e.Hue, e.Font, e.Name, e.Text, null);
 }

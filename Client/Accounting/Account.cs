@@ -1,6 +1,6 @@
 ﻿namespace Client.Accounting;
 using System.Xml;
-using Client.Game.Context;
+using Client.Game;
 using Client.Game.Data;
 
 public sealed class Account : IAccount, IComparable, IComparable<Account>
@@ -17,7 +17,7 @@ public sealed class Account : IAccount, IComparable, IComparable<Account>
     ///         <para>SA        = 7</para>
     ///     </c>
     /// </summary>
-    public MobileContext[]? Mobiles { get; } = new MobileContext[5]; // 1, 5, or 7 (all other values are not supported)
+    public Mobile[]? Mobiles { get; } = new Mobile[5]; // 1, 5, or 7 (all other values are not supported)
     public Account(string username, string password)
     {
         Username = username;
@@ -56,13 +56,13 @@ public sealed class Account : IAccount, IComparable, IComparable<Account>
     /// Gets or sets the character at the specified index for this account.
     /// Out of bound index values are handled; null returned for get, ignored for set.
     /// </summary>
-    public MobileContext? this[int index]
+    public Mobile? this[int index]
     {
         get
         {
             if (index >= 0 && index < Mobiles?.Length)
             {
-                MobileContext? m = Mobiles[index];
+                Mobile? m = Mobiles[index];
                 if (m != null && m.IsDeleted)
                 {
                     m.Account = null;
@@ -92,10 +92,10 @@ public sealed class Account : IAccount, IComparable, IComparable<Account>
     /// </summary>
     public void Delete()
     {
-        MobileContext[]? mobs = Mobiles;
+        Mobile[]? mobs = Mobiles;
         for (int i = 0; i < mobs?.Length; ++i)
         {
-            MobileContext? m = mobs?[i];
+            Mobile? m = mobs?[i];
             if (m == null)
                 continue;
 
@@ -125,7 +125,7 @@ public sealed class Account : IAccount, IComparable, IComparable<Account>
         xml.WriteStartElement("mobiles");
         for (int i = 0; i < Mobiles?.Length; ++i)
         {
-            MobileContext? m = Mobiles[i];
+            Mobile? m = Mobiles[i];
             //if ((m == null) ||m.Removed) // m.Deleted
             if (m == null)
                 continue;
