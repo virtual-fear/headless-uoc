@@ -15,5 +15,5 @@ public sealed class WeatherEventArgs : EventArgs
     public byte V2 => Buffer?.Length >= 2 ? Buffer[1] : (byte)0;
     public byte V3 => Buffer?.Length >= 3 ? Buffer[2] : (byte)0;
     static WeatherEventArgs() => Update += WeatherEventArgs_Update;
-    private static void WeatherEventArgs_Update(WeatherEventArgs e) => World.Instance.Weather = e;
+    private static void WeatherEventArgs_Update(WeatherEventArgs e) => World.Weather.Value = e;
 }

@@ -12,5 +12,5 @@ public sealed class ChangeUpdateRangeEventArgs : EventArgs
         Value = ip.ReadByte();
     }
     static ChangeUpdateRangeEventArgs() => Update += ChangeUpdateRangeEventArgs_OnUpdate;
-    private static void ChangeUpdateRangeEventArgs_OnUpdate(ChangeUpdateRangeEventArgs e) => World.Instance.TileRange = e.Value;
+    private static void ChangeUpdateRangeEventArgs_OnUpdate(ChangeUpdateRangeEventArgs e) => World.TileRange.Value = e.Value;
 }

@@ -1,7 +1,6 @@
 ﻿namespace Client.Game;
 
 using System;
-using System.Runtime.CompilerServices;
 using Client.Game.Data;
 using Client.Networking;
 using Client.Networking.Arguments;
@@ -11,7 +10,7 @@ public interface IMobileValidator
 }
 public class Mobile : Entity
 {
-    public static Mobile Acquire(Serial serial) => World.WantMobile(serial);
+    public static Mobile Acquire(Serial serial) => World.GetMobile(serial);
 
     #region Fields
     private Direction _direction;
@@ -56,7 +55,7 @@ public class Mobile : Entity
     #endregion
 
     public Mobile(Serial serial) : base(serial) { }
-    public string Name => _name;
+    public string Name => _name ?? "*MOBILE*";
     protected override void OnChangedLocation(IPoint3D from, IPoint3D to)
     {
         base.OnChangedLocation(from, to);

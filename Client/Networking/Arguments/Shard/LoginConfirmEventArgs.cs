@@ -6,7 +6,7 @@ namespace Client.Networking.Arguments;
 public sealed class LoginConfirmEventArgs : EventArgs
 {
     [PacketHandler(0x1B, length: 37, ingame: false)]
-    internal static event PacketEventHandler<LoginConfirmEventArgs>? Update;
+    public static event PacketEventHandler<LoginConfirmEventArgs>? Update;
     public NetState State { get; }
     public Serial Serial { get; }
     public short Body { get; }
@@ -32,5 +32,5 @@ public sealed class LoginConfirmEventArgs : EventArgs
         Height = ip.ReadInt16();
     }
     static LoginConfirmEventArgs() => Update += LoginConfirmEventArgs_Update;
-    private static void LoginConfirmEventArgs_Update(LoginConfirmEventArgs e) => World.WantMobile(e.Serial).Update(e);
+    private static void LoginConfirmEventArgs_Update(LoginConfirmEventArgs e) => World.GetMobile(e.Serial).Update(e);
 }

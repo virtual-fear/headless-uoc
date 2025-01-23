@@ -4,6 +4,7 @@ public sealed class CreateWorldEntityEventArgs
 {
     [PacketHandler(0xF3, length: 26, ingame: true)]
     public static event PacketEventHandler<CreateWorldEntityEventArgs>? Update;
+    public NetState State { get; }
     public int Type { get; }
     public int GraphicsID { get; }
     public ushort Amount { get; }
@@ -11,8 +12,9 @@ public sealed class CreateWorldEntityEventArgs
     public byte Light { get; }
     public int Flags { get; }
     public ushort ItemID { get; }
-    private CreateWorldEntityEventArgs(NetState ns, PacketReader pvSrc, bool isHS = false)
+    private CreateWorldEntityEventArgs(NetState state, PacketReader pvSrc, bool isHS = false)
     {
+        State = state;
         if (pvSrc.ReadInt16() != 0x1)
         {
             pvSrc.Trace();

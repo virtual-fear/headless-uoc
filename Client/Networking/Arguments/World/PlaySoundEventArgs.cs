@@ -23,5 +23,5 @@ public sealed class PlaySoundEventArgs : EventArgs
     }
 
     static PlaySoundEventArgs() => Update += PlaySoundEventArgs_Update;
-    private static void PlaySoundEventArgs_Update(PlaySoundEventArgs e) => World.PlaySound(e);
+    private static void PlaySoundEventArgs_Update(PlaySoundEventArgs e) => World.PlayAudio(e);
 }

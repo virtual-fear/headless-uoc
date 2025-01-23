@@ -16,5 +16,5 @@ public sealed class DamageEventArgs : EventArgs
         Amount = ip.ReadByte();
     }
     static DamageEventArgs() => Update += DamageEventArgs_OnUpdate;
-    private static void DamageEventArgs_OnUpdate(DamageEventArgs e) => World.WantMobile(serial: e.Mobile).Update(e);
+    private static void DamageEventArgs_OnUpdate(DamageEventArgs e) => World.GetMobile(serial: e.Mobile).Update(e);
 }

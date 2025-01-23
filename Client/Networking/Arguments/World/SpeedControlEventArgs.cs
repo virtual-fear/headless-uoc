@@ -12,5 +12,5 @@ public sealed class SpeedControlEventArgs : EventArgs
         Value = ip.ReadByte();
     }
     static SpeedControlEventArgs() => Update += SpeedControlEventArgs_Update;
-    private static void SpeedControlEventArgs_Update(SpeedControlEventArgs e) => World.Instance.SpeedControl = e.Value;
+    private static void SpeedControlEventArgs_Update(SpeedControlEventArgs e) => World.SpeedControl.Value = e.Value;
 }

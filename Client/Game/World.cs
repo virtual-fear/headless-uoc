@@ -9,25 +9,29 @@ using Client.Networking.Arguments;
 
 public delegate void WorldEventHandler(World w);
 public delegate void WorldEventChangedValue<T>(World w, T from, T? to);
+public sealed class WorldProperty<T> : ObservableProperty<World, T>
+{
+    internal WorldProperty(T? initialValue = default) : base(World.Instance, initialValue) { }
+
+}
 public partial class World : Entity
 {
     public const uint ItemOffset = 0x40000000;
     public const uint MaxItemSerial = 0x7EEEEEEE;
 
-    public static event WorldEventChangedValue<Mobile>? ChangedCurrentPlayer;
-    public static event WorldEventChangedValue<byte>? ChangedTileRange;
-    public static event WorldEventChangedValue<int>? ChangedSpeed;
-    public static event WorldEventChangedValue<sbyte>? ChangedGlobalLightValue;
-    public static event WorldEventChangedValue<sbyte>? ChangedPersonalLightValue;
-    public static event WorldEventChangedValue<byte>? ChangedSeason;
-    public static event WorldEventChangedValue<bool>? ChangedSeasonHasAudio;
-    public static event WorldEventChangedValue<WeatherEventArgs>? ChangedWeather;
+    public static readonly World Instance = new();
+    public static readonly WorldProperty<Mobile> Player = new();
+    public static readonly WorldProperty<byte> TileRange = new(18);
+    public static readonly WorldProperty<int> SpeedControl = new(1);
+    public static readonly WorldProperty<sbyte> GlobalLight = new(1);
+    public static readonly WorldProperty<sbyte> PersonalLight = new(1);
+    public static readonly WorldProperty<byte> Season = new(0);
+    public static readonly WorldProperty<bool> SeasonHasAudio = new(false);
+    public static readonly WorldProperty<WeatherEventArgs?> Weather = new();
 
-    #region Storage for items and mobiles
-
+    #region Dictionary<Serial, Item/Mobile> _worldItems/_worldMobiles
     private static Dictionary<Serial, Item> _worldItems = new();
     private static Dictionary<Serial, Mobile> _worldMobiles = new();
-
     public static Item WantItem(Serial serial)
     {
         Item item;
@@ -54,199 +58,64 @@ public partial class World : Entity
 
         return item;
     }
-    public static Mobile WantMobile(Serial serial)
+    public static Mobile GetMobile(Serial serial)
     {
         Mobile mobile;
-
-        if (!_worldMobiles.TryGetValue(serial, out mobile))
-            _worldMobiles.Add(serial, mobile = new Mobile(serial));
-
-        return mobile;
-    }
-    public static Mobile WantMobile(Serial serial, ref bool wasFound)
-    {
-        wasFound = false;
-        if (_worldMobiles.TryGetValue(serial, out Mobile? mobile))
+        if (_worldMobiles.ContainsKey(serial))
         {
-            wasFound = true;
-            return mobile;
+            mobile = _worldMobiles[serial];
+        } else
+        {
+            mobile = new Mobile(serial);
+            _worldMobiles.Add(serial, mobile);
         }
-        mobile = new Mobile(serial);
-        _worldMobiles.Add(serial, mobile);
         return mobile;
     }
-
     #endregion
-
-
-    private static Mobile? _worldCurrentPlayer;
-    public static Mobile? CurrentPlayer
-    {
-        get => _worldCurrentPlayer;
-        set
-        {
-            var previousValue = _worldCurrentPlayer;
-            _worldCurrentPlayer = value;
-            if (previousValue != null)
-                ChangedCurrentPlayer?.Invoke(World.Instance, previousValue, value);
-        }
-    }
-    public static bool Ingame => CurrentPlayer != null;
-
-    public static readonly World Instance = new();
+    public static bool Ingame => (World.Player.Value != null);
     public World() : base((Serial)0) { }
-    static World()
+    static World() => Configure();
+    private static void Configure()
     {
-        ChangedTileRange += World_ChangedTileRange;
+        Player.ChangedValue += Player_ChangedValue;
+        TileRange.ChangedValue += TileRange_ChangedValue;
+        SpeedControl.ChangedValue += SpeedControl_ChangedValue;
+        GlobalLight.ChangedValue += GlobalLight_ChangedValue;
+        PersonalLight.ChangedValue += PersonalLight_ChangedValue;
+        Season.ChangedValue += Season_ChangedValue;
+        SeasonHasAudio.ChangedValue += SeasonHasAudio_ChangedValue;
+        Weather.ChangedValue += Weather_ChangedValue;
     }
-    private static void World_ChangedTileRange(World w, byte from, byte to)
-        => Logger.Log($"The world tile range: {from} now set to {to}");
+    private static void Weather_ChangedValue(World owner, WeatherEventArgs? from, WeatherEventArgs? to)
+        => Logger.Log($"[World] Weather changed from ({from?.V1}, {from?.V2}, {from?.V3}) to ({to?.V1}, {to?.V2}, {to?.V3})");
+    private static void SeasonHasAudio_ChangedValue(World owner, bool from, bool to)
+        => Logger.Log($"[World] Season Audio changed from {from} to {to}");
+    private static void Season_ChangedValue(World owner, byte from, byte to)
+        => Logger.Log($"[World] Season changed from {from} to {to}");
+    private static void PersonalLight_ChangedValue(World owner, sbyte from, sbyte to)
+        => Logger.Log($"[World] Personal light changed from {from} to {to}");
+    private static void GlobalLight_ChangedValue(World owner, sbyte from, sbyte to)
+        => Logger.Log($"[World] Global light changed from {from} to {to}");
+    private static void SpeedControl_ChangedValue(World owner, int from, int to)
+        => Logger.Log($"[World] Speed control changed from {from} to {to}");
+    private static void TileRange_ChangedValue(World owner, byte from, byte to)
+        => Logger.Log($"[World] Tile range changed from {from} to {to}");
+    private static void Player_ChangedValue(World owner, Mobile? from, Mobile? to)
+        => Logger.Log($"[World] Player changed from {from?.Serial} to {to?.Serial}");
     internal static void Pause(NetState ns)
-    {
-        Logger.Log(ns.Address, $"The world has paused.");
-    }
+        => Logger.Log(ns.Address, $"[World] Paused.");
     internal static void CorpseEquip(CorpseEquipEventArgs e)
-    {
-        throw new NotImplementedException();
-    }
-
+        => Logger.Log(e.State, $"[World] Corpse equip: {e.Beheld}");
     internal static void CreateEntity(CreateWorldEntityEventArgs e)
-    {
-        throw new NotImplementedException();
-    }
-
+        => Logger.Log(e.State, $"[World] Creating entity itemID:{e.ItemID}, gfx:{e.GraphicsID}, type:{e.Type}, amt:{e.Amount}");
     internal static void UpdateHouseContent(CustomizedHouseContentEventArgs e)
-    {
-        throw new NotImplementedException();
-    }
-    internal static void PlayMusic(NetState from, MusicName name)
-    {
-        Logger.Log(from.Address, $"Playing music: {name}");
-    }
-
-    internal static void PlaySound(PlaySoundEventArgs e)
-    {
-        throw new NotImplementedException();
-    }
-
+        => Logger.Log(e.State, $"[World] House content updated: {e.Serial}");
+    internal static void PlayAudio(NetState from, MusicName name)
+        => Logger.Log(from.Address, $"Playing music: {name}");
+    internal static void PlayAudio(PlaySoundEventArgs e)
+        => Logger.Log(e.State.Address, $"Playing sound: {e.SoundID}");
     internal static void Remove(Serial serial)
-    {
-        throw new NotImplementedException();
-    }
+        => Logger.Log($"[World] Removing serial: {serial}");
     internal static void LoginComplete(NetState ns)
         => Logger.Log(ns.Address, "Logged in successfully!");
-
-    private byte _worldTileRange = 18;
-    private int _worldSpeedControl = 1;
-    private sbyte _worldGlobalLightValue = 1;
-    private sbyte _worldPersonalLightValue = 1;
-    private byte _worldSeason = 0;
-    private bool _worldSeasonHasAudio = false;
-    private WeatherEventArgs? _worldWeather = null;
-
-    /// <summary>
-    ///     The range of tiles we can view from our player.
-    ///     <para><c>Outside assemblies will not be able to modify this property.</c></para>
-    /// </summary>
-    public byte TileRange
-    {
-        get => _worldTileRange;
-        internal set // Outside assemblies will not be able to modify this property
-        {
-            var oldValue = _worldTileRange;
-            if (oldValue != value)
-            {
-                _worldTileRange = value;
-                Logger.Log($"[World] Range of tiles set to {value}");
-                ChangedTileRange?.Invoke(this, from: oldValue, to: value);
-            }
-        }
-    }
-    public int SpeedControl
-    {
-        get => _worldSpeedControl;
-        internal set
-        {
-            var oldValue = _worldSpeedControl;
-            if (oldValue != value)
-            {
-                _worldSpeedControl = value;
-                Logger.Log($"[World] Speed control changed to {value}");
-                ChangedSpeed?.Invoke(this, from: oldValue, to: value);
-            }
-        }
-    }
-    public sbyte GlobalLightValue
-    {
-        get => _worldGlobalLightValue;
-        internal set
-        {
-            var oldValue = _worldGlobalLightValue;
-            if (oldValue != value)
-            {
-                _worldGlobalLightValue = value;
-                Logger.Log($"The world light value has changed to {value}");
-                ChangedGlobalLightValue?.Invoke(this, from: oldValue, to: value);
-            }
-        }
-    }
-    public sbyte PersonalLightValue
-    {
-        get => _worldPersonalLightValue;
-        internal set
-        {
-            var oldValue = _worldPersonalLightValue;
-            if (oldValue != value)
-            {
-                _worldPersonalLightValue = value;
-                Logger.Log($"Your personal light value has changed to {value}");
-                ChangedPersonalLightValue?.Invoke(this, from: oldValue, to: value);
-            }
-        }
-    }
-    public byte Season
-    {
-        get => _worldSeason;
-        internal set
-        {
-            var oldValue = _worldSeason;
-            if (oldValue != value)
-            {
-                _worldSeason = value;
-                Logger.Log($"The season has changed to {value}");
-                ChangedSeason?.Invoke(this, from: oldValue, to: value);
-            }
-        }
-    }
-    public bool SeasonHasAudio
-    {
-        get => _worldSeasonHasAudio;
-        internal set
-        {
-            var oldValue = _worldSeasonHasAudio;
-            if (oldValue != value)
-            {
-                _worldSeasonHasAudio = value;
-                Logger.Log($"[World] Audio for the season ({(value ? "yes" : "no")})");
-                ChangedSeasonHasAudio?.Invoke(this, from: oldValue, to: value);
-            }
-        }
-    }
-    public WeatherEventArgs? Weather
-    {
-        get => _worldWeather;
-        internal set
-        {
-            var oldValue = _worldWeather;
-            if (oldValue != value)
-            {
-                _worldWeather = value;
-                Logger.Log($"[World] Weather changed to {value}");
-                if (oldValue == null)
-                    return;
-
-                ChangedWeather?.Invoke(this, from: oldValue, to: value);
-            }
-        }
-    }
 }

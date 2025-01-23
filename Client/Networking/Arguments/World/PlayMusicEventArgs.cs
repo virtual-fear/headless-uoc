@@ -14,5 +14,5 @@ public sealed class PlayMusicEventArgs : EventArgs
     }
 
     static PlayMusicEventArgs() => Update += PlayMusicEventArgs_Update;
-    private static void PlayMusicEventArgs_Update(PlayMusicEventArgs e) => World.PlayMusic(from: e.State, e.Name);
+    private static void PlayMusicEventArgs_Update(PlayMusicEventArgs e) => World.PlayAudio(from: e.State, e.Name);
 }
