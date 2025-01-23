@@ -71,8 +71,13 @@ public class Gump
         Logger.Log(ns.Address, $"(Gump) Close typeID:{typeID} buttonID:{buttonID}");
     }
 
-    internal static void Display(NetState ns, int serial, int typeID, int gumpX, int gumpY, string? layout, string[]? text)
+    internal static void Display(NetState ns, int serial, int typeID, int gumpX, int gumpY, string? layout, string[]? lines)
     {
-        Logger.Log(ns.Address, $"(Gump) Display serial:{serial} typeID:{typeID} gumpX:{gumpX} gumpY:{gumpY} layout:{layout} text:{text}");
+        Logger.Log(ns.Address, $"(Gump) Display serial:{serial} typeID:{typeID} gumpX:{gumpX} gumpY:{gumpY} layout:{layout}");
+        if (lines.Length > 0)
+        {
+            for(int i =0; i< lines.Length; i++)
+                Logger.Log(ns.Address, $"(Gump) [{i}] {lines[i]}");
+        }
     }
 }
