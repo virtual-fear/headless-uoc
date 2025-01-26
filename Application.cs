@@ -17,10 +17,10 @@ namespace Client
         public static Object? Instance { get; set; }
 
         // Intended for debugging purposes
-        static Application() => Configure(autoConnect: true);
-        public static void Configure(bool autoConnect = false)
+        static Application() => Configure();
+        private static void Configure()
         {
-            Name = Application.Process.ProcessName;
+            Name = Application.Process.ProcessName.Contains("Godot") ? "Godot" : nameof(Client);
             Thread = Thread.CurrentThread;
             Thread.Name = "Game Thread";
 
@@ -42,13 +42,17 @@ namespace Client
             Logger.Log(version, LogColor.Info);
             Logger.Log($"Running on {RuntimeInformation.FrameworkDescription}", LogColor.Info);
 
-            // Setup the assistant
-            Assistant.Configure();
-            
-            if (autoConnect)
+            // Check to see if we are running in Godot
+            bool runningInGodot = Application.Name.Contains("Godot");
+            if (!runningInGodot)
             {
-                // Run the assistant
+                Assistant.Configure(runningInGodot: false);
+
+                // Immediately connect to the server
                 Task.Run(Assistant.AsyncConnect);
+            } else
+            {
+                Assistant.Configure(runningInGodot: true);
             }
         }
         private static void CurrentDomain_ProcessExit(object? sender, EventArgs e)

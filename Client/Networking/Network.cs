@@ -31,7 +31,7 @@
         public static Socket? Socket { get; private set; }
         public static NetState? State { get; protected set; }
         public static bool IsAttached => State?.IsOpen ?? false;
-        public static async Task AsyncConnect(string textAddress, int port, string un, string pw)
+        public static async Task<bool> AsyncConnect(string textAddress, int port, string un, string pw)
         {
             var info = Network.Info;
             var addr = IPAddress.Parse(textAddress);
@@ -40,24 +40,22 @@
             info.Password = pw;
             info.Seed = 1;
             Network.Info = info;
-            await AsyncConnect();
+            return await AsyncConnect();
         }
-        public static async Task AsyncConnect()
+        public static async Task<bool> AsyncConnect()
         {
-            String processName = Application.Name;
             IPEndPoint serverEP = Network.Info.EndPoint;
             if (Socket == null || Socket.Blocking)
                 Socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
             IAsyncResult asyncResult = Socket.BeginConnect(serverEP, null, null);
-            Logger.Log(processName, $"Establishing connection with {serverEP}", LogColor.Info);
             try
             {
                 Socket.EndConnect(asyncResult);
-                Logger.Log(processName, $"Connected to {serverEP.Address}", LogColor.Success);
+                Logger.Log(serverEP.Address, $"Connection established.", LogColor.Success);
                 Network.Connect(new SocketEventArgs(Socket));
                 if ((State != null) && State.Attach(Socket))
                 {
-                    Logger.Log(Application.Name, $"{State.Address} attached to network.", LogColor.Info);
+                    Logger.Log(State.Address, $"Successfully attached to the network!", LogColor.Info);
                     await Task.Run(delegate ()
                     {
                         lock (Network.ConnectLock)
@@ -69,7 +67,7 @@
                 }
                 else
                 {
-                    Logger.LogError($"{serverEP.Address}: Failed to attach socket to network state.");
+                    Logger.LogError($"{serverEP.Address}: Failed to establish a connection with the server.");
                 }
             }
             catch (SocketException socketError)
@@ -81,7 +79,7 @@
                 Logger.LogError(what: error.Message);
                 State?.Detach();
             }
-            await Task.CompletedTask;
+            return await Task.FromResult(State?.IsOpen ?? false);
         }
         static Network()
         {

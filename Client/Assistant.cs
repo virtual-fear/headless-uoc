@@ -2,8 +2,6 @@ namespace Client
 {
     using System.Net;
     using Client.Accounting;
-    using Client.Game;
-    using Client.Game.Data;
     using Client.Networking;
     using Client.Networking.Arguments;
     using Client.Networking.Data;
@@ -13,15 +11,11 @@ namespace Client
     ///     An event driven network client, built for ModernUO.
     ///     <para>Currently supporting <c>.NET Framework v6.0</c></para>
     ///     It is recommended to use this class to handle and maintain assisted network events.
-    ///     <para>Game events that are network related can be subscribed outside of this class to 
-    ///     interact parallel with external game objects.</para>
     /// </summary>
     public partial class Assistant : Network
     {
         static Assistant()
         {
-            // TODO: Reach out to the user to get the username (or use config file) 
-            // Maybe implement string[] args to get the username and password
             Info = new ConnectInfo()
             {
                 EndPoint = new IPEndPoint(IPAddress.Parse("127.0.0.1"), 2593),
@@ -31,11 +25,13 @@ namespace Client
             };
         }
 
-
-        public static void Configure()
+        public static void Configure(bool runningInGodot)
         {
-            Network.OnAttach += Network_OnAttach;
-
+            if (!runningInGodot)
+            {
+                // Send seed/login packet on the first connection
+                Network.OnAttach += Network_OnAttach;
+            }
             PacketHandlers.RegisterAttributeEvents();
         }
         private static void Network_OnAttach(ConnectionEventArgs e)

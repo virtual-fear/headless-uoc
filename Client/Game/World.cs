@@ -116,6 +116,6 @@ public partial class World : Entity
         => Logger.Log(e.State.Address, $"Playing sound: {e.SoundID}");
     internal static void Remove(Serial serial)
         => Logger.Log($"[World] Removing serial: {serial}");
-    internal static void LoginComplete(NetState ns)
-        => Logger.Log(ns.Address, "Logged in successfully!");
+    internal static void LoginComplete(LoginCompleteEventArgs e)
+        => Logger.Log(e.State.Address, $"{e.Mobile?.Name ?? "<MOBILE>"} logged in successfully!");
 }

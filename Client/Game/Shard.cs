@@ -1,8 +1,8 @@
 ﻿namespace Client.Game;
-
 using System;
 using Client.Networking;
-using Client.Networking.Arguments;
+using Client.Networking.Data;
+
 public partial class Shard
 {
     public static TimeSpan CurrentTime { get; internal set; }

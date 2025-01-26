@@ -9,7 +9,7 @@ public sealed class LoginConfirmEventArgs : EventArgs
     public static event PacketEventHandler<LoginConfirmEventArgs>? Update;
     public NetState State { get; }
     public Serial Serial { get; }
-    public short Body { get; }
+    public short BodyID { get; }
     public IPoint3D Location { get; }
     public Direction Direction { get; }
     public short Width { get; }
@@ -19,7 +19,7 @@ public sealed class LoginConfirmEventArgs : EventArgs
         State = state;
         Serial = (Serial)ip.ReadUInt32();
         ip.Seek(4, SeekOrigin.Current);
-        Body = ip.ReadInt16();
+        BodyID = ip.ReadInt16();
         Location = new Point3D()
         {
             X = ip.ReadInt16(),

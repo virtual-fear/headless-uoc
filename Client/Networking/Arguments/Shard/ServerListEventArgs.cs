@@ -1,6 +1,5 @@
 ﻿namespace Client.Networking.Arguments;
 
-using Client.Game;
 using Client.Networking.Data;
 using Client.Networking.Packets;
 public sealed class ServerListEventArgs : EventArgs
