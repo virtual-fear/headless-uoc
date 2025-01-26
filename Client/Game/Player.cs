@@ -10,6 +10,8 @@ public static class Player
     public static bool IsDead { get; internal set; }
     public static ToggleSpecialAbilityEventArgs? SpecialAbility { get; internal set; }
     public static bool Warmode { get; internal set; }
+    public static Mobile? Mobile { get; internal set; }
+
     internal static void ClearWeaponAbility(NetState state)
     {
         throw new NotImplementedException();

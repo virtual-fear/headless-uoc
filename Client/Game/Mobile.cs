@@ -128,7 +128,7 @@ public class Mobile : Entity
     private void OnHealthChange() => Logger.Log($"({this.Serial}) {_name} health changed to {_hits}");
     internal void Update(LoginConfirmEventArgs e)
     {
-        e.State.Mobile = this;
+        Player.Mobile = e.State.Mobile = this;
         _bodyID = e.BodyID;
         _direction = e.Direction;
         // TODO: Check width/height?
