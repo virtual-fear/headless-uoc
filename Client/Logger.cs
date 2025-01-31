@@ -65,7 +65,8 @@ namespace Client
         public static void Log(object o, string what, LogColor color) => Log($"{Name(o)}: {what}", color);
         public static void Log(string what, LogColor color) => OnLog?.Invoke(color, what);
         public static void Log(string what = "") => OnLog?.Invoke(null, what);
-        public static void Log(object o, string what) => Log($"{Name(o)}: {what}");
+        public static void Log(object o, string what) => Log($"[{Name(o)}] {what}");
+        public static void LogError(object o, string what) => LogError($"{Name(o)}: {what}");
         public static void LogError(string what) => OnLogError?.Invoke(null, what);
         public static void PushWarning(string what) => OnPushWarning?.Invoke(null, what);
     }
