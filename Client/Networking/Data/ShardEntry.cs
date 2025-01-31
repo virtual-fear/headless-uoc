@@ -1,12 +1,12 @@
 ﻿namespace Client.Networking.Data;
-public struct ServerEntry
+public struct ShardEntry
 {
     public uint Index { get; }
     public string Name { get; }
     public uint PercentFull { get; }
     public uint TimeZone { get; }
     public uint Address { get; }
-    public ServerEntry(uint index, string name, uint percentFull, uint timeZone, uint address)
+    public ShardEntry(uint index, string name, uint percentFull, uint timeZone, uint address)
     {
         Index = index;
         Name = name;

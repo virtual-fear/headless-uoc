@@ -6,29 +6,24 @@ public sealed class CharInfo
     public NetState State { get; }
     public int Index { get; }
     public string Name { get; }
-    private CharInfo(NetState ns, int index, string name)
+    CharInfo(NetState state, int index, string name)
     {
-        State = ns;
+        State = state;
         Index = index;
         Name = name;
     }
     public void Play() => State.Send(PPlayCharacter.Instantiate(this));
-    public static CharInfo[] Instantiate(NetState state, PacketReader pvSrc)
+    public static CharInfo[] Construct(NetState state, PacketReader pvSrc)
     {
-        List<CharInfo> list = new List<CharInfo>();
+        List<CharInfo> list = new();
         int c = pvSrc.ReadByte();
-
-        for (int i = 0; i < c; i++)
+        for (int idx = 0; idx < c; idx++)
         {
             string un = pvSrc.ReadString(30).TrimEnd('\0');
             pvSrc.ReadString(30);
-
-            if (string.IsNullOrEmpty(un))
-                continue;
-
-            list.Add(new CharInfo(state, i, un));
+            if (string.IsNullOrEmpty(un)) continue;
+            list.Add(new CharInfo(state, idx, un));
         }
-
         return list.ToArray();
     }
 }

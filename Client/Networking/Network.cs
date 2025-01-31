@@ -31,14 +31,12 @@
         public static Socket? Socket { get; private set; }
         public static NetState? State { get; protected set; }
         public static bool IsAttached => State?.IsOpen ?? false;
-        public static async Task<bool> AsyncConnect(string textAddress, int port, string un, string pw)
+        public static async Task<bool> AsyncConnect(IPEndPoint ipep, string un, string pw)
         {
             var info = Network.Info;
-            var addr = IPAddress.Parse(textAddress);
-            info.EndPoint = new IPEndPoint(addr, port);
+            info.EndPoint = ipep;
             info.Username = un;
             info.Password = pw;
-            info.Seed = 1;
             Network.Info = info;
             return await AsyncConnect();
         }
@@ -63,7 +61,7 @@
                             while ((State != null) && State.IsOpen)
                                 State.Slice();
                         }
-                    });//.GetAwaiter().GetResult();
+                    });
                 }
                 else
                 {
@@ -86,16 +84,6 @@
             OnConnect += Network_OnConnect;
             OnDisconnect += Network_OnDisconnect;
             OnConstruct += Network_OnConstruct;
-            OnDetach += Network_OnDetach;
-        }
-
-        private static void Network_OnDetach(NetState ns)
-        {
-            OnDetach -= Network_OnDetach;
-            Logger.Log($"{ns.Address}: Detached network state");
-
-            // Reconnect with the seed
-            Task.Run(AsyncConnect);
         }
         private static void Network_OnConstruct(NetState ns) => Logger.Log(Application.Name, "Constructed network state.", LogColor.Info);
         private static void Network_OnDisconnect(SocketEventArgs e) => Logger.Log(Application.Name, $"{e.Address} disconnected from the server.");

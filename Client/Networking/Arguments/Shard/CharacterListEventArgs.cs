@@ -1,6 +1,5 @@
-﻿using CharInfo = Client.Game.Data.CharInfo;
-using CityInfo = Client.Game.Data.CityInfo;
-namespace Client.Networking.Arguments;
+﻿namespace Client.Networking.Arguments;
+using Client.Game.Data;
 public sealed class CharacterListEventArgs : EventArgs
 {
     [PacketHandler(0xA9, length: -1, ingame: false)]
@@ -9,11 +8,11 @@ public sealed class CharacterListEventArgs : EventArgs
     public IEnumerable<CharInfo>? Characters { get; }
     public IEnumerable<CityInfo>? Cities { get; }
     public int Flags { get; }
-    internal CharacterListEventArgs(NetState state, PacketReader ip)
+    CharacterListEventArgs(NetState state, PacketReader ip)
     {
         State = state;
-        Characters = CharInfo.Instantiate(state, ip);
-        Cities = CityInfo.Instantiate(ip);
+        Characters = CharInfo.Construct(state, ip);
+        Cities = CityInfo.Construct(ip);
         Flags = ip.ReadInt32(); // CharacterListFlags
         ip.ReadInt16();         // (ushort)-1
     }

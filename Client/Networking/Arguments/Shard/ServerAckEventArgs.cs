@@ -24,7 +24,8 @@ internal sealed class ServerAckEventArgs : EventArgs
         info.Seed = e.Seed;
         info.Stage = ConnectionAck.SecondLogin;
         Network.Info = info;
-        Network.Socket?.Disconnect(reuseSocket: true);
-        await Task.CompletedTask;
+        Network.State?.Detach();
+        // Reconnect with the seed
+        await Task.Run(Assistant.AsyncConnect);
     }
 }

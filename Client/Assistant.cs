@@ -31,12 +31,23 @@ namespace Client
             {
                 // Send seed/login packet on the first connection
                 Network.OnAttach += Network_OnAttach;
+
+                // Reconnect to the server after sending our seed and login packet
+                Network.OnDetach += Network_OnDetach;
             }
             PacketHandlers.RegisterAttributeEvents();
         }
+
+        private static void Network_OnDetach(NetState ns)
+        {
+            Logger.Log(Application.Name, $"{ns.Address} detached network state.", LogColor.Info);
+
+            // Reconnect with the seed
+            Task.Run(AsyncConnect);
+        }
         private static void Network_OnAttach(ConnectionEventArgs e)
         {
-            Logger.Log(Application.Name, $"{e.State.Address} attached to network state.", LogColor.Info);
+            Logger.Log(Application.Name, $"{e.State.Address} attached network state.", LogColor.Info);
             ConnectInfo info = Network.Info;
             string username = info.Username ?? string.Empty;
             string password = info.Password ?? string.Empty;
