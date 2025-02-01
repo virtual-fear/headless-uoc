@@ -33,7 +33,7 @@ public sealed class ShardListEventArgs : EventArgs
     static ShardListEventArgs() => Update += ShardListEventArgs_Update;
     private static void ShardListEventArgs_Update(ShardListEventArgs e)
     {
-        ShardList.View.Shards = e.ShardEntries;
+        ShardList.Current.Shards = e.ShardEntries;
 
         // Automatically connect to the first shard when Godot is not being used!
         if (Application.Instance == null)
