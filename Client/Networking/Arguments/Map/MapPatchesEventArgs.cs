@@ -29,5 +29,5 @@ public sealed class MapPatchesEventArgs : EventArgs
 
     static MapPatchesEventArgs() => Update += MapPatchesEventArgs_Update;
     private static void MapPatchesEventArgs_Update(MapPatchesEventArgs e)
-        => Map.Patches(e.State, e.Table);
+        => Map.InvokePatches(e.State, e.Table);
 }

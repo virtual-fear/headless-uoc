@@ -1,20 +1,17 @@
-﻿namespace Client.Game;
-using System.Collections;
+﻿using System.Collections;
 using Client.Networking;
-public class Map
+namespace Client.Game;
+public partial class Map
 {
-    internal static void Change(NetState ns, byte index)
+    internal static void InvokeChange(NetState state, byte index)
     {
-        Logger.Log(ns.Address, $"Changed map index to {index}");
     }
 
-    internal static void Command(NetState ns, int mapItem, byte cmd, byte number, int x, int y)
+    internal static void InvokeCommand(NetState state, int mapItem, byte command, byte number, int x, int y)
     {
-        Logger.Log(ns.Address, $"Map item {mapItem} command {cmd} number {number} x {x} y {y}");
     }
 
-    internal static void Patches(NetState ns, Hashtable? table)
+    internal static void InvokePatches(NetState state, Hashtable? table)
     {
-        Logger.Log(ns.Address, "Received map patches");
     }
 }

@@ -13,5 +13,5 @@ public sealed class MapChangeEventArgs : EventArgs
     }
     static MapChangeEventArgs() => Update += MapChangeEventArgs_Update;
     private static void MapChangeEventArgs_Update(MapChangeEventArgs e)
-        => Map.Change(e.State, e.Index);
+        => Map.InvokeChange(e.State, e.Index);
 }

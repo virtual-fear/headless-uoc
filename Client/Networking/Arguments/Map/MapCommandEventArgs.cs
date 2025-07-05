@@ -23,5 +23,5 @@ public sealed class MapCommandEventArgs : EventArgs
 
     static MapCommandEventArgs() => Update += MapCommandEventArgs_Update;
     private static void MapCommandEventArgs_Update(MapCommandEventArgs e)
-        => Map.Command(e.State, e.MapItem, e.Command, e.Number, e.X, e.Y);
+        => Map.InvokeCommand(e.State, e.MapItem, e.Command, e.Number, e.X, e.Y);
 }
