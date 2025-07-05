@@ -12,6 +12,7 @@ public sealed class CreateWorldEntityEventArgs
     public byte Light { get; }
     public int Flags { get; }
     public ushort ItemID { get; }
+    private CreateWorldEntityEventArgs(NetState state, PacketReader pvSrc) : this(state, pvSrc, isHS: false) { }
     private CreateWorldEntityEventArgs(NetState state, PacketReader pvSrc, bool isHS = false)
     {
         State = state;
