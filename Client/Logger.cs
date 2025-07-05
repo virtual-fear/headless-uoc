@@ -1,4 +1,6 @@
-﻿namespace Client
+﻿using System.Net;
+
+namespace Client
 {
     public enum LogColor
     {
@@ -17,8 +19,16 @@
         public static event EventHandler<string>? OnLog;
         public static event EventHandler<string>? OnLogError;
         public static event EventHandler<string>? OnPushWarning;
-        private static string Name(object o) => o is string s ? s : o is Type t ? t.Name : o == null ? "o" : o.GetType().Name;
-        static Logger()
+        private static string Name(object o) // => o is string s ? s : o is Type t ? t.Name : o == null ? "o" : o.GetType().Name;
+            => o switch
+            {
+                string s => s,
+                IPAddress addr => addr.ToString(),
+                Type t => t.Name,
+                _ => o.GetType().Name
+            };
+
+            static Logger()
         {
             // When using the Godot instance we don't want to write to the console.
             if (Application.Instance == null)
@@ -55,7 +65,8 @@
         public static void Log(object o, string what, LogColor color) => Log($"{Name(o)}: {what}", color);
         public static void Log(string what, LogColor color) => OnLog?.Invoke(color, what);
         public static void Log(string what = "") => OnLog?.Invoke(null, what);
-        public static void Log(object o, string what) => Log($"{Name(o)}: {what}");
+        public static void Log(object o, string what) => Log($"[{Name(o)}] {what}");
+        public static void LogError(object o, string what) => LogError($"{Name(o)}: {what}");
         public static void LogError(string what) => OnLogError?.Invoke(null, what);
         public static void PushWarning(string what) => OnPushWarning?.Invoke(null, what);
     }

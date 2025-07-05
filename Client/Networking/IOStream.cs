@@ -5,8 +5,8 @@ using Client.Cryptography.Impl;
 using Client.IO;
 using Client.Networking.Arguments;
 using Client.Networking.Data;
-using Client.Networking.Outgoing;
-using static Client.Networking.Outgoing.PLoginGame;
+using Client.Networking.Packets;
+using static Client.Networking.Packets.PLoginGame;
 public abstract class IOStream
 {
     public static IOStream Construct() => new DefaultIOStream();

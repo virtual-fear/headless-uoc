@@ -1,13 +1,11 @@
-﻿namespace Client.Game.Data.Skilling;
-
-using Client.Game.Context;
+﻿namespace Client.Game.Data;
 public sealed class SkillList
 {
-    public MobileContext Agent { get; }
+    public Mobile Agent { get; }
     public Skill[] Array { get; } = new Skill[SkillInfo.Table.Length];
     public int Capacity { get; set; } = 0x1B58; // 7000
     public int Length => Array.Length;
-    internal SkillList(MobileContext src) => Agent = src;
+    internal SkillList(Mobile src) => Agent = src;
     public Skill? this[SkillName name] => this[skillID: (int)name];
     public Skill? this[int skillID]
     {

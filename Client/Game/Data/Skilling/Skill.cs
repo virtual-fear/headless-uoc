@@ -1,4 +1,4 @@
-﻿namespace Client.Game.Data.Skilling;
+﻿namespace Client.Game.Data;
 public sealed class Skill
 {
     public SkillList Owner { get; }

@@ -1,5 +1,6 @@
 ﻿namespace Client.Networking;
-using Client.Diagnostics;
+using Client.Networking.Diagnostics;
+
 public class Packet
 {
     public byte ID { get; }

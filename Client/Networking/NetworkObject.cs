@@ -6,7 +6,7 @@ namespace Client.Networking;
 
 using Client.Game.Data;
 using Client.Networking.Arguments;
-using PLoginAccount = Outgoing.PLoginAccount;
+using PLoginAccount = Packets.PLoginAccount;
 public sealed class NetworkObject : NetState
 {
     public bool ShouldRebuild { get; private set; } = true;
@@ -72,14 +72,14 @@ public sealed class NetworkObject : NetState
                 m_IsOpen = false;
                 try
                 {
+                    if (m_Socket == null) throw new ArgumentNullException(typeof(Socket).Name);
                     m_Socket.Shutdown(SocketShutdown.Both);
-                }
-                catch { }
-                try
-                {
                     m_Socket.Close();
                 }
-                catch { }
+                catch (Exception ex)
+                {
+                    Logger.LogError(ex.Message);
+                }
                 Network.Detach(this);
             }
         }
@@ -98,7 +98,7 @@ public sealed class NetworkObject : NetState
         {
             if (m_IsOpen)
             {
-                if (Ingame)
+                if (ConfirmedLogin)
                     Logger.LogError($"Reason: {reason}");
                 
                 Detach();
@@ -113,6 +113,7 @@ public sealed class NetworkObject : NetState
             {
                 try
                 {
+
                     m_Socket.BeginReceive(m_RecvBuffer, 0, m_RecvBuffer.Length, SocketFlags.None, m_RecvCallback, null);
                 }
                 catch (Exception exception)
@@ -148,20 +149,24 @@ public sealed class NetworkObject : NetState
     {
         try
         {
-            if (!m_Socket.Connected)
-                throw new SocketException((int)SocketError.ConnectionAborted);
-            
-            int length = m_Socket.EndSend(asyncResult);
-            if (length <= 0)
+            if (m_Socket == null) throw new ArgumentNullException(typeof(Socket).Name);
+            if (m_Socket.Connected)
             {
-                Detach();
-                return;
-            }
+                int length = m_Socket.EndSend(asyncResult);
+                if (length <= 0)
+                {
+                    Detach();
+                    return;
+                }
 
-            var gram = m_Stream.Output.Proceed();
-            if (gram == null)
-                return;
-            Send(gram);
+                var gram = m_Stream.Output.Proceed();
+                if (gram == null)
+                    return;
+                Send(gram);
+            } else
+            {
+                throw new SocketException((int)SocketError.ConnectionAborted);
+            }
         }
         catch (Exception exception)
         {
@@ -175,6 +180,7 @@ public sealed class NetworkObject : NetState
             try
             {
                 Utility.FormatBuffer(Console.Out, buffer, ConsoleColor.DarkMagenta);
+                if (m_Socket == null) throw new ArgumentNullException(typeof(Socket).Name);
                 m_Socket.BeginSend(buffer, 0, buffer.Length, SocketFlags.None, m_SendCallback, null);
             }
             catch (Exception exception)
@@ -271,7 +277,7 @@ public sealed class NetworkObject : NetState
 
                     int length = ph.Length <= 0 ? Stream.Input.GetPacketLength() : ph.Length;
                     var ns = Network.State;
-                    var canRead = length > 0 && (ns != null) && (ns.ConfirmedLogin && length >= 1 || ns.Ingame && length >= 2);
+                    var canRead = length > 0 && (ns != null) && (!ns.CompletedLogin && length >= 1 || ns.ConfirmedLogin && length >= 2);
                     Logger.Log($"Server -> Client: {ph.Name} (0x{packetID:X2}, {ph.Length}).. length:{length} ({(canRead ? "in" : "out-of")})-game", LogColor.Info);
                     if (length < 3 && !canRead)
                     {

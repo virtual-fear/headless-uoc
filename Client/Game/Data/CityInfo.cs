@@ -10,7 +10,7 @@ public sealed class CityInfo
     public int Z { get; }
     public int MapID { get; }
     public int Description { get; }
-    private CityInfo(PacketReader pvSrc)
+    CityInfo(PacketReader pvSrc)
     {
         Index = pvSrc.ReadByte();
         City = pvSrc.ReadString(32);
@@ -22,17 +22,15 @@ public sealed class CityInfo
         Description = pvSrc.ReadInt32();
         pvSrc.ReadInt32();  //  0
     }
-    public static CityInfo[] Instantiate(PacketReader pvSrc)
+
+    public static CityInfo[] Construct(PacketReader pvSrc)
     {
         int count = pvSrc.ReadByte();
-        if (count < 2)
-            return new CityInfo[0]; //No cities
-
-        CityInfo[] info = new CityInfo[count - 2];
-        for (int i = 0; i < info.Length; i++)
-            info[i] = new CityInfo(pvSrc);
-
-        return info;
+        if (count < 2) return Array.Empty<CityInfo>(); //No cities
+        CityInfo[] ci = new CityInfo[count - 2];
+        for (int i = 0; i < ci.Length; i++)
+            ci[i] = new CityInfo(pvSrc);
+        return ci;
     }
     public override string ToString() => $"({X}, {Y}, {Z}) {City}, {Building}";
 }

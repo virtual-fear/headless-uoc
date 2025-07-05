@@ -1,6 +1,6 @@
 ﻿using Client.Game;
 
-namespace Client.Game.Data.Skilling;
+namespace Client.Game.Data;
 public delegate void SkillInfoCallback(SkillInfo info, Mobile from);
 public sealed class SkillInfo
 {

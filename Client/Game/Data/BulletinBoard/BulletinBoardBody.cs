@@ -1,4 +1,4 @@
-﻿namespace Client.Game.Data.BulletinBoard;
+﻿namespace Client.Game.Data;
 public sealed class BulletinBoardBody
 {
     public BulletinBoardAppearance Appearance { get; }
