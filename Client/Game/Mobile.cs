@@ -177,15 +177,15 @@ public class Mobile : Entity
     }
     internal void UpdateHealth(short hits, short hitsMax)
     {
-        throw new NotImplementedException();
+        Logger.Log(NetState.ClientIP, $"Updating health: {hits}, max-value: {hitsMax}");
     }
     internal void UpdateMana(short mana, short manaMax)
     {
-        throw new NotImplementedException();
+        Logger.Log(NetState.ClientIP, $"Updating mana: {mana}, max-value: {manaMax}");
     }
     internal void UpdateIncoming(MobileIncomingEventArgs e)
     {
-        throw new NotImplementedException();
+        Logger.Log(e.State.Address, $"Updating incoming mobile: {e.Body}, dir: {e.Direction}, hue: {e.Hue}, noto: {e.Notoriety}, loc: ({e.Location.X}, {e.Location.Y}, {e.Location.Z})");
     }
     internal void UpdateStamina(NetState ns, short stamina, short maxValue)
     {
@@ -206,15 +206,15 @@ public class Mobile : Entity
     }
     internal static void OnMovementAck(NetState ns, byte sequence, Notoriety notoriety)
     {
-        throw new NotImplementedException();
+        Logger.Log(ns.Address, $"Movement ack-seq {sequence}, noto: {notoriety}");
     }
     internal static void OnMovementRej(NetState ns, byte sequence, Direction direction, IPoint3D location)
     {
-        throw new NotImplementedException();
+        Logger.Log(ns.Address, $"Movement rej-seq {sequence}, dir: {direction}, loc: ({location.X}, {location.Y}, {location.Z})");
     }
     internal void UpdateAnimation(NetState ns, byte status, byte animation, byte frame)
     {
-        throw new NotImplementedException();
+        Logger.Log(ns.Address, $"Updating anim-status {status}, animation: {animation}, frame: {frame}");
     }
     internal void OnMove(NetState ns, short bodyID, short hue, byte packetFlags, Notoriety noto, Direction dir, IPoint3D loc)
     {
