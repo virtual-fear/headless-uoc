@@ -22,12 +22,12 @@ namespace Client
         {
             Thread = Thread.CurrentThread;
             Thread.Name = "Game Thread";
-
+             
             AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
             AppDomain.CurrentDomain.ProcessExit += CurrentDomain_ProcessExit;
 
             Console.OutputEncoding = Encoding.UTF8;
-            Logger.Log($"[https://github.com/virtual-fear/uo-assistant]", LogColor.Success);
+            Logger.Log($"[https://github.com/virtual-fear/headless-uoc]", LogColor.Success);
 
             string majorType = Version.Major switch
             {
