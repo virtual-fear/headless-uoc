@@ -25,19 +25,17 @@ namespace Client
             };
         }
 
-        public static void Configure(bool runningInGodot)
+        public static void Configure()
         {
-            if (!runningInGodot)
-            {
-                // Send seed/login packet on the first connection
-                Network.OnAttach += Network_OnAttach;
+            Network.OnAttach += Network_OnAttach;
+            Network.OnDetach += Network_OnDetach;
 
-                // Reconnect to the server after sending our seed and login packet
-                Network.OnDetach += Network_OnDetach;
-            }
             PacketHandlers.RegisterAttributeEvents();
         }
 
+        /// <summary>
+        ///     Reconnect to the server after sending our seed and login packet
+        /// </summary>
         private static void Network_OnDetach(NetState ns)
         {
             Logger.Log(Application.Name, $"{ns.Address} detached network state.", LogColor.Info);
@@ -45,6 +43,11 @@ namespace Client
             // Reconnect with the seed
             Task.Run(AsyncConnect);
         }
+
+        /// <summary>
+        ///     Sends the inital seed and login packet when the network gets attached
+        /// </summary>
+        /// <exception cref="ArgumentNullException"/>
         private static void Network_OnAttach(ConnectionEventArgs e)
         {
             Logger.Log(Application.Name, $"{e.State.Address} attached network state.", LogColor.Info);

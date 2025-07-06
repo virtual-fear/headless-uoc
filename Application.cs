@@ -20,7 +20,6 @@ namespace Client
         static Application() => Configure();
         private static void Configure()
         {
-            Name = Application.Process.ProcessName.Contains("Godot") ? "Godot" : nameof(Client);
             Thread = Thread.CurrentThread;
             Thread.Name = "Game Thread";
 
@@ -28,7 +27,7 @@ namespace Client
             AppDomain.CurrentDomain.ProcessExit += CurrentDomain_ProcessExit;
 
             Console.OutputEncoding = Encoding.UTF8;
-            Logger.Log($"[https://github.com/godot-this/uo-assistant]", LogColor.Success);
+            Logger.Log($"[https://github.com/virtual-fear/uo-assistant]", LogColor.Success);
 
             string majorType = Version.Major switch
             {
@@ -38,22 +37,14 @@ namespace Client
                 _ => "dev build"
             };
 
+            Logger.Log($"Running on {RuntimeInformation.OSDescription} ({(Is64Bit ? "64-bit" : "32-bit")})", LogColor.Info);
             string version = $"Version: {Version.Major}.{Version.Minor}.{Version.Build}.{Version.Revision} ({majorType})";
             Logger.Log(version, LogColor.Info);
-            Logger.Log($"Running on {RuntimeInformation.FrameworkDescription}", LogColor.Info);
 
-            // Check to see if we are running in Godot
-            bool runningInGodot = Application.Name.Contains("Godot");
-            if (!runningInGodot)
-            {
-                Assistant.Configure(runningInGodot: false);
+            Assistant.Configure();
 
-                // Immediately connect to the server
-                Task.Run(Assistant.AsyncConnect);
-            } else
-            {
-                Assistant.Configure(runningInGodot: true);
-            }
+            // Immediately connect to the server
+            Task.Run(Assistant.AsyncConnect);
         }
         private static void CurrentDomain_ProcessExit(object? sender, EventArgs e)
         {
